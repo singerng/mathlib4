@@ -74,6 +74,52 @@ structure Measure (α : Type*) [MeasurableSpace α] extends OuterMeasure α wher
 /-- Notation for `Measure` with respect to a non-standard σ-algebra in the domain. -/
 scoped notation "Measure[" mα "]" α:arg => @Measure α mα
 
+end MeasureTheory
+
+namespace Mathlib.Meta
+open Lean Elab Term Meta Qq
+
+/-- Try to elaborate `μ` as a term of type `T` where `OuterMeasureClass T ?Ω`. If that fails, try to
+elaborate `μ` as `Measure ?Ω`. -/
+def elabMeasure (μ : TSyntax `term) : TermElabM Expr := do
+  let ⟨u, T, _⟩ ← inferTypeQ (← elabTerm μ none)
+  match u, T with
+  | .succ v, ~q(OuterMeasure $α) => elabTerm μ <| .some q(OuterMeasure $α)
+  | .succ v, _ =>
+    let ty ← mkFreshExprMVarQ <| mkSort v.succ
+    elabTerm μ q(MeasureTheory.Measure $ty)
+
+/-- `∀ᵐ a ∂μ, p a` means that `p a` for a.e. `a`, i.e. `p` holds true away from a null set.
+
+This is notation for `Filter.Eventually p (MeasureTheory.ae μ)`. -/
+notation3 "∀ᵐ "(...)" ∂"μ", "r:(scoped p => Filter.Eventually p <| MeasureTheory.ae μ) => r
+
+/-- `∃ᵐ a ∂μ, p a` means that `p` holds `∂μ`-frequently,
+i.e. `p` holds on a set of positive measure.
+
+This is notation for `Filter.Frequently p (MeasureTheory.ae μ)`. -/
+notation3 "∃ᵐ "(...)" ∂"μ", "r:(scoped P => Filter.Frequently P <| MeasureTheory.ae μ) => r
+
+/-- `f =ᵐ[μ] g` means `f` and `g` are eventually equal along the a.e. filter,
+i.e. `f=g` away from a null set.
+
+This is notation for `Filter.EventuallyEq (MeasureTheory.ae μ) f g`. -/
+syntax:50 (name := aeeq) term:50 " =ᵐ[" term:50 "] " term:50 : term
+
+/-- Elaborate almost everywhere equal notation.
+
+We elabore `f =ᵐ[μ] g` as `Filter.EventuallyEq (MeasureTheory.ae μ) f g`. -/
+@[term_elab aeeq]
+def elabAEEq : TermElab
+  | `($f =ᵐ[$μ] $g), expectedType? => do
+    let μ' ← elabMeasure μ
+    elabTerm (← `(Filter.EventuallyEq (MeasureTheory.ae $μ') $f $g)) expectedType?
+  | _, _ => throwUnsupportedSyntax
+
+end Mathlib.Meta
+
+namespace MeasureTheory
+
 theorem Measure.toOuterMeasure_injective [MeasurableSpace α] :
     Injective (toOuterMeasure : Measure α → OuterMeasure α)
   | ⟨_, _, _⟩, ⟨_, _, _⟩, rfl => rfl
