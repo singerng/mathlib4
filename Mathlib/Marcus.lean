@@ -680,13 +680,8 @@ theorem Complex.polarCoord_symm_mem_slitPlane (x : ℝ × ℝ) :
   obtain hx | hx | hx := lt_trichotomy x.1 0
   · simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, not_false_eq_true, not_true_eq_false, true_or,
       true_and, false_or, false_and, false_or, and_or_left]
-    -- simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, false_implies, true_implies, not_false_eq_true,
-    --  true_and, false_and, false_or]
-
-
-
-
-
+    rw [or_iff_left]
+    sorry
     sorry
   · simp_rw [hx, lt_self_iff_false, not_false_eq_true, true_or, true_and]
   · sorry
