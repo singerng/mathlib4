@@ -667,13 +667,240 @@ theorem mapToUnitsPowComplex_image_prod (s : Set (InfinitePlace K → ℝ))
   · rintro ⟨_, y, ⟨⟨⟨x, hx, rfl⟩, hy⟩, rfl⟩⟩
     exact ⟨x, y, ⟨hx, hy⟩, rfl⟩
 
+theorem Complex.polarCoord_symm_mem_slitPlane (x : ℝ × ℝ) :
+    Complex.polarCoord.symm x ∈ Complex.slitPlane ↔
+        x.1 ≠ 0 ∧ (x.1 > 0 → ∀ k : ℤ, k * (2 * π) + π ≠ x.2) ∧
+          (x.1 < 0 →  ∀ k : ℤ, k * (2 * π) ≠ x.2) := by
+  rw [← not_iff_not]
+  simp_rw [Complex.mem_slitPlane_iff, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
+    Complex.ofReal_sin, Complex.cos_add_sin_I, Complex.re_ofReal_mul, Complex.exp_ofReal_mul_I_re,
+    Complex.im_ofReal_mul, ne_eq, mul_eq_zero, Complex.exp_ofReal_mul_I_im, mul_pos_iff,
+    Real.sin_eq_zero_iff_cos_eq, not_and_or, not_or, not_and_or, _root_.not_imp, not_forall,
+    not_not]
+  obtain hx | hx | hx := lt_trichotomy x.1 0
+  · simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, not_false_eq_true, not_true_eq_false, true_or,
+      true_and, false_or, false_and, false_or, and_or_left]
+    -- simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, false_implies, true_implies, not_false_eq_true,
+    --  true_and, false_and, false_or]
+
+
+
+
+
+    sorry
+  · simp_rw [hx, lt_self_iff_false, not_false_eq_true, true_or, true_and]
+  · sorry
+#exit
+
+  · simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, not_false_eq_true, false_and, false_implies,
+      true_and, true_implies, false_or, Real.sin_eq_zero_iff_cos_eq]
+    rw [← not_iff_not, not_or, not_not, not_lt, and_or_left, and_iff_right_of_imp]
+    rw [or_iff_left, Real.cos_eq_one_iff, not_forall]
+    simp_rw [not_not]
+    · rw [not_and']
+      intro h
+      rw [h]
+      linarith
+    · intro h
+      rw [h]
+      linarith
+  · simp_rw [hx, lt_self_iff_false, false_and, or_self, false_or, not_true_eq_false, false_and]
+  · simp_rw [hx, not_lt_of_gt hx, ne_of_gt hx, not_false_eq_true, true_and, true_implies, false_and,
+      false_implies, or_false, and_true, Real.sin_eq_zero_iff_cos_eq]
+    rw [← not_iff_not, not_or, not_not, not_lt, and_or_left, and_iff_left_of_imp]
+
+    sorry
+
+#exit
+
+  simp_rw [Complex.mem_slitPlane_iff_arg, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
+    Complex.ofReal_sin, Complex.cos_add_sin_I, ne_eq, mul_eq_zero, Complex.exp_ne_zero, or_false,
+    ← ne_eq, and_comm (b := (x.1 : ℂ) ≠ 0), ne_eq, Complex.ofReal_eq_zero, and_congr_right_iff]
+  intro h
+  obtain h | h := ne_iff_lt_or_gt.mp h
+  ·
+    simp_rw [h, not_lt_of_gt h, true_implies, false_implies, true_and]
+    rw [Complex.arg_eq_pi_iff_lt_zero]
+    rw [Complex.not_lt_zero_iff]
+    rw [show (x.1 : ℂ) = - (- x.1 : ℂ) by sorry, neg_mul, neg_mul]
+    rw [Complex.arg_neg_coe_angle]
+    sorry
+  · simp_rw [← ne_eq, h, not_lt_of_gt h, true_implies, false_implies, and_true,
+      Complex.arg_real_mul _ h, Complex.arg_exp_mul_I]
+
+#exit
+
+  rw [Complex.mem_slitPlane_iff, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
+    Complex.ofReal_sin, Complex.cos_add_sin_I, Complex.mul_re, Complex.ofReal_re,
+    Complex.exp_ofReal_mul_I_re, Complex.ofReal_im, zero_mul, sub_zero, Complex.mul_im,
+    Complex.exp_ofReal_mul_I_im, Complex.ofReal_re, Complex.ofReal_im, zero_mul, add_zero, ne_eq,
+    mul_eq_zero, or_comm, not_or, ← ne_eq, ← ne_eq, Real.sin_ne_zero_iff, mul_pos_iff]
+  obtain hx | hx | hx := lt_trichotomy x.1 0
+  ·
+    have e₁ : x.1 ≠ 0 := sorry
+    have e₂ : ¬ 0 < x.1 := sorry
+    simp_rw [hx, ne_eq, e₁, not_false_eq_true, true_and, true_implies, e₂, false_and, false_or,
+      false_implies, true_and]
+
+    refine ⟨?_, ?_⟩
+    · intro h
+      obtain h | h := h
+      · intro k hk
+        rw [← hk, (Real.cos_eq_one_iff _).mpr ⟨k, by ring⟩] at h
+        linarith
+      · intro k hk
+        specialize h (2 * k)
+        rw [Int.cast_mul, Int.cast_ofNat, hk] at h
+        exact h rfl
+    ·
+      sorry
+  · simp only [hx, lt_self_iff_false, false_and, or_self, ne_eq, not_true_eq_false, gt_iff_lt,
+    false_implies, and_self, and_true]
+  ·
+    sorry
+
+#exit
+
+  simp only [Complex.ofReal_cos, Complex.ofReal_sin, Complex.mul_re, Complex.ofReal_re,
+    Complex.add_re, Complex.I_re, mul_zero, Complex.sin_ofReal_im, Complex.I_im, mul_one,
+    _root_.sub_self, add_zero, Complex.ofReal_im, Complex.add_im, Complex.cos_ofReal_im,
+    Complex.mul_im, zero_add, zero_mul, sub_zero, ne_eq, mul_eq_zero, not_or, gt_iff_lt]
+
+theorem Complex.eq_of_polarCoord_symm (x y : ℝ × ℝ) (hx : x ∈ Set.Ici 0 ×ˢ Set.Icc (-π) π)
+    (hy : y ∈ Complex.polarCoord.target)
+    (hxy : Complex.polarCoord.symm x = Complex.polarCoord.symm y) :
+    x = y := by
+  by_cases h : x ∈ Complex.polarCoord.target
+  · exact Complex.polarCoord.symm.injOn h hy hxy
+  · rw [Complex.polarCoord_target, Set.mem_prod_eq, not_and_or] at h
+    rw [Set.mem_prod_eq] at hx
+    simp_rw [Complex.polarCoord_symm_apply] at hxy
+    obtain h | h := h
+    · exfalso
+      have : x.1 = 0 := by
+        refine eq_of_ge_of_not_gt ?_ ?_
+        exact hx.1
+        exact h
+      rw [this, Complex.ofReal_zero, zero_mul, zero_eq_mul, Complex.ofReal_eq_zero] at hxy
+      obtain h | h := hxy
+      · rw [Complex.polarCoord_target, Set.mem_prod_eq, h] at hy
+        exact Set.not_mem_Ioi_self hy.1
+      · rw [← norm_eq_zero, Complex.norm_eq_abs, Complex.ofReal_cos, Complex.ofReal_sin,
+          Complex.abs_cos_add_sin_mul_I] at h
+        linarith
+    · have : Complex.polarCoord.symm x ∉ Complex.slitPlane := by
+        rw [Complex.mem_slitPlane_iff, not_or, not_lt, ne_eq, not_not, Complex.polarCoord_symm_apply]
+
+        simp only [Complex.ofReal_cos, Complex.ofReal_sin, Complex.mul_re, Complex.ofReal_re,
+          Complex.add_re, Complex.I_re, mul_zero, Complex.sin_ofReal_im, Complex.I_im, mul_one,
+          _root_.sub_self, add_zero, Complex.ofReal_im, Complex.add_im, Complex.cos_ofReal_im,
+          Complex.mul_im, zero_add, zero_mul, sub_zero, mul_eq_zero]
+      have : x.2 ≠ -π → x.2 = π := by
+        intro h'
+        replace hx := hx.2
+        simp at h
+        simp at hx
+        refine le_antisymm ?_ ?_
+        · exact hx.2
+        · apply h
+          rw [lt_iff_le_and_ne]
+          refine ⟨?_, ?_⟩
+          · exact hx.1
+          · exact h'.symm
+      exfalso
+
+      sorry
+
+theorem mapToUnitsPowComplex_prod_indicator
+    {s : Set (InfinitePlace K → ℝ)} {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
+    (ht : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π)
+    (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ))
+    (hx : x ∈ (polarCoordMixedSpace K).target) :
+    (mapToUnitsPowComplex K '' s ×ˢ t).indicator (fun _ ↦ (1 : ENNReal))
+      ((polarCoordMixedSpace K).symm x) =
+      (mapToUnitsPow K '' s).indicator 1 x.1 * t.indicator 1 x.2 := by
+  classical
+  simp_rw [mapToUnitsPowComplex_image_prod,  ← Set.indicator_prod_one, Prod.mk.eta,
+    Set.indicator_apply, Set.mem_image, polarCoordMixedSpace_symm_apply, Prod.mk.inj_iff]
+  refine if_congr ⟨?_, ?_⟩  rfl rfl
+  · rintro ⟨y, hy, ⟨hxy₁, hxy₂⟩⟩
+    suffices y = x by rwa [← this]
+    obtain ⟨⟨c, _, hcy⟩, hy₂⟩ := hy
+    have hxy : ∀ w (hw : IsComplex w), y.1 w = x.1 w ∧ y.2 ⟨w, hw⟩ = x.2 ⟨w, hw⟩ := by
+      intro w hw
+      rw [← Prod.mk.inj_iff]
+      refine toto _ _ ⟨?_, ?_⟩ ?_ ?_
+      · rw [Set.mem_Ici]
+        dsimp only
+        rw [← hcy]
+        exact mapToUnitsPow_nonneg K c w
+      · exact Set.mem_univ_pi.mp (ht hy₂) ⟨w, hw⟩
+      · simp_rw [polarCoordMixedSpace_target, Set.mem_prod, Set.mem_univ_pi, Set.mem_ite_univ_left,
+          not_isReal_iff_isComplex] at hx
+        rw [Complex.polarCoord_target, Set.prod_mk_mem_set_prod_eq]
+        refine ⟨?_, ?_⟩
+        · exact hx.1 w hw
+        · exact hx.2 ⟨w, hw⟩
+      · exact (congr_fun hxy₂ ⟨w, hw⟩)
+    ext w
+    · obtain hw | hw := isReal_or_isComplex w
+      · exact (congr_fun hxy₁ ⟨w, hw⟩)
+      · exact (hxy w hw).1
+    · exact (hxy w.val w.prop).2
+  · intro hx
+    exact ⟨x, hx, by trivial⟩
+
 open Classical in
-theorem toto {s : Set (InfinitePlace K → ℝ)} {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
-    (hs : s ⊆ {x | ∀ w, 0 ≤ x w}) (ht : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
-    (fun x ↦ (mapToUnitsPowComplex K '' s ×ˢ t).indicator (fun x ↦ (1 : ENNReal))
-      ((polarCoordMixedSpace K).symm x)) =ᵐ[volume]
-        fun x ↦ (mapToUnitsPow K '' s).indicator 1 x.1 * t.indicator 1 x.2 := by
-  sorry
+theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → ℝ)}
+    {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
+    (ht : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
+    volume (mapToUnitsPowComplex K '' (s ×ˢ t)) =
+      volume ((Set.univ.pi fun x ↦ Set.Ioo (-π) π) ∩ t) * ∫⁻ x in mapToUnitsPow K '' s,
+        ∏ w : { w : InfinitePlace K // w.IsComplex }, (x w).toNNReal := by
+  rw [← setLIntegral_one, ← lintegral_indicator, lintegral_mixedSpace_eq]
+  rw [polarCoordMixedSpace_target]
+  simp_rw [mapToUnitsPowComplex_prod_indicator K ht _ sorry]
+  rw [volume_eq_prod, ← Measure.prod_restrict, lintegral_prod]
+  simp_rw [lintegral_const_mul' _ _ sorry]
+  simp_rw [← lintegral_indicator _ sorry]
+  simp_rw [Set.indicator_indicator]
+  simp_rw [lintegral_indicator_one sorry]
+  simp_rw [lintegral_indicator _ sorry]
+  simp_rw [← mul_assoc]
+  rw [lintegral_mul_const']
+  rw [mul_comm]
+  rw [← lintegral_indicator, ← lintegral_indicator]
+  conv_lhs =>
+    enter [2, 2, x, 2, x]
+    rw [← Set.indicator_mul_right (i := x) (mapToUnitsPow K '' s)
+      (fun y ↦ ENNReal.ofNNReal (∏ i : {w : InfinitePlace K // IsComplex w}, (y i).toNNReal))]
+  simp_rw [Set.indicator_indicator]
+  simp_rw [ENNReal.coe_finset_prod, Pi.one_apply, mul_one]
+  rw [lintegral_indicator, lintegral_indicator]
+  congr 1
+  · refine setLIntegral_congr ?_
+    rw [ae_eq_set]
+    refine ⟨?_, ?_⟩
+    · rw [Set.diff_eq_empty.mpr, measure_empty]
+      exact Set.inter_subset_right
+    · rw [Set.diff_inter_self_eq_diff]
+      have : mapToUnitsPow K '' s \
+          (Set.univ.pi fun w ↦ if w.IsReal then Set.univ else Set.Ioi 0) ⊆ { 0 } := by
+        rintro _ ⟨⟨x, hx, rfl⟩, hx'⟩
+        rw [Set.mem_singleton_iff]
+        ext w
+        rw [Pi.zero_apply, mapToUnitsPow_zero_iff]
+        simp only [Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left, not_isReal_iff_isComplex,
+          Set.mem_Ioi, true_implies, not_forall, Classical.not_imp, not_lt] at hx'
+        obtain ⟨w, hw, h⟩ := hx'
+        have : mapToUnitsPow K x w = 0 := le_antisymm h (mapToUnitsPow_nonneg K x w)
+        rwa [mapToUnitsPow_zero_iff] at this
+      have := measure_mono (μ := volume) this
+      rw [measure_singleton] at this
+      exact nonpos_iff_eq_zero.mp this
+  all_goals sorry
+
+#exit
 
 theorem normVector_mapToUnitsPowComplex (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
     (fun w ↦ normAtPlace w (mapToUnitsPowComplex K x)) = mapToUnitsPow K x.1 := by
@@ -683,42 +910,6 @@ theorem normVector_mapToUnitsPowComplex (x : (InfinitePlace K → ℝ) × ({w //
   · rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_eq_self.mpr (mapToUnitsPow_nonneg K _ _)]
   · rw [normAtPlace_apply_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
       abs_eq_self.mpr (mapToUnitsPow_nonneg K _ _)]
-
-open Classical in
-theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → ℝ)}
-    {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)} (hs : s ⊆ {x | ∀ w, 0 ≤ x w})
-    (ht : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
-    volume (mapToUnitsPowComplex K '' (s ×ˢ t)) =
-      volume t * ∫⁻ x in mapToUnitsPow K '' s,
-        ∏ w : { w : InfinitePlace K // w.IsComplex }, (x w).toNNReal := by
-  rw [← setLIntegral_one, ← lintegral_indicator, lintegral_mixedSpace_eq]
-  simp only [ENNReal.coe_finset_prod]
-  have := toto K hs ht
-  have := Filter.EventuallyEq.mul
-    (Filter.EventuallyEq.refl _ (fun x ↦ (∏ w : {w // IsComplex w}, (x.1 w.val).toNNReal))) this
-  rw [setLIntegral_congr_fun sorry ((ae_restrict_iff' sorry).mp
-    (Filter.EventuallyEq.restrict this))]
-  clear this
-  rw [polarCoordMixedSpace_target]
-  rw [volume_eq_prod, ← Measure.prod_restrict, lintegral_prod]
-  simp_rw [lintegral_const_mul' _ _ sorry]
-  simp_rw [← lintegral_indicator _ sorry]
-  simp_rw [Set.indicator_indicator]
-  simp_rw [lintegral_indicator _ sorry]
-  simp only [Pi.one_apply, lintegral_const, MeasurableSet.univ, restrict_apply, Set.univ_inter,
-    one_mul]
-  simp_rw [← mul_assoc]
-  rw [lintegral_mul_const']
-  rw [mul_comm]
-  congr 1
-  · sorry
-  · rw [← lintegral_indicator, ← lintegral_indicator]
-    congr with x
-    rw [Set.indicator_mul_right, Set.indicator_indicator]
-    sorry
-    sorry
-    sorry
-  all_goals sorry
 
 open Classical in
 def box₁ : Set (InfinitePlace K → ℝ) :=
@@ -745,11 +936,6 @@ theorem closure_subset_closure :
     have t₂ : ContinuousOn (mapToUnitsPowComplex K) (closure (box K)) := sorry
     have := t₁.image_of_continuousOn t₂
     exact IsCompact.isClosed this
-
--- NOT TRUE
--- theorem box_subset_source :
---     (box K) ⊆ (mapToUnitsPowComplex K).source := by
---   rw [box, box₁, box₂, mapToUnitsPowComplex_source]
 
 theorem normLessThanOnePlus_subset_target :
     normLessThanOnePlus K ⊆ (mapToUnitsPowComplex K).target := sorry

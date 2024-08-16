@@ -3,6 +3,35 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+-- section ComplexOrder
+
+-- open scoped ComplexOrder
+
+-- theorem Complex.nonpos_iff {z : ℂ} :
+--     z ≤ 0 ↔ z.re ≤ 0 ∧ 0 = z.im := by simp [le_def, eq_comm]
+
+-- theorem Complex.neg_iff {z : ℂ} :
+--     z < 0 ↔ z.re < 0 ∧ 0 = z.im := by simp [lt_def, eq_comm]
+
+-- theorem Complex.nonneg_iff_neg_nonpos {z : ℂ} :
+--     0 ≤ z ↔ - z ≤ 0 := by
+--   rw [nonpos_iff, nonneg_iff, neg_re, neg_im, neg_nonpos, zero_eq_neg, eq_comm]
+
+-- theorem Complex.nonpos_iff_neg_nonneg {z : ℂ} :
+--     z ≤ 0 ↔ 0 ≤ - z := by rw [← neg_neg z, ← nonneg_iff_neg_nonpos, neg_neg]
+
+-- theorem Complex.nonneg_real_mul_of_pos_iff {r : ℝ} (hr : 0 < r) (z : ℂ) :
+--     0 ≤ r * z ↔ 0 ≤ z := by
+--   rw [nonneg_iff, re_ofReal_mul, im_ofReal_mul, mul_nonneg_iff_right_nonneg_of_pos hr, zero_eq_mul,
+--     or_iff_right (ne_of_gt hr), eq_comm, nonneg_iff]
+
+-- theorem Complex.nonneg_real_mul_of_neg_iff {r : ℝ} (hr : r < 0) (z : ℂ) :
+--     0 ≤ r * z ↔ z ≤ 0 := by
+--   rw [nonpos_iff_neg_nonneg, ← neg_mul_neg, ← ofReal_neg,
+--     nonneg_real_mul_of_pos_iff (Left.neg_pos_iff.mpr hr)]
+
+-- end ComplexOrder
+
 section Measure
 
 open MeasureTheory MeasureTheory.Measure MeasurableSpace
