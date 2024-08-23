@@ -347,7 +347,7 @@ theorem exists_mem_smul_normEqOne {x : E K} (hx : x ∈ normLessThanOne K) :
   · exact Real.rpow_le_one (mixedEmbedding.norm_nonneg _) hx.2 (inv_nonneg.mpr (Nat.cast_nonneg _))
   · rw [smul_normEqOne K h₂]
     refine ⟨hx.1, ?_⟩
-    rw [← Real.rpow_natCast, ← Real.rpow_mul (mixedEmbedding.norm_nonneg _), inv_mul_cancel h₁,
+    rw [← Real.rpow_natCast, ← Real.rpow_mul (mixedEmbedding.norm_nonneg _), inv_mul_cancel₀ h₁,
       Real.rpow_one]
 
 -- Replace with Set.Ioc?

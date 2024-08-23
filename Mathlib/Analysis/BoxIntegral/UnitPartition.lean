@@ -321,6 +321,7 @@ variable (hs₁ : Bornology.IsBounded s) (hs₂ : MeasurableSet s)
 
 open Filter
 
+include hs₁ hs₂ in
 /-- Let `s` be a bounded, measurable set of `ι → ℝ` ** complete ** -/
 theorem tendsto_tsum_div_pow :
     Tendsto (fun n : ℕ ↦ (∑' x : ↑(s ∩ (n:ℝ)⁻¹ • L), F x) / n ^ card ι)
@@ -343,6 +344,7 @@ theorem tendsto_tsum_div_pow :
   · simp only [IntegrationParams.Riemann] at h
   · simp only [IntegrationParams.Riemann] at h
 
+include hs₁ hs₂ in
 theorem tendsto_card_div_pow' :
     Tendsto (fun n : ℕ ↦ (Nat.card ↑(s ∩ (n:ℝ)⁻¹ • L) : ℝ) / n ^ card ι)
       atTop (nhds (volume s).toReal) := by
@@ -352,6 +354,7 @@ theorem tendsto_card_div_pow' :
 
 variable (hs₃ : ∀ ⦃x y : ℝ⦄, 0 < x → x ≤ y → x • s ⊆ y • s)
 
+include hs₁ hs₂ hs₃ in
 theorem tendsto_card_div_pow :
     Tendsto (fun x : ℝ ↦ (Nat.card ↑(s ∩ x⁻¹ • L) : ℝ) / x ^ card ι)
       atTop (nhds (volume s).toReal) := by

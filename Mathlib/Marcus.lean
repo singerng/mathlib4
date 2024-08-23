@@ -147,7 +147,7 @@ theorem mapToUnitsPow₀_apply (c : {w : InfinitePlace K // w ≠ w₀} → ℝ)
   by_cases hw : w = w₀
   · rw [dif_pos hw, Finset.sum_comm, ← Finset.sum_neg_distrib, Real.exp_sum]
     simp_rw [← Finset.mul_sum, sum_logEmbedding_component, ← mul_assoc, mul_comm _ (c _),
-      mul_assoc (c _), hw, mul_neg, neg_mul, mul_neg, neg_neg, inv_mul_cancel mult_coe_ne_zero,
+      mul_assoc (c _), hw, mul_neg, neg_mul, mul_neg, neg_neg, inv_mul_cancel₀ mult_coe_ne_zero,
       one_mul]
     refine Finset.prod_congr rfl fun w _ ↦ ?_
     rw [← Real.log_rpow (pos_iff.mpr (by simp)),
@@ -155,7 +155,7 @@ theorem mapToUnitsPow₀_apply (c : {w : InfinitePlace K // w ≠ w₀} → ℝ)
   · rw [dif_neg hw, Real.exp_sum]
     congr with x
     rw [logEmbedding_component, ← mul_assoc, ← mul_assoc, mul_comm _ (c _), mul_assoc (c _),
-      inv_mul_cancel mult_coe_ne_zero, mul_one, ← Real.log_rpow (pos_iff.mpr (by simp)),
+      inv_mul_cancel₀ mult_coe_ne_zero, mul_one, ← Real.log_rpow (pos_iff.mpr (by simp)),
       Real.exp_log (Real.rpow_pos_of_pos (pos_iff.mpr (by simp)) _)]
 
 theorem mapToUnitsPow₀_ne_zero (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
@@ -213,7 +213,7 @@ def mapToUnitsPow : PartialHomeomorph (InfinitePlace K → ℝ) (InfinitePlace K
     ext w
     by_cases hw : w = w₀
     · rw [hw, dif_pos rfl, _root_.map_smul, mixedEmbedding.norm_smul, norm_mapToUnitsPow₀, mul_one,
-          ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), mul_inv_cancel
+          ← Real.rpow_natCast, ← Real.rpow_mul (abs_nonneg _), mul_inv_cancel₀
           (Nat.cast_ne_zero.mpr (ne_of_gt finrank_pos)), Real.rpow_one, abs_of_nonneg
           (abs_nonneg _), abs_of_pos (by convert h)]
     · rw [dif_neg hw, _root_.map_smul, logMap_smul (by rw [norm_mapToUnitsPow₀]; exact one_ne_zero)
@@ -404,7 +404,7 @@ theorem jacobian_det {c : InfinitePlace K → ℝ} (hc : 0 ≤ c w₀) :
   · ext
     simp only [Matrix.transpose_apply, Matrix.of_apply, ite_mul, one_mul, mul_ite]
     split_ifs
-    · rw [inv_mul_cancel mult_coe_ne_zero]
+    · rw [inv_mul_cancel₀ mult_coe_ne_zero]
     · rw [← mul_assoc, mul_comm _ (c w₀), mul_assoc, inv_mul_cancel_left₀ mult_coe_ne_zero,
         abs_eq_self.mpr hc]
 
@@ -667,144 +667,68 @@ theorem mapToUnitsPowComplex_image_prod (s : Set (InfinitePlace K → ℝ))
   · rintro ⟨_, y, ⟨⟨⟨x, hx, rfl⟩, hy⟩, rfl⟩⟩
     exact ⟨x, y, ⟨hx, hy⟩, rfl⟩
 
-theorem Complex.polarCoord_symm_mem_slitPlane (x : ℝ × ℝ) :
-    Complex.polarCoord.symm x ∈ Complex.slitPlane ↔
-        x.1 ≠ 0 ∧ (x.1 > 0 → ∀ k : ℤ, k * (2 * π) + π ≠ x.2) ∧
+theorem _root_.Complex.polarCoord_symm_mem_slitPlane (x : ℝ × ℝ) :
+    Complex.polarCoord.symm x ∈ Complex.polarCoord.source ↔
+        x.1 ≠ 0 ∧ (x.1 > 0 → ∀ k : ℤ, π + k * (2 * π) ≠ x.2) ∧
           (x.1 < 0 →  ∀ k : ℤ, k * (2 * π) ≠ x.2) := by
   rw [← not_iff_not]
-  simp_rw [Complex.mem_slitPlane_iff, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
-    Complex.ofReal_sin, Complex.cos_add_sin_I, Complex.re_ofReal_mul, Complex.exp_ofReal_mul_I_re,
-    Complex.im_ofReal_mul, ne_eq, mul_eq_zero, Complex.exp_ofReal_mul_I_im, mul_pos_iff,
+  simp_rw [Complex.polarCoord_source, Complex.mem_slitPlane_iff, Complex.polarCoord_symm_apply,
+    Complex.ofReal_cos, Complex.ofReal_sin, Complex.cos_add_sin_I, Complex.re_ofReal_mul,
+    Complex.exp_ofReal_mul_I_re, Complex.im_ofReal_mul, ne_eq, mul_eq_zero,
+    Complex.exp_ofReal_mul_I_im, mul_pos_iff,
     Real.sin_eq_zero_iff_cos_eq, not_and_or, not_or, not_and_or, _root_.not_imp, not_forall,
     not_not]
   obtain hx | hx | hx := lt_trichotomy x.1 0
   · simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, not_false_eq_true, not_true_eq_false, true_or,
       true_and, false_or, false_and, false_or, and_or_left]
-    rw [or_iff_left]
-    sorry
-    sorry
-  · simp_rw [hx, lt_self_iff_false, not_false_eq_true, true_or, true_and]
-  · sorry
-#exit
-
-  · simp_rw [hx, not_lt_of_gt hx, ne_of_lt hx, not_false_eq_true, false_and, false_implies,
-      true_and, true_implies, false_or, Real.sin_eq_zero_iff_cos_eq]
-    rw [← not_iff_not, not_or, not_not, not_lt, and_or_left, and_iff_right_of_imp]
-    rw [or_iff_left, Real.cos_eq_one_iff, not_forall]
-    simp_rw [not_not]
-    · rw [not_and']
+    rw [or_iff_left, and_iff_right_of_imp, Real.cos_eq_one_iff]
+    · intro h
+      rw [h]
+      linarith
+    · refine not_and'.mpr ?_
       intro h
-      rw [h]
+      rw [h, not_not]
       linarith
+  · simp_rw [hx, lt_self_iff_false, not_false_eq_true, true_or, true_and]
+  · simp_rw [hx, not_lt_of_gt hx, ne_of_gt hx, not_false_eq_true, not_true_eq_false, true_or,
+      and_true, true_and, false_or, false_and, or_false, and_or_left]
+    rw [or_iff_right, and_iff_right_of_imp, Real.cos_eq_neg_one_iff]
     · intro h
       rw [h]
       linarith
-  · simp_rw [hx, lt_self_iff_false, false_and, or_self, false_or, not_true_eq_false, false_and]
-  · simp_rw [hx, not_lt_of_gt hx, ne_of_gt hx, not_false_eq_true, true_and, true_implies, false_and,
-      false_implies, or_false, and_true, Real.sin_eq_zero_iff_cos_eq]
-    rw [← not_iff_not, not_or, not_not, not_lt, and_or_left, and_iff_left_of_imp]
+    · refine not_and'.mpr ?_
+      intro h
+      rw [h, not_not]
+      exact zero_lt_one
 
-    sorry
-
-#exit
-
-  simp_rw [Complex.mem_slitPlane_iff_arg, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
-    Complex.ofReal_sin, Complex.cos_add_sin_I, ne_eq, mul_eq_zero, Complex.exp_ne_zero, or_false,
-    ← ne_eq, and_comm (b := (x.1 : ℂ) ≠ 0), ne_eq, Complex.ofReal_eq_zero, and_congr_right_iff]
-  intro h
-  obtain h | h := ne_iff_lt_or_gt.mp h
-  ·
-    simp_rw [h, not_lt_of_gt h, true_implies, false_implies, true_and]
-    rw [Complex.arg_eq_pi_iff_lt_zero]
-    rw [Complex.not_lt_zero_iff]
-    rw [show (x.1 : ℂ) = - (- x.1 : ℂ) by sorry, neg_mul, neg_mul]
-    rw [Complex.arg_neg_coe_angle]
-    sorry
-  · simp_rw [← ne_eq, h, not_lt_of_gt h, true_implies, false_implies, and_true,
-      Complex.arg_real_mul _ h, Complex.arg_exp_mul_I]
-
-#exit
-
-  rw [Complex.mem_slitPlane_iff, Complex.polarCoord_symm_apply, Complex.ofReal_cos,
-    Complex.ofReal_sin, Complex.cos_add_sin_I, Complex.mul_re, Complex.ofReal_re,
-    Complex.exp_ofReal_mul_I_re, Complex.ofReal_im, zero_mul, sub_zero, Complex.mul_im,
-    Complex.exp_ofReal_mul_I_im, Complex.ofReal_re, Complex.ofReal_im, zero_mul, add_zero, ne_eq,
-    mul_eq_zero, or_comm, not_or, ← ne_eq, ← ne_eq, Real.sin_ne_zero_iff, mul_pos_iff]
-  obtain hx | hx | hx := lt_trichotomy x.1 0
-  ·
-    have e₁ : x.1 ≠ 0 := sorry
-    have e₂ : ¬ 0 < x.1 := sorry
-    simp_rw [hx, ne_eq, e₁, not_false_eq_true, true_and, true_implies, e₂, false_and, false_or,
-      false_implies, true_and]
-
-    refine ⟨?_, ?_⟩
-    · intro h
-      obtain h | h := h
-      · intro k hk
-        rw [← hk, (Real.cos_eq_one_iff _).mpr ⟨k, by ring⟩] at h
-        linarith
-      · intro k hk
-        specialize h (2 * k)
-        rw [Int.cast_mul, Int.cast_ofNat, hk] at h
-        exact h rfl
-    ·
-      sorry
-  · simp only [hx, lt_self_iff_false, false_and, or_self, ne_eq, not_true_eq_false, gt_iff_lt,
-    false_implies, and_self, and_true]
-  ·
-    sorry
-
-#exit
-
-  simp only [Complex.ofReal_cos, Complex.ofReal_sin, Complex.mul_re, Complex.ofReal_re,
-    Complex.add_re, Complex.I_re, mul_zero, Complex.sin_ofReal_im, Complex.I_im, mul_one,
-    _root_.sub_self, add_zero, Complex.ofReal_im, Complex.add_im, Complex.cos_ofReal_im,
-    Complex.mul_im, zero_add, zero_mul, sub_zero, ne_eq, mul_eq_zero, not_or, gt_iff_lt]
-
-theorem Complex.eq_of_polarCoord_symm (x y : ℝ × ℝ) (hx : x ∈ Set.Ici 0 ×ˢ Set.Icc (-π) π)
+theorem mapToUnitsPowComplex_prod_indicator_aux (x y : ℝ × ℝ) (hx : x ∈ Set.Ici 0 ×ˢ Set.Icc (-π) π)
     (hy : y ∈ Complex.polarCoord.target)
     (hxy : Complex.polarCoord.symm x = Complex.polarCoord.symm y) :
     x = y := by
-  by_cases h : x ∈ Complex.polarCoord.target
-  · exact Complex.polarCoord.symm.injOn h hy hxy
-  · rw [Complex.polarCoord_target, Set.mem_prod_eq, not_and_or] at h
-    rw [Set.mem_prod_eq] at hx
-    simp_rw [Complex.polarCoord_symm_apply] at hxy
-    obtain h | h := h
-    · exfalso
-      have : x.1 = 0 := by
-        refine eq_of_ge_of_not_gt ?_ ?_
-        exact hx.1
-        exact h
-      rw [this, Complex.ofReal_zero, zero_mul, zero_eq_mul, Complex.ofReal_eq_zero] at hxy
-      obtain h | h := hxy
-      · rw [Complex.polarCoord_target, Set.mem_prod_eq, h] at hy
-        exact Set.not_mem_Ioi_self hy.1
-      · rw [← norm_eq_zero, Complex.norm_eq_abs, Complex.ofReal_cos, Complex.ofReal_sin,
-          Complex.abs_cos_add_sin_mul_I] at h
-        linarith
-    · have : Complex.polarCoord.symm x ∉ Complex.slitPlane := by
-        rw [Complex.mem_slitPlane_iff, not_or, not_lt, ne_eq, not_not, Complex.polarCoord_symm_apply]
-
-        simp only [Complex.ofReal_cos, Complex.ofReal_sin, Complex.mul_re, Complex.ofReal_re,
-          Complex.add_re, Complex.I_re, mul_zero, Complex.sin_ofReal_im, Complex.I_im, mul_one,
-          _root_.sub_self, add_zero, Complex.ofReal_im, Complex.add_im, Complex.cos_ofReal_im,
-          Complex.mul_im, zero_add, zero_mul, sub_zero, mul_eq_zero]
-      have : x.2 ≠ -π → x.2 = π := by
-        intro h'
-        replace hx := hx.2
-        simp at h
-        simp at hx
-        refine le_antisymm ?_ ?_
-        · exact hx.2
-        · apply h
-          rw [lt_iff_le_and_ne]
-          refine ⟨?_, ?_⟩
-          · exact hx.1
-          · exact h'.symm
-      exfalso
-
-      sorry
+  suffices x ∈ Complex.polarCoord.target from Complex.polarCoord.symm.injOn this hy hxy
+  suffices x.1 ≠ 0 ∧ x.2 ≠ -π ∧ x.2 ≠ π by
+    simp only [Complex.polarCoord_target, Set.mem_prod, Set.mem_Ioi, Set.mem_Ioo]
+    simp at hx
+    refine ⟨?_, ?_, ?_⟩
+    · rw [lt_iff_le_and_ne]
+      exact ⟨hx.1, this.1.symm⟩
+    · rw [lt_iff_le_and_ne]
+      exact ⟨hx.2.1, this.2.1.symm⟩
+    · rw [lt_iff_le_and_ne]
+      exact ⟨hx.2.2, this.2.2⟩
+  have := (Complex.polarCoord_symm_mem_slitPlane x).mp ?_
+  have hx₁ : 0 < x.1 := by
+    refine lt_iff_le_and_ne.mpr ⟨?_, ?_⟩
+    exact hx.1
+    exact this.1.symm
+  · refine ⟨?_, ?_, ?_⟩
+    · exact this.1
+    · have := this.2.1 hx₁ (-1)
+      rwa [show π + (-1 : ℤ) * (2 * π) = -π by ring, ne_comm] at this
+    · have := this.2.1 hx₁ 0
+      rwa [Int.cast_zero, zero_mul, add_zero, ne_comm] at this
+  · rw [hxy]
+    exact Complex.polarCoord.map_target hy
 
 theorem mapToUnitsPowComplex_prod_indicator
     {s : Set (InfinitePlace K → ℝ)} {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
@@ -815,35 +739,28 @@ theorem mapToUnitsPowComplex_prod_indicator
       ((polarCoordMixedSpace K).symm x) =
       (mapToUnitsPow K '' s).indicator 1 x.1 * t.indicator 1 x.2 := by
   classical
-  simp_rw [mapToUnitsPowComplex_image_prod,  ← Set.indicator_prod_one, Prod.mk.eta,
+  simp_rw [mapToUnitsPowComplex_image_prod, ← Set.indicator_prod_one, Prod.mk.eta,
     Set.indicator_apply, Set.mem_image, polarCoordMixedSpace_symm_apply, Prod.mk.inj_iff]
-  refine if_congr ⟨?_, ?_⟩  rfl rfl
-  · rintro ⟨y, hy, ⟨hxy₁, hxy₂⟩⟩
-    suffices y = x by rwa [← this]
-    obtain ⟨⟨c, _, hcy⟩, hy₂⟩ := hy
-    have hxy : ∀ w (hw : IsComplex w), y.1 w = x.1 w ∧ y.2 ⟨w, hw⟩ = x.2 ⟨w, hw⟩ := by
-      intro w hw
+  refine if_congr ⟨fun ⟨y, hy, ⟨hxy₁, hxy₂⟩⟩ ↦ ?_, fun h ↦ ⟨x, h, rfl, rfl⟩⟩ rfl rfl
+  suffices y = x by rwa [← this]
+  have hxy : ∀ i (hi : IsComplex i), y.1 i = x.1 i ∧ y.2 ⟨i, hi⟩ = x.2 ⟨i, hi⟩ := by
+      intro i hi
       rw [← Prod.mk.inj_iff]
-      refine toto _ _ ⟨?_, ?_⟩ ?_ ?_
-      · rw [Set.mem_Ici]
-        dsimp only
-        rw [← hcy]
-        exact mapToUnitsPow_nonneg K c w
-      · exact Set.mem_univ_pi.mp (ht hy₂) ⟨w, hw⟩
+      refine mapToUnitsPowComplex_prod_indicator_aux _ _ ?_ ?_ (congr_fun hxy₂ ⟨i, hi⟩)
+      · rw [Set.prod_mk_mem_set_prod_eq]
+        refine ⟨?_, ?_⟩
+        · obtain ⟨t, _, ht⟩ := hy.1
+          rw [← ht]
+          exact mapToUnitsPow_nonneg _ _ _
+        · exact ht hy.2 ⟨i, hi⟩ trivial
       · simp_rw [polarCoordMixedSpace_target, Set.mem_prod, Set.mem_univ_pi, Set.mem_ite_univ_left,
           not_isReal_iff_isComplex] at hx
-        rw [Complex.polarCoord_target, Set.prod_mk_mem_set_prod_eq]
-        refine ⟨?_, ?_⟩
-        · exact hx.1 w hw
-        · exact hx.2 ⟨w, hw⟩
-      · exact (congr_fun hxy₂ ⟨w, hw⟩)
-    ext w
-    · obtain hw | hw := isReal_or_isComplex w
-      · exact (congr_fun hxy₁ ⟨w, hw⟩)
-      · exact (hxy w hw).1
-    · exact (hxy w.val w.prop).2
-  · intro hx
-    exact ⟨x, hx, by trivial⟩
+        exact ⟨hx.1 i hi, hx.2 ⟨i, hi⟩⟩
+  ext i
+  · obtain hi | hi := isReal_or_isComplex i
+    · exact congr_fun hxy₁ ⟨i, hi⟩
+    · exact (hxy i hi).1
+  · exact (hxy i.val i.prop).2
 
 open Classical in
 theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → ℝ)}

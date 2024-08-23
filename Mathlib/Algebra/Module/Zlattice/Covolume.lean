@@ -169,6 +169,7 @@ variable {X : Set E} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 < r → r �
 variable {F : E → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ card ι * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
 
+include hX hF₁ in
 private theorem tendsto_card_le_div''_aux {c : ℝ} (hc : 0 < c) :
     c • {x ∈ X | F x ≤ 1} = {x ∈ X | F x ≤ c ^ card ι} := by
   ext x
@@ -183,6 +184,7 @@ private theorem tendsto_card_le_div''_aux {c : ℝ} (hc : 0 < c) :
     rw [hF₁ _ (inv_pos_of_pos hc), inv_pow]
     exact inv_mul_le_one_of_le hx₂ (pow_nonneg (le_of_lt hc) _)
 
+include hX hF₁ hF₂ hF₃ in
 theorem tendsto_card_le_div'' [Nonempty ι] :
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set E) / (c : ℝ))
@@ -202,7 +204,7 @@ theorem tendsto_card_le_div'' [Nonempty ι] :
       Equiv.smulRight_apply, Real.rpow_neg hc₁, Set.smul_mem_smul_set_iff₀ (by aesop),
       ← Set.mem_smul_set_iff_inv_smul_mem₀ (by aesop), ← image_smul_set,
       tendsto_card_le_div''_aux hX hF₁ (by positivity), ← Real.rpow_natCast, ← Real.rpow_mul hc₁,
-      inv_mul_cancel h, Real.rpow_one]
+      inv_mul_cancel₀ h, Real.rpow_one]
     simp_rw [SetLike.mem_coe, Set.mem_image, EmbeddingLike.apply_eq_iff_eq, exists_eq_right,
       and_congr_right_iff, ← b.ofZlatticeBasis_span ℝ, mem_toAddSubgroup,
       Basis.mem_span_iff_repr_mem, Pi.basisFun_repr, Basis.equivFun_apply, implies_true]
@@ -241,6 +243,7 @@ variable {X : Set (ι → ℝ)} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 <
 variable {F : (ι → ℝ) → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ card ι * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
 
+include hX hF₁ hF₂ hF₃ in
 theorem tendsto_card_le_div [Nonempty ι]:
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set (ι → ℝ)) / (c : ℝ))
@@ -281,6 +284,7 @@ variable {X : Set E} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 < r → r �
 variable {F : E → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ finrank ℝ E * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
 
+include hX hF₁ hF₂ hF₃ in
 theorem tendsto_card_le_div' [Nontrivial E]:
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set E) / (c : ℝ))
