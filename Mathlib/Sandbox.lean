@@ -3,6 +3,21 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section symmDiff
+
+end symmDiff
+
+-- section ENNReal
+
+-- example {r : ℝ} (hr : 0 < r) :
+--     ENNReal.ofReal r ≠ 0 := by
+--   rw [← zero_lt_iff]
+--   exact ENNReal.ofReal_pos.mpr hr
+
+-- end ENNReal
+
+-- #exit
+
 -- section ComplexOrder
 
 -- open scoped ComplexOrder
@@ -88,7 +103,7 @@ theorem Complex.lintegral_pi_comp_polarCoord_symm_aux {ι : Type*} [DecidableEq 
         · exact measurable_coe_nnreal_ennreal_iff.mpr <|
             Finset.measurable_prod _ fun _ _ ↦ by fun_prop
         · exact hf.comp <| measurable_pi_lambda _ fun _ ↦
-            Complex.measurable_polarCoord_symm.comp (measurable_pi_apply _)
+            Complex.continuous_polarCoord_symm.measurable.comp (measurable_pi_apply _)
       calc
         _ = ∫⁻ x in polarCoord.target, x.1.toNNReal •
               (∫⋯∫⁻_s, f ∂fun _ ↦ volume)
@@ -326,9 +341,9 @@ theorem lintegral_comp_abs {f : ℝ → ENNReal} (hf : Measurable f) :
       rw [restrict_Iio_eq_restrict_Iic]
       congr 1
       · refine setLIntegral_congr_fun measurableSet_Iic ?_
-        exact Filter.eventually_of_forall fun x hx ↦ by rw [abs_of_nonpos (by convert hx)]
+        exact Filter.Eventually.of_forall fun x hx ↦ by rw [abs_of_nonpos (by convert hx)]
       · refine setLIntegral_congr_fun measurableSet_Ioi ?_
-        exact Filter.eventually_of_forall fun x hx ↦ by rw [abs_of_pos (by convert hx)]
+        exact Filter.Eventually.of_forall fun x hx ↦ by rw [abs_of_pos (by convert hx)]
     _ = 2 * ∫⁻ x in Ioi 0, f x := by
       rw [two_mul, show Iio (0 : ℝ) = (fun x ↦ -x) ⁻¹' Ioi 0 by simp,
         ← (setLIntegral_map measurableSet_Ioi hf measurable_neg), Measure.map_neg_eq_self]

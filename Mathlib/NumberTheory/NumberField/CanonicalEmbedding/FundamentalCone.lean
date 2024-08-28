@@ -173,6 +173,12 @@ theorem logMap_smul {x : E K} (hx : mixedEmbedding.norm x ≠ 0) {c : ℝ} (hc :
   · rw [norm_real]
     exact pow_ne_zero _ (abs_ne_zero.mpr hc)
 
+theorem measurable_logMap :
+    Measurable (logMap : (E K) → _) :=
+  measurable_pi_iff.mpr fun _ ↦
+    measurable_const.mul <| (continuous_normAtPlace _).measurable.log.sub
+      <| (mixedEmbedding.continuous_norm K).measurable.log.mul measurable_const
+
 theorem continuousOn_logMap :
     ContinuousOn (logMap : (E K) → _) {x | mixedEmbedding.norm x ≠ 0} := by
   refine continuousOn_pi.mpr fun w ↦ continuousOn_const.mul (ContinuousOn.sub ?_ ?_)
@@ -182,7 +188,6 @@ theorem continuousOn_logMap :
       (Real.continuousOn_log.comp''  (mixedEmbedding.continuous_norm K).continuousOn
         fun _ hx ↦ hx) continuousOn_const
 
-@[simp]
 theorem logMap_apply_of_norm_one {x : E K} (hx : mixedEmbedding.norm x = 1) {w : InfinitePlace K}
     (hw : w ≠ w₀) :
     logMap x ⟨w, hw⟩ = mult w * Real.log (normAtPlace w x) := by

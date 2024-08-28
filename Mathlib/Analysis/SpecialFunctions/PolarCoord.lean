@@ -93,9 +93,9 @@ theorem measurable_polarCoord :
     Measurable (polarCoord) :=
   Measurable.prod_mk (by fun_prop) Complex.measurableEquivRealProd.symm.measurable.carg
 
-theorem measurable_polarCoord_symm :
-    Measurable (polarCoord.symm) :=
-  Measurable.prod_mk (by fun_prop) (by fun_prop)
+theorem continuous_polarCoord_symm :
+    Continuous (polarCoord.symm) :=
+  Continuous.prod_mk (by fun_prop) (by fun_prop)
 
 theorem hasFDerivAt_polarCoord_symm (p : ℝ × ℝ) :
     HasFDerivAt polarCoord.symm
@@ -186,9 +186,9 @@ protected theorem measurable_polarCoord :
     Measurable (Complex.polarCoord) :=
   measurable_polarCoord.comp Complex.measurableEquivRealProd.measurable
 
-protected theorem measurable_polarCoord_symm :
-    Measurable (Complex.polarCoord.symm) :=
-  Complex.measurableEquivRealProd.symm.measurable.comp measurable_polarCoord_symm
+protected theorem continuous_polarCoord_symm :
+    Continuous (Complex.polarCoord.symm) :=
+  equivRealProdCLM.symm.continuous.comp continuous_polarCoord_symm
 
 protected theorem polarCoord_apply (a : ℂ) :
     Complex.polarCoord a = (Complex.abs a, Complex.arg a) := by
