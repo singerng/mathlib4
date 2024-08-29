@@ -5,16 +5,27 @@ import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
 section indicator
 
-example {α M : Type*} [TopologicalSpace α] [TopologicalSpace M] [Zero M] (s : Set α) (f : α → M) :
-    Continuous (s.indicator f) := by
-  classical
-  refine continuous_piecewise ?_ ?_ ?_
-  classical
-  let g := (frontier s).piecewise (fun _ ↦ 0) f
-  have : Continuous (s.indicator g) := by
-    refine continuous_indicator ?_ ?_
+variable {α β : Type*} [One β] {f : α → β} {s : Set α}
 
-  sorry
+@[to_additive]
+theorem Set.eqOn_mulIndicator' : Set.EqOn (Set.mulIndicator s f) 1 sᶜ :=
+  fun _ hx => mulIndicator_of_not_mem hx f
+
+variable [TopologicalSpace α] [TopologicalSpace β]
+
+open scoped Topology
+
+@[to_additive]
+theorem continuousAt_mulIndicator_of_not_mem_frontier (hf : ContinuousOn f (interior s))
+    {x : α} (hx : x ∉ frontier s) :
+    ContinuousAt (s.mulIndicator f) x := by
+  rw [← Set.not_mem_compl_iff, Set.not_not_mem, compl_frontier_eq_union_interior] at hx
+  obtain h | h := hx
+  · have hs : interior s ∈ 𝓝 x := mem_interior_iff_mem_nhds.mp (by rwa [interior_interior])
+    exact ContinuousAt.congr (hf.continuousAt hs) <| Filter.eventuallyEq_iff_exists_mem.mpr
+      ⟨interior s, hs, Set.eqOn_mulIndicator.symm.mono interior_subset⟩
+  · refine ContinuousAt.congr continuousAt_const <| Filter.eventuallyEq_iff_exists_mem.mpr
+      ⟨sᶜ, mem_interior_iff_mem_nhds.mp h, Set.eqOn_mulIndicator'.symm⟩
 
 end indicator
 
@@ -408,9 +419,9 @@ theorem MeasureTheory.Measure.restrict_prod_eq_univ_prod {α β : Type*} [Measur
 theorem Real.rpow_ne_zero_of_pos {x : ℝ} (hx : 0 < x) (y : ℝ) : x ^ y ≠ 0 := by
   rw [rpow_def_of_pos hx]; apply exp_ne_zero _
 
-theorem Basis.total_eq_iff_eq_repr {M R ι : Type*} [Semiring R] [AddCommMonoid M] [Module R M]
-    (B : Basis ι R M) (x : M) (c : ι →₀ R) : Finsupp.total ι M R B c = x ↔ c = B.repr x :=
-  ⟨fun h ↦ by rw [← h, B.repr_total], fun h ↦ by rw [h, B.total_repr]⟩
+-- theorem Basis.total_eq_iff_eq_repr {M R ι : Type*} [Semiring R] [AddCommMonoid M] [Module R M]
+--     (B : Basis ι R M) (x : M) (c : ι →₀ R) : Finsupp.total ι M R B c = x ↔ c = B.repr x :=
+--   ⟨fun h ↦ by rw [← h, B.repr_total], fun h ↦ by rw [h, B.total_repr]⟩
 
 -- Is it a good idea to use equivFun?
 theorem Basis.sum_eq_iff_eq_equivFun {M R ι : Type*} [Fintype ι] [Semiring R] [AddCommMonoid M]

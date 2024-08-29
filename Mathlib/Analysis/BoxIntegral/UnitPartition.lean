@@ -6,6 +6,8 @@ Authors: Xavier Roblot
 import Mathlib.Algebra.Module.Zlattice.Basic
 import Mathlib.Analysis.BoxIntegral.Integrability
 
+import Mathlib.Sandbox
+
  /-!
 # Unit Partition
 
@@ -317,27 +319,35 @@ theorem integralSum_eq_tsum_div {B : Box ι} (hB : hasIntegralVertices B) (hs₀
       tag_index_eq_self_of_mem_smul_span n hx.2, ENNReal.toReal_div,
       ENNReal.one_toReal, ENNReal.toReal_pow, ENNReal.toReal_nat, mul_comm_div, one_mul]
 
-variable (hs₁ : Bornology.IsBounded s) (hs₂ : MeasurableSet s)
+variable (hs₁ : Bornology.IsBounded s) (hs₂ : MeasurableSet s) (hs₃ : volume (frontier s) = 0)
 
 open Filter
 
-include hs₁ hs₂ in
+include hs₁ hs₂ hs₃ hF in
 /-- Let `s` be a bounded, measurable set of `ι → ℝ` ** complete ** -/
-theorem tendsto_tsum_div_pow :
+theorem tendsto_tsum_div_pow  :
     Tendsto (fun n : ℕ ↦ (∑' x : ↑(s ∩ (n:ℝ)⁻¹ • L), F x) / n ^ card ι)
       atTop (nhds (∫ x in s, F x)) := by
   obtain ⟨B, hB, hs₀⟩ := le_hasIntegralVertices_of_isBounded hs₁
   refine Metric.tendsto_atTop.mpr fun ε hε ↦ ?_
-  have : ContinuousOn (Set.indicator s (fun x ↦ F x)) (BoxIntegral.Box.Icc B) := by
-    apply?
-    sorry
-
-  obtain ⟨r, hr₁, hr₂⟩ := (BoxIntegral.hasIntegral_iff.mp <| ContinuousOn.hasBoxIntegral
-    (volume : Measure (ι → ℝ)) this BoxIntegral.IntegrationParams.Riemann) (ε / 2) (half_pos hε)
+  have h₁ : ∃ C, ∀ x ∈ Box.Icc B, ‖Set.indicator s F x‖ ≤ C := by
+    obtain ⟨C₀, h₀⟩ := IsCompact.exists_bound_of_continuousOn (Box.isCompact_Icc B) hF.continuousOn
+    refine ⟨max 0 C₀, fun x hx ↦ ?_⟩
+    by_cases hx' : x ∈ s
+    · rw [Set.indicator_of_mem hx']
+      exact le_max_of_le_right (h₀ x hx)
+    · rw [Set.indicator_of_not_mem hx', norm_zero]
+      exact le_max_left 0 _
+  have h₂ : ∀ᵐ x, ContinuousAt (s.indicator F) x := by
+    filter_upwards [compl_mem_ae_iff.mpr hs₃] with _ h
+      using continuousAt_indicator_of_not_mem_frontier hF.continuousOn h
+  obtain ⟨r, hr₁, hr₂⟩ := (BoxIntegral.hasIntegral_iff.mp <|
+      AEContinuous.hasBoxIntegral (volume : Measure (ι → ℝ)) h₁ h₂
+        BoxIntegral.IntegrationParams.Riemann) (ε / 2) (half_pos hε)
   refine ⟨⌈(r 0 0 : ℝ)⁻¹⌉₊, fun n hn ↦ lt_of_le_of_lt ?_ (half_lt_self_iff.mpr hε)⟩
   lift n to ℕ+ using lt_of_lt_of_le (Nat.ceil_pos.mpr (inv_pos.mpr (by convert (r 0 0).prop))) hn
-  erw [← integralSum_eq_tsum_div _ s F hB hs₀]
-  rw [← Measure.restrict_restrict_of_subset hs₀, ← MeasureTheory.integral_indicator hs₂]
+  rw [← integralSum_eq_tsum_div _ s F hB hs₀, ← Measure.restrict_restrict_of_subset hs₀,
+    ← MeasureTheory.integral_indicator hs₂]
   refine hr₂ 0 _ ⟨?_, fun _ ↦ ?_, fun h ↦ ?_, fun h ↦ ?_⟩ (prepartition_isPartition _ hB)
   · rw [show r 0 = fun _ ↦ r 0 0 from Function.funext_iff.mpr (hr₁ 0 rfl)]
     apply prepartition_isSubordinate n B
@@ -347,17 +357,17 @@ theorem tendsto_tsum_div_pow :
   · simp only [IntegrationParams.Riemann] at h
   · simp only [IntegrationParams.Riemann] at h
 
-include hs₁ hs₂ in
+include hs₁ hs₂ hs₃ in
 theorem tendsto_card_div_pow' :
     Tendsto (fun n : ℕ ↦ (Nat.card ↑(s ∩ (n:ℝ)⁻¹ • L) : ℝ) / n ^ card ι)
       atTop (nhds (volume s).toReal) := by
-  convert tendsto_tsum_div_pow s (fun _ ↦ 1) hs₁ hs₂
+  convert tendsto_tsum_div_pow s (fun _ ↦ 1) continuous_const hs₁ hs₂ hs₃
   · rw [tsum_const, nsmul_eq_mul, mul_one, Nat.cast_inj]
   · rw [MeasureTheory.setIntegral_const, smul_eq_mul, mul_one]
 
-variable (hs₃ : ∀ ⦃x y : ℝ⦄, 0 < x → x ≤ y → x • s ⊆ y • s)
+variable (hs₄ : ∀ ⦃x y : ℝ⦄, 0 < x → x ≤ y → x • s ⊆ y • s)
 
-include hs₁ hs₂ hs₃ in
+include hs₁ hs₂ hs₃ hs₄ in
 theorem tendsto_card_div_pow :
     Tendsto (fun x : ℝ ↦ (Nat.card ↑(s ∩ x⁻¹ • L) : ℝ) / x ^ card ι)
       atTop (nhds (volume s).toReal) := by
@@ -372,7 +382,7 @@ theorem tendsto_card_div_pow :
     refine Nat.card_mono ?_ ?_
     · exact Zspan.setFinite_inter _ (IsBounded.smul₀ hs₁ y)
     · gcongr
-      exact hs₃ hx hy
+      exact hs₄ hx hy
   have ineq₁ : ∀ᶠ x : ℝ in atTop,
       (Nat.card ↑(s ∩ (⌊x⌋₊ : ℝ)⁻¹ • L) : ℝ) / x ^ card ι ≤
         (Nat.card ↑(s ∩ x⁻¹ • L) : ℝ) / x ^ card ι := by
@@ -396,7 +406,7 @@ theorem tendsto_card_div_pow :
       field_simp [hx]
     rw [show (volume s).toReal = (volume s).toReal * 1 ^ card ι by ring]
     refine Tendsto.congr' this (Tendsto.mul ?_ (Tendsto.pow ?_ _))
-    · exact Tendsto.comp (tendsto_card_div_pow' s hs₁ hs₂) tendsto_nat_floor_atTop
+    · exact Tendsto.comp (tendsto_card_div_pow' s hs₁ hs₂ hs₃) tendsto_nat_floor_atTop
     · exact tendsto_nat_floor_div_atTop
   · have :
         (fun x ↦ (Nat.card ↑(s ∩ (⌈x⌉₊ : ℝ)⁻¹ • L) : ℝ) / ⌈x⌉₊ ^ card ι * (⌈x⌉₊ / x) ^ card ι)
@@ -405,7 +415,7 @@ theorem tendsto_card_div_pow :
       field_simp [hx]
     rw [show (volume s).toReal = (volume s).toReal * 1 ^ card ι by ring]
     refine Tendsto.congr' this (Tendsto.mul ?_ (Tendsto.pow ?_ _))
-    · exact Tendsto.comp (tendsto_card_div_pow' s hs₁ hs₂) tendsto_nat_ceil_atTop
+    · exact Tendsto.comp (tendsto_card_div_pow' s hs₁ hs₂ hs₃) tendsto_nat_ceil_atTop
     · exact tendsto_nat_ceil_div_atTop
 
 end BoxIntegral.unitPartition

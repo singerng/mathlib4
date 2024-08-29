@@ -148,11 +148,12 @@ variable [MeasurableSpace E] [BorelSpace E]
 variable {L : AddSubgroup E} [DiscreteTopology L] [IsZlattice ℝ L]
 variable {ι : Type*} [Fintype ι] (b : Basis ι ℤ L)
 
-theorem tendsto_card_div_pow'' {s : Set E} (hs₁ : IsBounded s) (hs₂ : MeasurableSet s) :
+theorem tendsto_card_div_pow'' {s : Set E} (hs₁ : IsBounded s) (hs₂ : MeasurableSet s)
+    (hs₃ : volume (frontier ((b.ofZlatticeBasis ℝ L).equivFun '' s)) = 0) :
     Tendsto (fun n : ℕ ↦ (Nat.card (s ∩ (n : ℝ)⁻¹ • L : Set E) : ℝ) / n ^ card ι)
       atTop (𝓝 (volume ((b.ofZlatticeBasis ℝ).equivFun '' s)).toReal) := by
   refine Tendsto.congr' ?_
-    (unitPartition.tendsto_card_div_pow' ((b.ofZlatticeBasis ℝ).equivFun '' s) ?_ ?_)
+    (unitPartition.tendsto_card_div_pow' ((b.ofZlatticeBasis ℝ).equivFun '' s) ?_ ?_ hs₃)
   · filter_upwards [eventually_gt_atTop 0] with n hn
     congr
     refine Nat.card_congr <| ((b.ofZlatticeBasis ℝ).equivFun.toEquiv.subtypeEquiv fun x ↦ ?_).symm
@@ -166,8 +167,10 @@ theorem tendsto_card_div_pow'' {s : Set E} (hs₁ : IsBounded s) (hs₂ : Measur
   · exact (b.ofZlatticeBasis ℝ).equivFunL.toHomeomorph.toMeasurableEquiv.measurableSet_image.mpr hs₂
 
 variable {X : Set E} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 < r → r • x ∈ X)
+
 variable {F : E → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ card ι * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
+  (hF₄ : volume (frontier ((b.ofZlatticeBasis ℝ L).equivFun '' {x | x ∈ X ∧ F x ≤ 1})) = 0)
 
 include hX hF₁ in
 private theorem tendsto_card_le_div''_aux {c : ℝ} (hc : 0 < c) :
@@ -184,14 +187,14 @@ private theorem tendsto_card_le_div''_aux {c : ℝ} (hc : 0 < c) :
     rw [hF₁ _ (inv_pos_of_pos hc), inv_pow]
     exact inv_mul_le_one_of_le hx₂ (pow_nonneg (le_of_lt hc) _)
 
-include hX hF₁ hF₂ hF₃ in
+include hX hF₁ hF₂ hF₃ hF₄ in
 theorem tendsto_card_le_div'' [Nonempty ι] :
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set E) / (c : ℝ))
         atTop (𝓝 (volume ((b.ofZlatticeBasis ℝ).equivFun '' {x ∈ X | F x ≤ 1})).toReal) := by
   have h : (card ι : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr card_ne_zero
   refine Tendsto.congr' ?_ <| (unitPartition.tendsto_card_div_pow
-      ((b.ofZlatticeBasis ℝ).equivFun '' {x ∈ X | F x ≤ 1}) ?_ ?_ fun x y hx hy ↦ ?_).comp
+      ((b.ofZlatticeBasis ℝ).equivFun '' {x ∈ X | F x ≤ 1}) ?_ ?_ hF₄ fun x y hx hy ↦ ?_).comp
         (tendsto_rpow_atTop <| inv_pos.mpr
           (Nat.cast_pos.mpr card_pos) : Tendsto (fun x ↦ x ^ (card ι : ℝ)⁻¹) atTop atTop)
   · filter_upwards [eventually_gt_atTop 0] with c hc
@@ -230,7 +233,7 @@ theorem tendsto_card_div_pow (b : Basis ι ℤ L) {s : Set (ι → ℝ)} (hs₁ 
     (hs₂ : MeasurableSet s) :
     Tendsto (fun n : ℕ ↦ (Nat.card (s ∩ (n : ℝ)⁻¹ • L : Set (ι → ℝ)) : ℝ) / n ^ card ι)
       atTop (𝓝 ((volume s).toReal / covolume L)) := by
-  convert tendsto_card_div_pow'' b hs₁ hs₂
+  convert tendsto_card_div_pow'' b hs₁ hs₂ ?_
   rw [LinearEquiv.image_eq_preimage, Measure.addHaar_preimage_linearEquiv, LinearEquiv.symm_symm,
     ENNReal.toReal_mul, ENNReal.toReal_ofReal (abs_nonneg _), covolume_eq_det_mul_measure L
     volume b (Pi.basisFun ℝ ι), div_eq_mul_inv, Zspan.fundamentalDomain_pi_basisFun, volume_pi_pi,
