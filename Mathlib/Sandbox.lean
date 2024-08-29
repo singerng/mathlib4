@@ -3,9 +3,44 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
-section symmDiff
+section polarCoord
 
-end symmDiff
+open scoped Real
+
+theorem Complex.polarCoord.symm_injOn :
+      Set.InjOn Complex.polarCoord.symm ((Set.Ioi 0) ×ˢ (Set.Ico (-π) π)) := by
+  intro x hx y hy hxy
+  sorry
+
+theorem Complex.polarCoord.symm_measurableSet_image {s t : Set ℝ} (hs : s ⊆ Set.Ici 0)
+    (ht : t ⊆ Set.Icc (-π) π) :
+    MeasurableSet (Complex.polarCoord.symm '' s ×ˢ t) := sorry
+  
+
+  -- ext
+  -- · have := congr_arg Complex.abs hxy
+  --   rwa [Complex.polarCoord_symm_abs, Complex.polarCoord_symm_abs, abs_of_pos (hs hx.1),
+  --     abs_of_pos (hs hy.1)]  at this
+  -- · have := congr_arg Complex.arg hxy
+  --   simp_rw [Complex.polarCoord_symm_apply] at this
+  --   simp_rw [Complex.ofReal_cos, Complex.ofReal_sin, Complex.cos_add_sin_I] at this
+  --   rw [Complex.arg_real_mul _ (hs hx.1), Complex.arg_real_mul _ (hs hy.1)] at this
+  --   rw [Complex.arg_exp_mul_I, Complex.arg_exp_mul_I] at this
+  --   rwa [(toIocMod_eq_self (by positivity)).mpr, (toIocMod_eq_self (by positivity)).mpr] at this
+  --   ·
+  --     sorry
+  --   ·
+  --     sorry
+
+end polarCoord
+
+section diff
+
+theorem Set.eq_union_of_diff_subset {α : Type*} {s t u : Set α} (h : t ⊆ s) :
+    s \ t = u → s = t ∪ u := by aesop
+
+end diff
+
 
 -- section ENNReal
 

@@ -356,12 +356,18 @@ theorem measurable_mapToUnitsPow_image {s : Set (InfinitePlace K → ℝ)}
     have : MeasurableSet (s ∩ {x | 0 < x w₀}) :=
       hs.inter (measurableSet_lt measurable_const (measurable_pi_apply w₀))
     exact MeasurableSet.preimage this (measurable_mapToUnitsPow_symm K)
-  have := mapToUnitsPow_image_minus_image_inter K hs'
-  
---  obtain h | h := mapToUnitsPow_image_eq K hs'
---  · rwa [h]
---  · rw [h]
---    exact MeasurableSet.union hm (measurableSet_singleton 0)
+  obtain h | h : mapToUnitsPow K '' s = mapToUnitsPow K '' (s ∩ {x | 0 < x w₀}) ∨
+      mapToUnitsPow K '' s = mapToUnitsPow K '' (s ∩ {x | 0 < x w₀}) ∪ { 0 } := by
+    have h₀ : mapToUnitsPow K '' (s ∩ {x | 0 < x w₀}) ⊆ mapToUnitsPow K '' s :=
+      Set.image_mono Set.inter_subset_left
+    obtain h₁ | h₁ := Set.subset_singleton_iff_eq.mp (mapToUnitsPow_image_minus_image_inter K hs')
+    · left
+      rw [Set.eq_union_of_diff_subset h₀ h₁, Set.union_empty]
+    · right
+      rw [Set.eq_union_of_diff_subset h₀ h₁]
+  · rwa [h]
+  · rw [h]
+    exact MeasurableSet.union hm (measurableSet_singleton 0)
 
 open ContinuousLinearMap
 
@@ -607,16 +613,29 @@ theorem continuous_polarCoordMixedSpace_symm :
     · exact Complex.continuous_polarCoord_symm
     · fun_prop
 
-theorem measurable_polarCoordMixedSpace_symm :
-    Measurable (polarCoordMixedSpace K).symm := by
-  change Measurable (fun x ↦ (polarCoordMixedSpace K).symm x)
-  simp_rw [polarCoordMixedSpace_symm_apply]
-  refine Measurable.prod ?_ ?_
-  · dsimp only
-    exact measurable_pi_lambda _ fun x ↦ (measurable_pi_apply _).comp' measurable_fst
-  · dsimp only
-    simp_rw [Complex.polarCoord_symm_apply]
-    fun_prop
+-- example :
+--     Set.InjOn ((polarCoordMixedSpace K).symm)
+--       ((Set.univ.pi fun _ ↦ Set.Ioi 0) ×ˢ (Set.univ.pi fun _ ↦ Set.Ico (-π) π)) := by
+--   intro x hx y hy hxy
+--   simp_rw [polarCoordMixedSpace_symm_apply] at hxy
+--   ext w
+--   · obtain hw | hw := isReal_or_isComplex w
+--     · exact congr_fun (congr_arg Prod.fst hxy) ⟨w, hw⟩
+--     ·
+--       sorry
+--   · sorry
+
+-- example {s t} (hs : MeasurableSet s) (ht : MeasurableSet t) :
+--     MeasurableSet ((polarCoordMixedSpace K).symm '' s ×ˢ t) := by
+--   dsimp [polarCoordMixedSpace]
+--   simp
+
+--   refine MeasurableSet.prod ?_ ?_
+--   refine MeasurableSet.image_of_continuousOn_injOn ?_ ?_ ?_
+--   · refine MeasurableSet.prod hs ht
+--   · exact (continuous_polarCoordMixedSpace_symm K).continuousOn
+--   ·
+--     sorry
 
 theorem polarCoordMixedSpace_source :
     (polarCoordMixedSpace K).source = Set.univ ×ˢ Set.univ.pi fun _ ↦ Complex.slitPlane := by
@@ -675,7 +694,7 @@ theorem lintegral_mixedSpace_eq (f : (E K) → ENNReal) (hf : Measurable f) :
       f ((polarCoordMixedSpace K).symm x) := by
     refine Measurable.mul ?_ ?_
     · exact measurable_coe_nnreal_ennreal_iff.mpr <| Finset.measurable_prod _ fun _ _ ↦ by fun_prop
-    · exact hf.comp' (measurable_polarCoordMixedSpace_symm K)
+    · exact hf.comp' (continuous_polarCoordMixedSpace_symm K).measurable
   rw [← (volume_preserving_realProdComplexProdEquiv K).setLIntegral_comp_preimage
     (measurableSet_polarCoordMixedSpace_target K) h, volume_eq_prod, volume_eq_prod,
     lintegral_prod _ hf.aemeasurable]
@@ -865,12 +884,14 @@ theorem mapToUnitsPowComplex_prod_indicator
 
 open Classical in
 theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → ℝ)}
-    (hs : MeasurableSet s) {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
+    (hs : MeasurableSet s) (hs' : s ⊆ {x | 0 ≤ x w₀} )
+    {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
     (ht : MeasurableSet t) (ht' : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
     volume (mapToUnitsPowComplex K '' (s ×ˢ t)) =
       volume ((Set.univ.pi fun _ ↦ Set.Ioo (-π) π) ∩ t) * ∫⁻ x in mapToUnitsPow K '' s,
         ENNReal.ofReal (∏ w : {w : InfinitePlace K // IsComplex w}, x w) := by
   have hm : MeasurableSet (mapToUnitsPowComplex K '' s ×ˢ t) := by
+    rw [mapToUnitsPowComplex_image_prod]
     sorry -- PROBLEM?
   rw [← setLIntegral_one, ← lintegral_indicator _ hm, lintegral_mixedSpace_eq K _
     ((measurable_indicator_const_iff 1).mpr hm)]
@@ -888,12 +909,10 @@ theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → �
         · exact measurable_coe_nnreal_ennreal_iff.mpr <|
             Finset.measurable_prod _ fun _ _ ↦ by fun_prop
         · refine Measurable.mul ?_ ?_
-          · -- simp_rw [Set.indicator_apply]
-            refine Measurable.ite ?_ ?_ ?_
+          · refine Measurable.ite ?_ ?_ ?_
             · change MeasurableSet (Prod.fst ⁻¹' (mapToUnitsPow K '' s))
               refine measurable_fst ?_
-              refine measurable_mapToUnitsPow_image K hs
-
+              refine measurable_mapToUnitsPow_image K hs hs'
             · exact measurable_const
             · exact measurable_const
           · refine Measurable.indicator ?_ ?_
@@ -914,8 +933,9 @@ theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → �
           Set.indicator_indicator, lintegral_indicator_one ((MeasurableSet.univ_pi
           fun _ ↦ measurableSet_Ioo).inter ht)]
       rw [← lintegral_const_mul']
-      congr with x
-      ring_nf
+      · congr with x
+        ring
+      · sorry
 
 #exit
 
