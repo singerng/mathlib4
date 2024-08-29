@@ -65,7 +65,7 @@ variable {n} in
 theorem mem_box_iff' {ν : ι → ℤ} {x : ι → ℝ} :
     x ∈ box n ν ↔ ∀ i, ν i < n * x i ∧ n * x i ≤ ν i + 1 := by
   have h_npos : 0 < (n:ℝ) := Nat.cast_pos.mpr <| PNat.pos n
-  simp_rw [mem_box_iff, ← _root_.le_div_iff' h_npos, ← div_lt_iff' h_npos, add_div]
+  simp_rw [mem_box_iff, ← _root_.le_div_iff₀' h_npos, ← div_lt_iff' h_npos, add_div]
 
 /-- For `x : ι → ℝ`, its index is the index of the unique `BoxIntegral.unitPartition.Box` to which
 it belongs`. -/
@@ -229,12 +229,12 @@ theorem mem_admissibleIndex_of_mem_box {B : Box ι} (hB : hasIntegralVertices B)
   have h : (0 : ℝ) < n := by aesop
   have ineq₁ : ∀ ⦃x : ℝ⦄ ⦃a : ℤ⦄, a < x ↔ a ≤ (⌈n * x⌉ - 1 : ℤ) / (n : ℝ) := by
     intro x a
-    rw [le_div_iff' h, Int.cast_sub, Int.cast_one, le_sub_iff_add_le, show (n : ℝ) * a + 1 =
+    rw [le_div_iff₀' h, Int.cast_sub, Int.cast_one, le_sub_iff_add_le, show (n : ℝ) * a + 1 =
       (n * a + 1 : ℤ) by norm_cast, Int.cast_le, Int.add_one_le_ceil_iff, Int.cast_mul,
       Int.cast_natCast, mul_lt_mul_left h]
   have ineq₂ : ∀ ⦃x : ℝ⦄ ⦃a : ℤ⦄, x ≤ a ↔ (⌈n * x⌉ - 1 : ℤ) / (n : ℝ) + 1 / n ≤ a := by
     intro x a
-    rw [Int.cast_sub, Int.cast_one, ← add_div, sub_add_cancel, div_le_iff' h, show (n : ℝ) * a =
+    rw [Int.cast_sub, Int.cast_one, ← add_div, sub_add_cancel, div_le_iff₀' h, show (n : ℝ) * a =
       (n * a : ℤ) by norm_cast, Int.cast_le, Int.ceil_le, Int.cast_mul, Int.cast_natCast,
       mul_le_mul_left h]
   obtain ⟨l, u, hl, hu⟩ := hB
@@ -328,7 +328,10 @@ theorem tendsto_tsum_div_pow :
       atTop (nhds (∫ x in s, F x)) := by
   obtain ⟨B, hB, hs₀⟩ := le_hasIntegralVertices_of_isBounded hs₁
   refine Metric.tendsto_atTop.mpr fun ε hε ↦ ?_
-  have : ContinuousOn (Set.indicator s (fun x ↦ F x)) (BoxIntegral.Box.Icc B) := sorry
+  have : ContinuousOn (Set.indicator s (fun x ↦ F x)) (BoxIntegral.Box.Icc B) := by
+    apply?
+    sorry
+
   obtain ⟨r, hr₁, hr₂⟩ := (BoxIntegral.hasIntegral_iff.mp <| ContinuousOn.hasBoxIntegral
     (volume : Measure (ι → ℝ)) this BoxIntegral.IntegrationParams.Riemann) (ε / 2) (half_pos hε)
   refine ⟨⌈(r 0 0 : ℝ)⁻¹⌉₊, fun n hn ↦ lt_of_le_of_lt ?_ (half_lt_self_iff.mpr hε)⟩

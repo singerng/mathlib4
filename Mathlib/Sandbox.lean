@@ -3,6 +3,21 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section indicator
+
+example {α M : Type*} [TopologicalSpace α] [TopologicalSpace M] [Zero M] (s : Set α) (f : α → M) :
+    Continuous (s.indicator f) := by
+  classical
+  refine continuous_piecewise ?_ ?_ ?_
+  classical
+  let g := (frontier s).piecewise (fun _ ↦ 0) f
+  have : Continuous (s.indicator g) := by
+    refine continuous_indicator ?_ ?_
+
+  sorry
+
+end indicator
+
 section polarCoord
 
 open scoped Real
@@ -15,7 +30,7 @@ theorem Complex.polarCoord.symm_injOn :
 theorem Complex.polarCoord.symm_measurableSet_image {s t : Set ℝ} (hs : s ⊆ Set.Ici 0)
     (ht : t ⊆ Set.Icc (-π) π) :
     MeasurableSet (Complex.polarCoord.symm '' s ×ˢ t) := sorry
-  
+
 
   -- ext
   -- · have := congr_arg Complex.abs hxy
