@@ -6,6 +6,8 @@ Authors: Xavier Roblot
 import Mathlib.Analysis.BoxIntegral.UnitPartition
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
+import Mathlib.Sandbox
+
 /-!
 # Covolume of ℤ-lattices
 
@@ -229,24 +231,38 @@ open Filter Fintype Pointwise Topology
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 variable (L : AddSubgroup (ι → ℝ)) [DiscreteTopology L] [IsZlattice ℝ L]
 
+-- Move this above?
+theorem volume_basis_equivFun_image (b : Basis ι ℤ L) (s : Set (ι → ℝ)) :
+    volume ((b.ofZlatticeBasis ℝ L).equivFun '' s) = (volume s) / ENNReal.ofReal (covolume L) := by
+  rw [LinearEquiv.image_eq_preimage, Measure.addHaar_preimage_linearEquiv, LinearEquiv.symm_symm,
+    covolume_eq_det_mul_measure L volume b (Pi.basisFun ℝ ι), div_eq_mul_inv,
+    Zspan.fundamentalDomain_pi_basisFun, volume_pi_pi, Real.volume_Ico, sub_zero,
+    ENNReal.ofReal_one, Finset.prod_const_one, ENNReal.one_toReal, mul_one,
+    show (((↑) : L → _) ∘ ⇑b) = (b.ofZlatticeBasis ℝ) by ext; simp, ← Basis.det_inv,
+    Units.val_inv_eq_inv_val, IsUnit.unit_spec, abs_inv, ENNReal.ofReal_inv_of_pos,
+    inv_inv, mul_comm, Basis.det_basis]
+  · rfl
+  · exact abs_pos.mpr <|
+      (AlternatingMap.map_basis_ne_zero_iff _ _).mpr (Basis.ofZlatticeBasis ℝ L b).det_ne_zero
+
 theorem tendsto_card_div_pow (b : Basis ι ℤ L) {s : Set (ι → ℝ)} (hs₁ : IsBounded s)
-    (hs₂ : MeasurableSet s) :
+    (hs₂ : MeasurableSet s) (hs₃ : volume (frontier s) = 0) :
     Tendsto (fun n : ℕ ↦ (Nat.card (s ∩ (n : ℝ)⁻¹ • L : Set (ι → ℝ)) : ℝ) / n ^ card ι)
       atTop (𝓝 ((volume s).toReal / covolume L)) := by
   convert tendsto_card_div_pow'' b hs₁ hs₂ ?_
-  rw [LinearEquiv.image_eq_preimage, Measure.addHaar_preimage_linearEquiv, LinearEquiv.symm_symm,
-    ENNReal.toReal_mul, ENNReal.toReal_ofReal (abs_nonneg _), covolume_eq_det_mul_measure L
-    volume b (Pi.basisFun ℝ ι), div_eq_mul_inv, Zspan.fundamentalDomain_pi_basisFun, volume_pi_pi,
-    Real.volume_Ico, sub_zero, ENNReal.ofReal_one, Finset.prod_const_one, ENNReal.one_toReal,
-    mul_one, show (((↑) : L → _) ∘ ⇑b) = (b.ofZlatticeBasis ℝ) by ext; simp, ← Basis.det_inv,
-    Units.val_inv_eq_inv_val, IsUnit.unit_spec, abs_inv, inv_inv, mul_comm, Basis.det_basis]
-  rfl
+  · rw [volume_basis_equivFun_image, ENNReal.toReal_div, ENNReal.toReal_ofReal
+      (covolume_pos L volume).le]
+  · rw [LinearEquiv.image_eq_preimage, ← Basis.equivFunL_symm_coe, ← ContinuousLinearEquiv.coe_coe,
+      ContinuousLinearMap.frontier_preimage _ (ContinuousLinearEquiv.surjective _),
+      ContinuousLinearEquiv.coe_coe, Basis.equivFunL_symm_coe, ← LinearEquiv.image_eq_preimage,
+      volume_basis_equivFun_image, hs₃, ENNReal.zero_div]
 
 variable {X : Set (ι → ℝ)} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 < r → r • x ∈ X)
 variable {F : (ι → ℝ) → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ card ι * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
+  (hF₄ : volume (frontier {x | x ∈ X ∧ F x ≤ 1}) = 0)
 
-include hX hF₁ hF₂ hF₃ in
+include hX hF₁ hF₂ hF₃ hF₄ in
 theorem tendsto_card_le_div [Nonempty ι]:
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set (ι → ℝ)) / (c : ℝ))
@@ -255,14 +271,13 @@ theorem tendsto_card_le_div [Nonempty ι]:
     refine Fintype.equivOfCardEq ?_
     rw [← finrank_eq_card_chooseBasisIndex, Zlattice.rank ℝ, finrank_fintype_fun_eq_card]
   let b := (Module.Free.chooseBasis ℤ L).reindex e
-  convert tendsto_card_le_div'' b hX hF₁ hF₂ hF₃
-  rw [LinearEquiv.image_eq_preimage, Measure.addHaar_preimage_linearEquiv, LinearEquiv.symm_symm,
-    ENNReal.toReal_mul, ENNReal.toReal_ofReal (abs_nonneg _), covolume_eq_det_mul_measure L
-    volume b (Pi.basisFun ℝ ι), div_eq_mul_inv, Zspan.fundamentalDomain_pi_basisFun, volume_pi_pi,
-    Real.volume_Ico, sub_zero, ENNReal.ofReal_one, Finset.prod_const_one, ENNReal.one_toReal,
-    mul_one, show (((↑) : L → _) ∘ ⇑b) = (b.ofZlatticeBasis ℝ) by ext; simp, ← Basis.det_inv,
-    Units.val_inv_eq_inv_val, IsUnit.unit_spec, abs_inv, inv_inv, mul_comm, Basis.det_basis]
-  rfl
+  convert tendsto_card_le_div'' b hX hF₁ hF₂ hF₃ ?_
+  · rw [volume_basis_equivFun_image, ENNReal.toReal_div, ENNReal.toReal_ofReal
+      (covolume_pos L volume).le]
+  · rw [LinearEquiv.image_eq_preimage, ← Basis.equivFunL_symm_coe, ← ContinuousLinearEquiv.coe_coe,
+      ContinuousLinearMap.frontier_preimage _ (ContinuousLinearEquiv.surjective _),
+      ContinuousLinearEquiv.coe_coe, Basis.equivFunL_symm_coe, ← LinearEquiv.image_eq_preimage,
+      volume_basis_equivFun_image, hF₄, ENNReal.zero_div]
 
 end Pi
 
@@ -274,29 +289,39 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDim
   [MeasurableSpace E] [BorelSpace E]
 variable (L : AddSubgroup E) [DiscreteTopology L] [IsZlattice ℝ L]
 
-theorem tendsto_card_div_pow' {s : Set E} (hs₁ : IsBounded s) (hs₂ : MeasurableSet s) :
+theorem tendsto_card_div_pow' {s : Set E} (hs₁ : IsBounded s) (hs₂ : MeasurableSet s)
+    (hs₃ : volume (frontier s) = 0) :
     Tendsto (fun n : ℕ ↦ (Nat.card (s ∩ (n : ℝ)⁻¹ • L : Set E) : ℝ) / n ^ finrank ℝ E)
       atTop (𝓝 ((volume s).toReal / covolume L)) := by
   let b := Module.Free.chooseBasis ℤ L
-  convert tendsto_card_div_pow'' b hs₁ hs₂
+  convert tendsto_card_div_pow'' b hs₁ hs₂ ?_
   · rw [← finrank_eq_card_chooseBasisIndex, Zlattice.rank ℝ L]
   · rw [volume_image_eq_volume_div_covolume hs₂, ENNReal.toReal_div, ENNReal.toReal_ofReal]
     exact le_of_lt (covolume_pos L)
+  · rw [LinearEquiv.image_eq_preimage, ← Basis.equivFunL_symm_coe, ← ContinuousLinearEquiv.coe_coe,
+      ContinuousLinearMap.frontier_preimage _ (ContinuousLinearEquiv.surjective _),
+      ContinuousLinearEquiv.coe_coe, Basis.equivFunL_symm_coe, ← LinearEquiv.image_eq_preimage,
+      volume_image_eq_volume_div_covolume measurableSet_frontier, hs₃, ENNReal.zero_div]
 
 variable {X : Set E} (hX : ∀ ⦃x⦄ ⦃r : ℝ⦄, x ∈ X → 0 < r → r • x ∈ X)
 variable {F : E → ℝ} (hF₁ : ∀ x ⦃r : ℝ⦄, 0 < r →  F (r • x) = r ^ finrank ℝ E * (F x))
   (hF₂ : IsBounded {x ∈ X | F x ≤ 1}) (hF₃ : MeasurableSet {x ∈ X | F x ≤ 1})
+  (hF₄ : volume (frontier {x ∈ X | F x ≤  1}) = 0)
 
-include hX hF₁ hF₂ hF₃ in
+include hX hF₁ hF₂ hF₃ hF₄ in
 theorem tendsto_card_le_div' [Nontrivial E]:
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set E) / (c : ℝ))
         atTop (𝓝 ((volume {x ∈ X | F x ≤ 1}).toReal / covolume L)) := by
   let b := Module.Free.chooseBasis ℤ L
-  convert tendsto_card_le_div'' b hX ?_ hF₂ hF₃
+  convert tendsto_card_le_div'' b hX ?_ hF₂ hF₃ ?_
   · rw [volume_image_eq_volume_div_covolume hF₃, ENNReal.toReal_div, ENNReal.toReal_ofReal]
     exact le_of_lt (covolume_pos L)
   · rwa [← finrank_eq_card_chooseBasisIndex, Zlattice.rank ℝ L]
+  · rw [LinearEquiv.image_eq_preimage, ← Basis.equivFunL_symm_coe, ← ContinuousLinearEquiv.coe_coe,
+      ContinuousLinearMap.frontier_preimage _ (ContinuousLinearEquiv.surjective _),
+      ContinuousLinearEquiv.coe_coe, Basis.equivFunL_symm_coe, ← LinearEquiv.image_eq_preimage,
+      volume_image_eq_volume_div_covolume measurableSet_frontier, hF₄, ENNReal.zero_div]
   · have : Nontrivial L := nontrivial_of_finrank_pos <| (Zlattice.rank ℝ L).symm ▸ finrank_pos
     infer_instance
 

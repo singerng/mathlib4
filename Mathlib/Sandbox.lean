@@ -3,6 +3,29 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section topo
+
+theorem measurableSet_frontier {α : Type*} {s : Set α} [TopologicalSpace α] [MeasurableSpace α]
+    [OpensMeasurableSpace α] :
+    MeasurableSet (frontier s) :=
+  measurableSet_closure.diff measurableSet_interior
+
+end topo
+
+section basis
+
+variable {𝕜 : Type*} [hnorm : NontriviallyNormedField 𝕜] {E : Type*} [AddCommGroup E] [Module 𝕜 E]
+  [TopologicalSpace E] [TopologicalAddGroup E] [ContinuousSMul 𝕜 E] [CompleteSpace 𝕜] {ι : Type*}
+  [Finite ι]  [T2Space E] (v : Basis ι 𝕜 E)
+
+theorem Basis.equivFunL_coe :
+  ⇑v.equivFunL = v.equivFun := rfl
+
+theorem Basis.equivFunL_symm_coe :
+  ⇑v.equivFunL.symm = v.equivFun.symm := rfl
+
+end basis
+
 section indicator
 
 variable {α β : Type*} [One β] {f : α → β} {s : Set α}
