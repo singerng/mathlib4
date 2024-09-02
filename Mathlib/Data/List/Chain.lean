@@ -375,8 +375,15 @@ theorem relationReflTransGen_of_exists_chain (l : List α) (hl₁ : Chain r a l)
   Chain.backwards_induction_head _ l hl₁ hl₂ (fun _ _ => Relation.ReflTransGen.head)
     Relation.ReflTransGen.refl
 
+/-- Two elements are related by the reflexive transitive closure of `r` iff
+there exists an `r`-chain between them. -/
+theorem relationReflTransGen_iff_exists_chain :
+    Relation.ReflTransGen r a b ↔ ∃ l, Chain r a l ∧ (a :: l).getLast (cons_ne_nil _ _) = b :=
+  ⟨exists_chain_of_relationReflTransGen,
+    fun ⟨l, hl₁, hl₂⟩ ↦ relationReflTransGen_of_exists_chain l hl₁ hl₂⟩
+
 /-- If `a` and `b` are related by the transitive closure of `r`, then there is a nonempty `r`-chain
-starting at `a` and ending at `b`. The converse of `relationTransGen_of_exists_chain`. -/
+starting at `a` and ending at `b`. Converse of `relationTransGen_of_exists_chain`. -/
 theorem exists_chain_of_relationTransGen (h : Relation.TransGen r a b) :
     ∃ l hl₀, Chain r a l ∧ l.getLast hl₀ = b := by
   induction h using Relation.TransGen.head_induction_on with
@@ -387,7 +394,7 @@ theorem exists_chain_of_relationTransGen (h : Relation.TransGen r a b) :
     rwa [getLast_cons hl₀]
 
 /-- If there is a nonempty `r`-chain starting at `a` and ending at `b`, then `a` and `b` are
-related by the transitive closure of `r`. The converse of `exists_chain_of_relationTransGen`. -/
+related by the transitive closure of `r`. Converse of `exists_chain_of_relationTransGen`. -/
 theorem relationTransGen_of_exists_chain (l : List α) (hl₀ : l ≠ []) (hl₁ : Chain r a l)
     (hl₂ : l.getLast hl₀ = b) : Relation.TransGen r a b := by
   induction l generalizing a with
@@ -399,6 +406,13 @@ theorem relationTransGen_of_exists_chain (l : List α) (hl₀ : l ≠ []) (hl₁
       exact Relation.TransGen.single (hl₂ ▸ hl₁.1)
     · rw [getLast_cons hl] at hl₂
       exact Relation.TransGen.head hl₁.1 (ih hl hl₁.2 hl₂)
+
+/-- Two elements are related by the transitive closure of `r` iff
+there exists a nonempty `r`-chain between them. -/
+theorem relationTransGen_iff_exists_chain :
+    Relation.TransGen r a b ↔ ∃ l hl₀, Chain r a l ∧ l.getLast hl₀ = b :=
+  ⟨exists_chain_of_relationTransGen,
+    fun ⟨l, hl₀, hl₁, hl₂⟩ ↦ relationTransGen_of_exists_chain l hl₀ hl₁ hl₂⟩
 
 theorem Chain'.cons_of_le [LinearOrder α] {a : α} {as m : List α}
     (ha : List.Chain' (· > ·) (a :: as)) (hm : List.Chain' (· > ·) m) (hmas : m ≤ as) :
