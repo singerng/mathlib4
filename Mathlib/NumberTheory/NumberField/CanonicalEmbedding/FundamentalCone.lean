@@ -364,6 +364,13 @@ theorem smul_normEqOne_subset {c : ℝ} (hc₁ : 0 < c) (hc₂ : c ≤ 1) :
   rw [hx.2]
   exact pow_le_one _ hc₁.le hc₂
 
+theorem normLessThanOne_eq_union_smul_normEqOne :
+    normLessThanOne K = ⋃ c ∈ Set.Ioc (0 : ℝ) 1, c • normEqOne K := by
+  ext
+  simp_rw [Set.mem_iUnion, Set.mem_Ioc, exists_prop, and_assoc]
+  exact ⟨fun hx ↦ exists_mem_smul_normEqOne hx,
+    fun ⟨_, h₁, h₂, hx⟩ ↦ smul_normEqOne_subset K h₁ h₂ hx⟩
+
 theorem smul_normLessThanOne_subset {c : ℝ} (hc₁ : c ≠ 0) (hc₂ : |c| ≤ 1) :
     c • normLessThanOne K ⊆ normLessThanOne K := by
   rintro _ ⟨x, hx, rfl⟩

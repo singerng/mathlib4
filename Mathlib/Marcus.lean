@@ -27,6 +27,16 @@ def realToMixed : (InfinitePlace K → ℝ) →L[ℝ] (E K) := ContinuousLinearM
   (ContinuousLinearMap.pi fun w ↦ Complex.ofRealCLM.comp (ContinuousLinearMap.proj w.val))
 
 @[simp]
+theorem realToMixed_apply_of_isReal (x : InfinitePlace K → ℝ) {w : InfinitePlace K}
+    (hw : IsReal w) :
+    (realToMixed x).1 ⟨w, hw⟩ = x w := rfl
+
+@[simp]
+theorem realToMixed_apply_of_isComplex (x : InfinitePlace K → ℝ) {w : InfinitePlace K}
+    (hw : IsComplex w) :
+    (realToMixed x).2 ⟨w, hw⟩ = x w := rfl
+
+@[simp]
 theorem normAtPlace_realToMixed (w : InfinitePlace K) (x : InfinitePlace K → ℝ) :
     normAtPlace w (realToMixed x) = |x w| := by
   obtain hw | hw := isReal_or_isComplex w
@@ -42,6 +52,40 @@ theorem pos_norm_realToMixed {x : InfinitePlace K → ℝ} (hx : ∀ w, 0 < x w)
     0 < mixedEmbedding.norm (realToMixed x) := by
   rw [norm_realToMixed]
   exact Finset.prod_pos fun w _ ↦ pow_pos (abs_pos_of_pos (hx w)) _
+
+theorem logMap_realToMixed {x : InfinitePlace K → ℝ}
+    (hx : mixedEmbedding.norm (realToMixed x) = 1) :
+    logMap (realToMixed x) = fun w ↦ (mult w.val) * Real.log (x w.val) := by
+  ext
+  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.log_abs]
+
+def vectorNormAtPlace (x : E K) : InfinitePlace K → ℝ := fun w ↦ normAtPlace w x
+
+theorem vectorNormAtPlace_smul (x : E K) {r : ℝ} (hr : 0 ≤ r) :
+    vectorNormAtPlace (r • x) = r • vectorNormAtPlace x := by
+  ext
+  rw [vectorNormAtPlace, Pi.smul_apply, vectorNormAtPlace, normAtPlace_smul, smul_eq_mul,
+    abs_of_nonneg hr]
+
+@[simp]
+theorem norm_realToMixed_vectorNormAtPlace (x : E K) :
+    mixedEmbedding.norm (realToMixed (vectorNormAtPlace x)) = mixedEmbedding.norm x := by
+  simp_rw [norm_realToMixed, vectorNormAtPlace, mixedEmbedding.norm_apply, abs_of_nonneg
+    (normAtPlace_nonneg _ _)]
+
+theorem logMap_realToMixed_vectorNormAtPlace_of_norm_one {x : E K}
+    (hx : mixedEmbedding.norm x = 1) :
+    logMap (realToMixed (vectorNormAtPlace x)) = logMap x := by
+  ext
+  rw [logMap_apply_of_norm_one hx, logMap_apply_of_norm_one
+    (by rwa [norm_realToMixed_vectorNormAtPlace]), normAtPlace_realToMixed, Real.log_abs,
+    vectorNormAtPlace]
+
+theorem vectorNormAtPlace_realToMixed_of_nonneg {x : InfinitePlace K → ℝ} (hx : ∀ w, 0 ≤ x w) :
+    vectorNormAtPlace (realToMixed x) = x := by
+  ext
+  rw [vectorNormAtPlace, normAtPlace_realToMixed, abs_of_nonneg (hx _)]
+
 
 variable (K)
 
@@ -81,6 +125,9 @@ def mapToUnitsPow₀_aux :
         neg_neg, inv_mul_cancel_left₀ mult_coe_ne_zero, Real.exp_log (hx.1 w₀)]
     · rw [dif_neg hw, inv_mul_cancel_left₀ mult_coe_ne_zero, Real.exp_log (hx.1 w)]
 
+theorem mapToUnitsPow₀_aux_symm_apply (x : InfinitePlace K → ℝ) :
+    (mapToUnitsPow₀_aux K).symm x = fun w ↦ w.val.mult * Real.log (x w.val) := rfl
+
 theorem continuous_mapToUnitsPow₀_aux :
     Continuous (mapToUnitsPow₀_aux K) := by
   unfold mapToUnitsPow₀_aux
@@ -95,6 +142,11 @@ theorem continuousOn_mapToUnitsPow₀_aux_symm :
     ContinuousOn (mapToUnitsPow₀_aux K).symm {x | ∀ w, x w ≠ 0} :=
   continuousOn_pi.mpr fun w ↦
     continuousOn_const.mul <| (continuousOn_apply _ _).log fun _ h ↦ h w
+
+theorem pos_fundSystem (w : InfinitePlace K) (i : Fin (rank K)) :
+    0 < w (fundSystem K i) := by
+  refine pos_iff.mpr ?_
+  simp only [ne_eq, RingOfIntegers.coe_eq_zero_iff, Units.ne_zero, not_false_eq_true]
 
 open Classical in
 -- This cannot be a `PartiaHomeomorph` because the target is not an open set
@@ -136,27 +188,117 @@ theorem mapToUnitsPow₀_pos (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) (
   rw [mapToUnitsPow₀_source]
   exact trivial
 
+theorem mapToUnitsPow₀_aux_symm_apply_of_norm_one {x : InfinitePlace K → ℝ}
+    (hx : mixedEmbedding.norm (realToMixed x) = 1) :
+    (mapToUnitsPow₀_aux K).symm x = logMap (realToMixed x) := by
+  ext
+  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.log_abs]
+  rfl
+
+open Classical in
+theorem mapToUnitsPow₀_symm_apply_of_norm_one {x : InfinitePlace K → ℝ}
+    (hx : mixedEmbedding.norm (realToMixed x) = 1) (i : Fin (rank K)) :
+    (mapToUnitsPow₀ K).symm x (equivFinRank i) =
+      ((basisUnitLattice K).ofZlatticeBasis ℝ (unitLattice K)).repr
+        (logMap (realToMixed x)) i := by
+  simp_rw [mapToUnitsPow₀, PartialEquiv.coe_trans_symm, Equiv.toPartialEquiv_symm_apply,
+    LinearEquiv.coe_toEquiv_symm, LinearEquiv.symm_symm, Function.comp_apply,
+    mapToUnitsPow₀_aux_symm_apply, EquivLike.coe_coe, Basis.equivFun_apply, Basis.repr_reindex,
+    Finsupp.mapDomain_equiv_apply, logMap_realToMixed hx, Equiv.symm_apply_apply]
+
+open Classical in
+theorem mapToUnitsPow₀_symm_prod_fundSystem_rpow (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
+    (mapToUnitsPow₀ K).symm (fun w ↦ ∏ i, w (fundSystem K (equivFinRank.symm i)) ^ c i) = c := by
+  ext
+  simp_rw [mapToUnitsPow₀, PartialEquiv.coe_trans_symm, Equiv.toPartialEquiv_symm_apply,
+    LinearEquiv.coe_toEquiv_symm, LinearEquiv.symm_symm, Function.comp_apply,
+    mapToUnitsPow₀_aux_symm_apply, EquivLike.coe_coe, Basis.equivFun_apply, Basis.repr_reindex,
+    Real.log_prod _ _ (fun _ _ ↦ ne_of_gt (Real.rpow_pos_of_pos (pos_fundSystem K _ _) _)),
+    Real.log_rpow (pos_fundSystem K _ _), Finset.mul_sum, mul_left_comm,
+    ← logEmbedding_component, logEmbedding_fundSystem, ← sum_fn, _root_.map_sum, ← smul_eq_mul,
+    ← Pi.smul_def, _root_.map_smul, Finsupp.mapDomain_equiv_apply, Finset.sum_apply',
+    Finsupp.coe_smul, Pi.smul_apply, Basis.ofZlatticeBasis_repr_apply, Basis.repr_self,
+    smul_eq_mul, Finsupp.single_apply, Int.cast_ite, mul_ite, Int.cast_zero, mul_zero,
+    EmbeddingLike.apply_eq_iff_eq, sum_ite_eq', mem_univ, if_true, Int.cast_one, mul_one]
+
+open Classical in
+theorem norm_realToMixed_prod_fundSystem_rpow (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
+    mixedEmbedding.norm (realToMixed fun w : InfinitePlace K ↦
+      ∏ i, w (fundSystem K (equivFinRank.symm i)) ^ c i) = 1 :=
+   calc
+    _ = |∏ w : InfinitePlace K,
+          ∏ i, (w (fundSystem K (equivFinRank.symm i)) ^ c i) ^ w.mult| := by
+      simp_rw [norm_realToMixed, ← abs_pow, ← Finset.abs_prod, ← Finset.prod_pow]
+    _ = |∏ w : InfinitePlace K,
+          ∏ i, (w (fundSystem K (equivFinRank.symm i)) ^ w.mult) ^ c i| := by
+      congr!
+      rw [← Real.rpow_natCast, Real.rpow_comm (pos_fundSystem K _ _).le, Real.rpow_natCast]
+    _ = |∏ i,
+          (∏ w : InfinitePlace K, (w (fundSystem K (equivFinRank.symm i)) ^ w.mult)) ^ c i| := by
+      rw [Finset.prod_comm]
+      simp_rw [Real.finset_prod_rpow _ _ (fun _ _ ↦ pow_nonneg (pos_fundSystem K _ _).le _)]
+    _ = 1 := by
+      simp_rw [prod_eq_abs_norm, Units.norm, Rat.cast_one, Real.one_rpow, prod_const_one, abs_one]
+
 open Classical in
 theorem mapToUnitsPow₀_apply (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
-    mapToUnitsPow₀ K c = fun w ↦ ∏ i, w (fundSystem K (equivFinRank.symm i)) ^ (c i) := by
-  ext w
-  simp_rw [mapToUnitsPow₀, PartialEquiv.coe_trans, Equiv.toPartialEquiv_apply,
-    LinearEquiv.coe_toEquiv, mapToUnitsPow₀_aux, Function.comp_apply, Basis.equivFun_symm_apply,
-    Basis.coe_reindex, Function.comp_apply, Basis.ofZlatticeBasis_apply, Finset.sum_apply,
-    Pi.smul_apply, smul_eq_mul, neg_mul, ← logEmbedding_fundSystem, Finset.mul_sum]
-  by_cases hw : w = w₀
-  · rw [dif_pos hw, Finset.sum_comm, ← Finset.sum_neg_distrib, Real.exp_sum]
-    simp_rw [← Finset.mul_sum, sum_logEmbedding_component, ← mul_assoc, mul_comm _ (c _),
-      mul_assoc (c _), hw, mul_neg, neg_mul, mul_neg, neg_neg, inv_mul_cancel₀ mult_coe_ne_zero,
-      one_mul]
-    refine Finset.prod_congr rfl fun w _ ↦ ?_
-    rw [← Real.log_rpow (pos_iff.mpr (by simp)),
-      Real.exp_log (by exact Real.rpow_pos_of_pos (pos_iff.mpr (by simp)) _)]
-  · rw [dif_neg hw, Real.exp_sum]
-    congr with x
-    rw [logEmbedding_component, ← mul_assoc, ← mul_assoc, mul_comm _ (c _), mul_assoc (c _),
-      inv_mul_cancel₀ mult_coe_ne_zero, mul_one, ← Real.log_rpow (pos_iff.mpr (by simp)),
-      Real.exp_log (Real.rpow_pos_of_pos (pos_iff.mpr (by simp)) _)]
+    mapToUnitsPow₀ K c = fun w ↦ ∏ i, w (fundSystem K (equivFinRank.symm i)) ^ c i := by
+  refine (PartialEquiv.eq_symm_apply _ (by trivial) ?_).mp
+    (mapToUnitsPow₀_symm_prod_fundSystem_rpow K c).symm
+  rw [mapToUnitsPow₀_target]
+  refine ⟨?_, norm_realToMixed_prod_fundSystem_rpow K c⟩
+  exact fun _ ↦ Finset.prod_pos fun _ _ ↦ Real.rpow_pos_of_pos (pos_fundSystem K _ _) _
+
+theorem realToMixed_mapToUnitsPow₀_mem_fundamentalCone_iff
+    (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
+    realToMixed (mapToUnitsPow₀ K c) ∈ fundamentalCone K ↔ ∀ i, c i ∈ Set.Ico 0 1 := by
+  classical
+  simp_rw [mem_fundamentalCone, Zspan.mem_fundamentalDomain, ← mapToUnitsPow₀_symm_apply_of_norm_one
+    K (norm_mapToUnitsPow₀ K _), (mapToUnitsPow₀ K).left_inv (by trivial), mapToUnitsPow₀_apply,
+    norm_realToMixed_prod_fundSystem_rpow, and_iff_left one_ne_zero, Equiv.forall_congr_right
+    (q := fun i ↦ c i ∈ Set.Ico 0 1)]
+
+-- Use the above to golf this proof
+theorem vectorNormAtPlace_normEqOne_eq_image :
+    vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) =
+      mapToUnitsPow₀ K '' (Set.univ.pi fun _ ↦ Set.Ico 0 1) := by
+  classical
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨x, ⟨⟨⟨hx, hx₁⟩, hx₂⟩, _⟩, rfl⟩
+    rw [Set.mem_preimage, Zspan.mem_fundamentalDomain] at hx
+    refine ⟨fun i ↦
+      (((basisUnitLattice K).ofZlatticeBasis ℝ (unitLattice K) ).repr (logMap x))
+        (equivFinRank.symm i), ?_, ?_⟩
+    · exact fun i _ ↦ hx (equivFinRank.symm i)
+    · rw [← logMap_realToMixed_vectorNormAtPlace_of_norm_one hx₂]
+      rw [← norm_realToMixed_vectorNormAtPlace] at hx₂
+      simp_rw [← mapToUnitsPow₀_symm_apply_of_norm_one (x := vectorNormAtPlace x) hx₂,
+        Equiv.apply_symm_apply]
+      rw [PartialEquiv.right_inv]
+      rw [mapToUnitsPow₀_target]
+      refine ⟨?_, hx₂⟩
+      intro _
+      rw [vectorNormAtPlace]
+      exact lt_iff_le_and_ne.mpr ⟨normAtPlace_nonneg _ _,
+        (mixedEmbedding.norm_ne_zero_iff.mp hx₁ _).symm⟩
+  · rintro ⟨c, hc, rfl⟩
+    refine ⟨realToMixed (mapToUnitsPow₀ K c), ⟨⟨?_, ?_⟩, ?_⟩, ?_⟩
+    · rw [mem_fundamentalCone]
+      refine ⟨?_, ?_⟩
+      · rw [Zspan.mem_fundamentalDomain]
+        intro _
+        rw [← mapToUnitsPow₀_symm_apply_of_norm_one]
+        · rw [PartialEquiv.left_inv]
+          exact hc _ trivial
+          trivial
+        · exact norm_mapToUnitsPow₀ K c
+      · rw [norm_mapToUnitsPow₀]
+        exact one_ne_zero
+    · exact norm_mapToUnitsPow₀ K c
+    · intro _
+      exact mapToUnitsPow₀_pos K c _
+    · rw [vectorNormAtPlace_realToMixed_of_nonneg (fun _ ↦ (mapToUnitsPow₀_pos K c _).le)]
 
 theorem mapToUnitsPow₀_ne_zero (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
     mapToUnitsPow₀ K c ≠ 0 := by
@@ -283,36 +425,42 @@ theorem mapToUnitsPow_apply (c : InfinitePlace K → ℝ) :
 
 open Classical in
 -- Use this to simplify the definition of mapToUnitsPow?
-abbrev mapToUnitsPow_single (c : (InfinitePlace K → ℝ)) : InfinitePlace K → (InfinitePlace K → ℝ) :=
+abbrev mapToUnitsPow_single (c : InfinitePlace K → ℝ) : InfinitePlace K → (InfinitePlace K → ℝ) :=
   fun i ↦ if hi : i = w₀ then fun _ ↦ |c w₀| else
     fun w ↦ (w (fundSystem K (equivFinRank.symm ⟨i, hi⟩))) ^ (c i)
 
 open Classical in
-theorem mapToUnitsPow₀_eq_prod_single (c : (InfinitePlace K → ℝ)) (w : InfinitePlace K) :
+theorem mapToUnitsPow₀_eq_prod_single (c : InfinitePlace K → ℝ) (w : InfinitePlace K) :
     mapToUnitsPow₀ K (fun w ↦ c w.val) w =
       ∏ i ∈ univ.erase w₀, mapToUnitsPow_single K c i w := by
   rw [mapToUnitsPow₀_apply, Finset.prod_subtype (Finset.univ.erase w₀)
     (fun w ↦ (by aesop : w ∈ univ.erase w₀ ↔ w ≠ w₀))]
   exact Finset.prod_congr rfl fun w _ ↦ by rw [mapToUnitsPow_single, dif_neg w.prop]
 
-theorem mapToUnitsPow_eq_prod_single (c : (InfinitePlace K → ℝ)) (w : InfinitePlace K) :
+theorem mapToUnitsPow_eq_prod_single (c : InfinitePlace K → ℝ) (w : InfinitePlace K) :
     mapToUnitsPow K c w = ∏ i, mapToUnitsPow_single K c i w := by
   classical
   rw [← Finset.univ.mul_prod_erase _ (Finset.mem_univ w₀), mapToUnitsPow_apply, Pi.smul_apply,
     mapToUnitsPow₀_eq_prod_single, smul_eq_mul, mapToUnitsPow_single, dif_pos rfl]
 
-theorem mapToUnitsPow_nonneg (c : (InfinitePlace K → ℝ)) (w : InfinitePlace K) :
+theorem mapToUnitsPow_nonneg (c : InfinitePlace K → ℝ) (w : InfinitePlace K) :
     0 ≤ mapToUnitsPow K c w :=
   mul_nonneg (abs_nonneg _) (mapToUnitsPow₀_pos K _ _).le
 
-theorem mapToUnitsPow_zero_iff (c : (InfinitePlace K → ℝ)) (w : InfinitePlace K) :
+variable {K} in
+theorem mapToUnitsPow_zero_iff {c : InfinitePlace K → ℝ} {w : InfinitePlace K} :
     mapToUnitsPow K c w = 0 ↔ c w₀ = 0 := by
   rw [mapToUnitsPow_apply, Pi.smul_apply, smul_eq_mul, mul_eq_zero, abs_eq_zero,
     or_iff_left (ne_of_gt (mapToUnitsPow₀_pos K _ _))]
 
-theorem mapToUnitsPow_zero_iff' (c : (InfinitePlace K → ℝ)) :
+variable {K} in
+theorem mapToUnitsPow_zero_iff' {c : InfinitePlace K → ℝ} :
     mapToUnitsPow K c = 0 ↔ c w₀ = 0 := by
   rw [mapToUnitsPow_apply, smul_eq_zero, abs_eq_zero, or_iff_left (mapToUnitsPow₀_ne_zero _ _)]
+
+theorem mapToUnitsPow_pos {c : InfinitePlace K → ℝ} (hc : c w₀ ≠ 0) (w : InfinitePlace K) :
+    0 < mapToUnitsPow K c w :=
+  lt_of_le_of_ne (mapToUnitsPow_nonneg K c w) (Ne.symm (mapToUnitsPow_zero_iff.not.mpr hc))
 
 theorem continuous_mapToUnitsPow :
     Continuous (mapToUnitsPow K) :=
@@ -525,6 +673,83 @@ theorem setLIntegral_mapToUnitsPow {s : Set (InfinitePlace K → ℝ)} (hs₀ : 
     ring
   · exact mul_ne_top (mul_ne_top (pow_ne_top (inv_ne_top.mpr two_ne_zero)) ofReal_ne_top)
       (natCast_ne_top _)
+
+open Classical in
+abbrev box₁ : Set (InfinitePlace K → ℝ) :=
+  Set.univ.pi fun w ↦ if w = w₀ then Set.Ioc 0 1 else Set.Ico 0 1
+
+theorem mem_Ioc_of_mem_box₁ {c : InfinitePlace K → ℝ} (hc : c ∈ box₁ K) :
+    c w₀ ∈ Set.Ioc 0 1 := by
+  have := hc w₀ (Set.mem_univ _)
+  simp_rw [ite_true] at this
+  exact this
+
+theorem mem_Ico_of_mem_box₁ {c : InfinitePlace K → ℝ} (hc : c ∈ box₁ K) {w : InfinitePlace K}
+    (hw : w ≠ w₀) :
+    c w ∈ Set.Ico 0 1 := by
+  have := hc w (Set.mem_univ _)
+  simp_rw [if_neg hw] at this
+  exact this
+
+theorem vectorNormAtPlace_normLessThanOne_eq_image :
+    vectorNormAtPlace '' (normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}) =
+      mapToUnitsPow K '' (box₁ K) := by
+  classical
+  rw [normLessThanOne_eq_union_smul_normEqOne, Set.iUnion₂_inter, Set.image_iUnion₂]
+  ext
+  rw [Set.mem_iUnion₂, Set.mem_image]
+  refine ⟨?_, ?_⟩
+  · rintro ⟨r, hr, ⟨_, ⟨⟨x, hx, rfl⟩, hx₂⟩, rfl⟩⟩
+    have : vectorNormAtPlace x ∈ vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) := by
+      have hn : ∀ w, normAtPlace w (fun w ↦ |x.1 w|, x.2) = normAtPlace w x := by
+        intro w
+        obtain hw | hw := isReal_or_isComplex w
+        · simp_rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_abs]
+        · simp_rw [normAtPlace_apply_isComplex hw]
+      refine ⟨(fun w ↦ |x.1 w|, x.2), ⟨?_, ?_⟩, ?_⟩
+      · exact mem_normEqOne_of_normAtPlace_eq K hx hn
+      · intro w
+        dsimp only
+        rw [← Real.norm_eq_abs, ← normAtPlace_apply_isReal]
+        exact normAtPlace_pos_of_mem hx.1 w
+      · ext w
+        rw [vectorNormAtPlace, vectorNormAtPlace, hn]
+    rw [vectorNormAtPlace_normEqOne_eq_image] at this
+    obtain ⟨c, hc₁, hc₂⟩ := this
+    refine ⟨?_, ?_, ?_⟩
+    · exact fun w ↦ if hw : w = w₀ then r else c ⟨w, hw⟩
+    · -- simp_rw [Set.mem_pi, Set.mem_univ, true_implies]
+      intro w _
+      by_cases hw : w = w₀
+      · simp_rw [hw, dite_true, if_true]
+        exact hr
+      · simp_rw [dif_neg hw, if_neg hw]
+        exact hc₁ _ (Set.mem_univ _)
+    · simp_rw [mapToUnitsPow_apply, dite_true, Subtype.coe_eta]
+      conv_lhs =>
+        enter [2, 2, w]
+        rw [dif_neg w.prop]
+      rw [hc₂, abs_of_nonneg hr.1.le, vectorNormAtPlace_smul _ hr.1.le]
+  · rintro ⟨c, hc, rfl⟩
+    refine ⟨c w₀, mem_Ioc_of_mem_box₁ K hc, ⟨?_, ⟨?_, ?_⟩, ?_⟩⟩
+    · exact realToMixed (mapToUnitsPow K c)
+    · rw [smul_normEqOne K (mem_Ioc_of_mem_box₁ K hc).1]
+      refine ⟨?_, ?_⟩
+      · rw [mapToUnitsPow_apply, _root_.map_smul, smul_mem_iff_mem,
+          realToMixed_mapToUnitsPow₀_mem_fundamentalCone_iff]
+        · exact fun i ↦ mem_Ico_of_mem_box₁ K hc i.prop
+        · rw [abs_ne_zero]
+          exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
+      · rw [mapToUnitsPow_apply, _root_.map_smul, mixedEmbedding.norm_smul, norm_mapToUnitsPow₀,
+          mul_one, abs_of_pos, abs_of_pos]
+        · exact (mem_Ioc_of_mem_box₁ K hc).1
+        · refine abs_pos_of_pos (mem_Ioc_of_mem_box₁ K hc).1
+    · intro w
+      rw [realToMixed_apply_of_isReal]
+      refine mapToUnitsPow_pos K ?_ _
+      exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
+    · rw [vectorNormAtPlace_realToMixed_of_nonneg]
+      exact fun _ ↦ (mapToUnitsPow_pos K (mem_Ioc_of_mem_box₁ K hc).1.ne.symm _).le
 
 open Classical in
 def realProdComplexProdMeasurableEquiv :
@@ -886,17 +1111,16 @@ open Classical in
 theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → ℝ)}
     (hs : MeasurableSet s) (hs' : s ⊆ {x | 0 ≤ x w₀} )
     {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
-    (ht : MeasurableSet t) (ht' : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
+    (ht : MeasurableSet t) (ht' : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π)
+    (hm : MeasurableSet (mapToUnitsPowComplex K '' s ×ˢ t)) :
     volume (mapToUnitsPowComplex K '' (s ×ˢ t)) =
       volume ((Set.univ.pi fun _ ↦ Set.Ioo (-π) π) ∩ t) * ∫⁻ x in mapToUnitsPow K '' s,
-        ENNReal.ofReal (∏ w : {w : InfinitePlace K // IsComplex w}, x w) := by
-  have hm : MeasurableSet (mapToUnitsPowComplex K '' s ×ˢ t) := by
-    rw [mapToUnitsPowComplex_image_prod]
-    sorry -- PROBLEM?
+        ∏ w : {w : InfinitePlace K // IsComplex w}, (x w).toNNReal := by
   rw [← setLIntegral_one, ← lintegral_indicator _ hm, lintegral_mixedSpace_eq K _
-    ((measurable_indicator_const_iff 1).mpr hm)]
+    ((measurable_indicator_const_iff 1).mpr hm),
+    setLIntegral_congr (setLIntegral_mapToUnitsPow_aux₂ K hs')]
   calc
-    _ = ∫⁻ x  in Set.univ.pi fun w ↦ if IsReal w then Set.univ else Set.Ioi 0,
+    _ = ∫⁻ x in Set.univ.pi fun w ↦ if IsReal w then Set.univ else Set.Ioi 0,
           ∫⁻ y in Set.univ.pi fun _ ↦ Set.Ioo (-π) π,
             (∏ w : {w // IsComplex w}, (x w.val).toNNReal) *
               ((mapToUnitsPow K '' s).indicator 1 x * t.indicator 1 y) := by
@@ -915,10 +1139,9 @@ theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → �
               refine measurable_mapToUnitsPow_image K hs hs'
             · exact measurable_const
             · exact measurable_const
-          · refine Measurable.indicator ?_ ?_
-            exact measurable_const
-            sorry -- PROBLEM?
-    _ = volume ((Set.univ.pi fun x ↦ Set.Ioo (-π) π) ∩ t) *
+          · refine Measurable.comp' ?_ measurable_snd
+            exact measurable_const.indicator ht
+    _ = volume ((Set.univ.pi fun _ ↦ Set.Ioo (-π) π) ∩ t) *
           ∫⁻ x in Set.univ.pi fun w ↦ if IsReal w then Set.univ else Set.Ioi 0,
             (∏ w : {w // IsComplex w}, (x w.val).toNNReal) *
               (mapToUnitsPow K '' s).indicator 1 x := by
@@ -935,114 +1158,43 @@ theorem volume_mapToUnitsPowComplex_set_prod_set {s : Set (InfinitePlace K → �
       rw [← lintegral_const_mul']
       · congr with x
         ring
-      · sorry
-
-#exit
-
-      simp_rw [← lintegral_indicator _ sorry, ← lintegral_mul_const' _ _ sorry,
-        Set.indicator_indicator]
-      ·
-        congr!
-        ring_nf
-        sorry
-
-      sorry
+      · refine ne_top_of_le_ne_top ?_ (measure_mono Set.inter_subset_left)
+        simp_rw [volume_pi, pi_pi, Real.volume_Ioo, Finset.prod_const]
+        refine ENNReal.pow_ne_top ENNReal.ofReal_ne_top
     _ = volume ((Set.univ.pi fun _ ↦ Set.Ioo (-π) π) ∩ t) *
-          ∫⁻ x in mapToUnitsPow K '' s, ENNReal.ofReal (∏ w : {w // IsComplex w}, x w.val) := by
-      simp_rw [lintegral_const_mul' _ _ sorry]
-      simp_rw [← lintegral_indicator _ sorry]
-      simp_rw [Set.indicator_indicator]
-      simp_rw [lintegral_indicator_one sorry]
-      simp_rw [lintegral_indicator _ sorry]
-      simp_rw [← mul_assoc]
-      sorry
-
-#exit
-
-  conv_lhs =>
-    enter [2, x, 2]
-    rw [mapToUnitsPowComplex_prod_indicator K ht']
-
-
-  sorry
-
---    refine NullMeasurableSet.congr
---      (s := mapToUnitsPowComplex K '' s ×ˢ (t ∩ Set.univ.pi fun _ ↦ Set.Ioo (-π) π)) ?_ ?_
---    · sorry
---    ·
---      sorry
-
-    -- refine MeasurableSet.congr
-    --   (s := mapToUnitsPowComplex K '' s ×ˢ (t ∩ Set.univ.pi fun _ ↦ Set.Ioo (-π) π)) ?_ ?_
-    -- refine MeasurableSet.image_of_measurable_injOn ?_ ?_ ?_
-    -- · exact MeasurableSet.prod hs sorry
-    -- · refine Continuous.measurable ?_
-    --   exact continuous_mapToUnitsPowComplex K
-    -- · refine Set.InjOn.mono ?_ (PartialHomeomorph.injOn (mapToUnitsPowComplex K))
-    --   sorry
-
-  · rw [← setLIntegral_one, ← lintegral_indicator₀, lintegral_mixedSpace_eq]
-    · sorry
-    · refine (measurable_indicator_const_iff 1).mpr ?_
-      sorry
-    · sorry
-
-#exit
-
-open Classical in
-theorem volume_mapToUnitsPowComplex_set_prod_set' {s : Set (InfinitePlace K → ℝ)}
-    {t : Set ({w : InfinitePlace K // IsComplex w} → ℝ)}
-    (ht : t ⊆ Set.univ.pi fun _ ↦ Set.Icc (-π) π) :
-    volume (mapToUnitsPowComplex K '' (s ×ˢ t)) =
-      volume ((Set.univ.pi fun x ↦ Set.Ioo (-π) π) ∩ t) * ∫⁻ x in mapToUnitsPow K '' s,
-        ENNReal.ofReal (∏ w : {w : InfinitePlace K // w.IsComplex}, x w) := by
-  rw [← setLIntegral_one, ← lintegral_indicator, lintegral_mixedSpace_eq]
-  rw [polarCoordMixedSpace_target]
-  simp_rw [mapToUnitsPowComplex_prod_indicator K ht _ sorry]
-  rw [volume_eq_prod, ← Measure.prod_restrict, lintegral_prod]
-  simp_rw [lintegral_const_mul' _ _ sorry]
-  simp_rw [← lintegral_indicator _ sorry]
-  simp_rw [Set.indicator_indicator]
-  simp_rw [lintegral_indicator_one sorry]
-  simp_rw [lintegral_indicator _ sorry]
-  simp_rw [← mul_assoc]
-  rw [lintegral_mul_const']
-  rw [mul_comm]
-  rw [← lintegral_indicator, ← lintegral_indicator]
-  conv_lhs =>
-    enter [2, 2, x, 2, x]
-    rw [← Set.indicator_mul_right (i := x) (mapToUnitsPow K '' s)
-      (fun y ↦ ENNReal.ofNNReal (∏ i : {w : InfinitePlace K // IsComplex w}, (y i).toNNReal))]
-  simp_rw [Set.indicator_indicator]
-  simp_rw [ENNReal.coe_finset_prod, Pi.one_apply, mul_one]
-  rw [lintegral_indicator, lintegral_indicator]
-  congr 1
-  sorry
-  -- · refine setLIntegral_congr ?_
-  --   rw [ae_eq_set]
-  --   refine ⟨?_, ?_⟩
-  --   · rw [Set.diff_eq_empty.mpr, measure_empty]
-  --     exact Set.inter_subset_right
-  --   · rw [Set.diff_inter_self_eq_diff]
-  --     have : mapToUnitsPow K '' s \
-  --         (Set.univ.pi fun w ↦ if w.IsReal then Set.univ else Set.Ioi 0) ⊆ { 0 } := by
-  --       rintro _ ⟨⟨x, hx, rfl⟩, hx'⟩
-  --       rw [Set.mem_singleton_iff]
-  --       ext w
-  --       rw [Pi.zero_apply, mapToUnitsPow_zero_iff]
-  --       simp only [Set.mem_pi, Set.mem_univ, Set.mem_ite_univ_left, not_isReal_iff_isComplex,
-  --         Set.mem_Ioi, true_implies, not_forall, Classical.not_imp, not_lt] at hx'
-  --       obtain ⟨w, hw, h⟩ := hx'
-  --       have : mapToUnitsPow K x w = 0 := le_antisymm h (mapToUnitsPow_nonneg K x w)
-  --       rwa [mapToUnitsPow_zero_iff] at this
-  --     have := measure_mono (μ := volume) this
-  --     rw [measure_singleton] at this
-  --     exact nonpos_iff_eq_zero.mp this
-  -- all_goals sorry
-
-open Classical in
-abbrev box₁ : Set (InfinitePlace K → ℝ) :=
-  Set.univ.pi fun w ↦ if w = w₀ then Set.Ioc 0 1 else Set.Ico 0 1
+          ∫⁻ x in Set.univ.pi fun w ↦ if IsReal w then Set.univ else Set.Ioi 0,
+            (∏ w : {w // IsComplex w}, (x w.val).toNNReal) *
+              (mapToUnitsPow K '' (s ∩ {x | 0 < x w₀})).indicator 1 x := by
+      congr 1
+      refine lintegral_congr_ae ?_
+      refine Filter.EventuallyEq.mul ?_ ?_
+      · exact Filter.EventuallyEq.rfl
+      · refine indicator_ae_eq_of_ae_eq_set ?_
+        refine Filter.EventuallyEq.restrict ?_
+        exact setLIntegral_mapToUnitsPow_aux₂ K hs'
+    _ = volume ((Set.univ.pi fun _ ↦ Set.Ioo (-π) π) ∩ t) *
+          ∫⁻ x in mapToUnitsPow K '' (s ∩ {x | 0 < x w₀}),
+            ∏ w : {w // IsComplex w}, (x w.val).toNNReal := by
+      rw [← lintegral_indicator, ← lintegral_indicator]
+      congr with x
+      rw [Set.indicator_mul_right, Set.indicator_indicator, Set.inter_eq_right.mpr]
+      by_cases hx : x ∈ (mapToUnitsPow K) '' (s ∩ {x | 0 < x w₀})
+      · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, Pi.one_apply, mul_one,
+          ENNReal.coe_finset_prod]
+      · rw [Set.indicator_of_not_mem hx, Set.indicator_of_not_mem hx, mul_zero]
+      · rintro _ ⟨x, hx, rfl⟩
+        refine Set.mem_univ_pi.mpr fun _ ↦ ?_
+        rw [Set.mem_ite_univ_left]
+        intro _
+        rw [Set.mem_Ioi]
+        refine mapToUnitsPow_pos K (ne_of_gt hx.2) _
+      · refine measurable_mapToUnitsPow_image K ?_ ?_
+        · exact hs.inter (measurableSet_lt measurable_const (measurable_pi_apply w₀))
+        · exact Set.inter_subset_left.trans hs'
+      · refine MeasurableSet.univ_pi fun _ ↦ ?_
+        refine MeasurableSet.ite' (fun _ ↦ ?_) (fun _ ↦ ?_)
+        exact MeasurableSet.univ
+        exact measurableSet_Ioi
 
 abbrev box₂ : Set ({w : InfinitePlace K // IsComplex w} → ℝ) :=
   Set.univ.pi fun _ ↦ Set.Ioc (-π) π
@@ -1060,82 +1212,25 @@ theorem measurableSet_box₂ :
 theorem measurableSet_box :
     MeasurableSet (box K) := MeasurableSet.prod (measurableSet_box₁ K) (measurableSet_box₂ K)
 
-def normLessThanOnePlus : (Set (E K)) := (normLessThanOne K) ∩ {x | ∀ w, 0 < x.1 w}
+abbrev normLessThanOnePlus : (Set (E K)) := normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}
 
-def normVector (x : E K) : InfinitePlace K → ℝ := fun w ↦ normAtPlace w x
-
-theorem polarCoordMixedSpace_symm_apply_prod_zero (x : InfinitePlace K → ℝ) :
-    (polarCoordMixedSpace K).symm (x, fun _ ↦ 0) = realToMixed x := by
-  sorry
-
-example : normVector K '' (normLessThanOnePlus K ∩ {x | mixedEmbedding.norm x = 1}) =
-    mapToUnitsPow₀ K '' (Set.univ.pi fun w ↦ Set.Ico 0 1) := by
-  -- see mapToUnitsPow₀_symm_apply
-  sorry
-  -- classical
-  -- ext
-  -- refine ⟨?_, ?_⟩
-  -- · rintro ⟨_⟩
-  --   sorry
-  -- · rintro ⟨c, hc, rfl⟩
-  --   refine ⟨?_, ⟨⟨⟨?_, ?_⟩, ?_⟩, ?_⟩, ?_⟩
-  --   · exact realToMixed (mapToUnitsPow₀ K c)
-  --   · refine mem_fundamentalCone.mpr ⟨?_, ?_⟩
-  --     · rw [Zspan.mem_fundamentalDomain]
-  --       intro i
-  --       rw [mapToUnitsPow₀_apply]
-  --       simp_rw [mapToUnitsPow₀_apply, realToMixed, ContinuousLinearMap.prod_apply,  coe_pi',
-  --         proj_apply, coe_comp', Function.comp_apply, Complex.ofRealCLM_apply, proj_apply,
-  --         Complex.ofReal_prod]
-  --       simp only [ne_eq, Zspan.mem_fundamentalDomain, Set.mem_Ico]
-  --       rw [logMap_apply_of_norm_one]
-  --       sorry
-  --     · rw [norm_mapToUnitsPow₀ K]
-  --       exact one_ne_zero
-  --   · refine le_of_eq ?_
-  --     exact norm_mapToUnitsPow₀ K _
-  --   · intro _
-  --     rw [realToMixed]
-  --     -- make a function
-  --     simp only [ne_eq, ContinuousLinearMap.prod_apply, coe_pi', proj_apply, coe_comp',
-  --       Function.comp_apply, Complex.ofRealCLM_apply]
-  --     exact mapToUnitsPow₀_pos K c _
-  --   · exact norm_mapToUnitsPow₀ K _
-  --   · ext
-  --     rw [normVector, normAtPlace_realToMixed, abs_of_pos]
-  --     exact mapToUnitsPow₀_pos K _ _
-
-example : normVector K '' (normLessThanOnePlus K) =
-    mapToUnitsPow K '' (box₁ K) := sorry
-
-
--- theorem normVector_mapToUnitsPowComplex (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
---     (fun w ↦ normAtPlace w (mapToUnitsPowComplex K x)) = mapToUnitsPow K x.1 := by
---   rw [mapToUnitsPowComplex_apply]
---   ext w
---   obtain hw | hw := isReal_or_isComplex w
---   · rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_eq_self.mpr (mapToUnitsPow_nonneg K _ _)]
---   · rw [normAtPlace_apply_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
---       abs_eq_self.mpr (mapToUnitsPow_nonneg K _ _)]
-
--- example (A : Set (E K)) (hA : ∀ x, x ∈ A ↔ ⟨fun w ↦ x.1 w, fun w ↦ ‖x.2 w‖⟩ ∈ A)
---     (s : Set (InfinitePlace K → ℝ))
---     (h : mapToUnitsPow K '' s = (fun x w ↦ normAtPlace w x) '' A) :
---     mapToUnitsPowComplex K '' (s ×ˢ (box₂ K)) = A := by
---   ext x
---   refine ⟨?_, ?_⟩
---   · rintro ⟨⟨x, θ⟩, ⟨hx, hθ⟩, rfl⟩
---     rw [hA]
-
---     sorry
---   · intro hx
---     rw [Set.mem_image]
---     refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩, ?_⟩
---     sorry
+theorem normLessThanOnePlus_measurableSet :
+    MeasurableSet (normLessThanOnePlus K) := by
+  convert_to MeasurableSet (normLessThanOne K ∩ (⋂ w, {x | 0 < x.1 w}))
+  · ext; simp
+  · exact (measurableSet_normLessThanOne K).inter <|
+      MeasurableSet.iInter fun _ ↦  measurableSet_lt measurable_const <|
+        (measurable_pi_apply _).comp' measurable_fst
 
 theorem normLessThanOnePlus_eq_image :
     normLessThanOnePlus K = mapToUnitsPowComplex K '' (box K) := by
   sorry
+
+theorem pos_of_mem_box₁ {x : InfinitePlace K → ℝ}  (hx : x ∈ box₁ K) :
+    0 < x w₀ := by
+  have := hx w₀ (Set.mem_univ w₀)
+  simp_rw [if_true] at this
+  exact this.1
 
 theorem isBounded_box₁ : Bornology.IsBounded (box₁ K) := by
   refine Bornology.IsBounded.pi ?_
@@ -1190,10 +1285,19 @@ theorem interior_box₂ :
   intro _ _
   exact interior_Ioc
 
-theorem interior_subset_source :
+theorem interior_subset_mapToUnitsPowComplex_source :
     interior (box K) ⊆ (mapToUnitsPowComplex K).source := by
   rw [interior_prod_eq, interior_box₁, interior_box₂, mapToUnitsPowComplex_source]
   exact Set.prod_mono (fun _ h ↦ (h w₀ (Set.mem_univ _)).1) subset_rfl
+
+theorem isClosed_mapToUnitsPowComplex_closure_box :
+    IsClosed (mapToUnitsPowComplex K '' (closure (box K))) := by
+  classical
+  refine (IsCompact.image_of_continuousOn ?_ ?_).isClosed
+  · refine Metric.isCompact_iff_isClosed_bounded.mpr
+      ⟨isClosed_closure, Metric.isBounded_closure_iff.mpr ?_⟩
+    exact (isBounded_box₁ K).prod (isBounded_box₂ K)
+  · exact (continuous_mapToUnitsPowComplex K).continuousOn
 
 theorem closure_subset_closure :
     closure (normLessThanOnePlus K) ⊆ mapToUnitsPowComplex K '' (closure (box K)) := by
@@ -1202,49 +1306,52 @@ theorem closure_subset_closure :
   · rw [normLessThanOnePlus_eq_image]
     refine Set.image_mono ?_
     exact subset_closure
-  · have t₁ : IsCompact (closure (box K)) := by
-      rw [Metric.isCompact_iff_isClosed_bounded]
-      refine ⟨?_, ?_⟩
-      · exact isClosed_closure
-      · refine Metric.isBounded_closure_iff.mpr ?_
-        exact Bornology.IsBounded.prod (isBounded_box₁ K) (isBounded_box₂ K)
-    have t₂ : ContinuousOn (mapToUnitsPowComplex K) (closure (box K)) := by
-      refine Continuous.continuousOn ?_
-      exact continuous_mapToUnitsPowComplex K
-    have := t₁.image_of_continuousOn t₂
-    exact IsCompact.isClosed this
+  · exact isClosed_mapToUnitsPowComplex_closure_box K
+
+theorem isOpen_mapToUnitsPowComplex_interior_box :
+    IsOpen (mapToUnitsPowComplex K '' (interior (box K))) :=
+  (mapToUnitsPowComplex K).isOpen_image_of_subset_source isOpen_interior
+    (interior_subset_mapToUnitsPowComplex_source K)
 
 theorem interior_subset_interior :
     mapToUnitsPowComplex K '' (interior (box K)) ⊆ interior (normLessThanOnePlus K) := by
-  refine interior_maximal ?_ ?_
-  · rw [normLessThanOnePlus_eq_image]
-    refine Set.image_mono ?_
-    exact interior_subset
-  · refine (mapToUnitsPowComplex K).isOpen_image_of_subset_source ?_ ?_
-    · exact isOpen_interior
-    · exact interior_subset_source K
+  refine interior_maximal ?_ (isOpen_mapToUnitsPowComplex_interior_box K)
+  rw [normLessThanOnePlus_eq_image]
+  exact Set.image_mono interior_subset
 
 open Classical in
 theorem volume_interior_eq_volume_closure :
     volume (mapToUnitsPowComplex K '' (interior (box K))) =
       volume (mapToUnitsPowComplex K '' (closure (box K))) := by
+  have hm₁ : MeasurableSet
+      (mapToUnitsPowComplex K '' (Set.univ.pi fun x ↦ Set.Ioo 0 1) ×ˢ
+        Set.univ.pi fun _ ↦ Set.Ioo (-π) π) := by
+    rw [← interior_box₁, ← interior_box₂, ← interior_prod_eq]
+    exact (isOpen_mapToUnitsPowComplex_interior_box K).measurableSet
+  have hm₂ : MeasurableSet
+      (mapToUnitsPowComplex K '' Set.Icc 0 1 ×ˢ Set.univ.pi fun _ ↦ Set.Icc (-π) π) := by
+    rw [← closure_box₁, ← closure_box₂, ← closure_prod_eq]
+    exact (isClosed_mapToUnitsPowComplex_closure_box K).measurableSet
+  have h₁ : Set.Icc 0 1 ⊆ {x : InfinitePlace K → ℝ | 0 ≤ x w₀} :=
+    fun _ h ↦ (Set.mem_Icc.mp h).1 w₀
+  have h₂ : Set.univ.pi (fun _ : InfinitePlace K ↦ Set.Ioo (0 : ℝ) 1) ⊆ {x | 0 ≤ x w₀} :=
+    fun _ h ↦ (h w₀ (Set.mem_univ _)).1.le
+  have h₃ : MeasurableSet (Set.univ.pi fun _ : InfinitePlace K ↦ Set.Ioo (0 : ℝ) 1) :=
+    MeasurableSet.univ_pi fun _ ↦ measurableSet_Ioo
   rw [closure_prod_eq, interior_prod_eq, closure_box₁, closure_box₂, interior_box₁, interior_box₂,
-    volume_mapToUnitsPowComplex_set_prod_set K (Set.pi_mono fun _ _ ↦ Set.Ioo_subset_Icc_self),
-    volume_mapToUnitsPowComplex_set_prod_set K subset_rfl]
-  congr 1
-  · simp_rw [← Set.pi_inter_distrib, volume_pi_pi, Set.inter_self, Set.inter_eq_left.mpr
+    volume_mapToUnitsPowComplex_set_prod_set K h₃ h₂ (MeasurableSet.univ_pi fun _ ↦
+    measurableSet_Ioo) (Set.pi_mono fun _ _ ↦ Set.Ioo_subset_Icc_self) hm₁,
+    volume_mapToUnitsPowComplex_set_prod_set K measurableSet_Icc h₁ (MeasurableSet.univ_pi fun _ ↦
+    measurableSet_Icc) le_rfl hm₂]
+  simp_rw [setLIntegral_mapToUnitsPow K h₃ h₂, setLIntegral_mapToUnitsPow K measurableSet_Icc h₁,
+    mul_assoc, ← Set.pi_inter_distrib, Set.inter_self, Set.inter_eq_left.mpr
       Set.Ioo_subset_Icc_self]
-  · rw [setLIntegral_mapToUnitsPow, setLIntegral_mapToUnitsPow]
-    · congr 2
-      refine Measure.restrict_congr_set ?_
-      rw [show (Set.univ.pi fun _ ↦ Set.Ioo (0 : ℝ) 1) = interior (Set.Icc 0 1) by
+  congr 5
+  refine Measure.restrict_congr_set ?_
+  rw [show (Set.univ.pi fun _ ↦ Set.Ioo (0 : ℝ) 1) = interior (Set.Icc 0 1) by
         simp_rw [← Set.pi_univ_Icc, interior_pi_set Set.finite_univ, Pi.zero_apply, Pi.one_apply,
         interior_Icc]]
-      exact interior_ae_eq_of_null_frontier ((convex_Icc _ _).addHaar_frontier volume)
-    · exact measurableSet_Icc
-    · exact fun _ h ↦ h.1 w₀
-    · refine MeasurableSet.univ_pi fun _ ↦ measurableSet_Ioo
-    · exact fun _ h ↦ (h w₀ (Set.mem_univ _)).1.le
+  exact interior_ae_eq_of_null_frontier ((convex_Icc 0 1).addHaar_frontier volume)
 
 theorem volume_normLessThanOnePlus_aux (n : ℕ) :
     ∫⁻ x in box₁ K, ENNReal.ofReal |x w₀| ^ n = (n + 1 : ENNReal)⁻¹ := by
@@ -1277,6 +1384,48 @@ theorem volume_normLessThanOnePlus_aux (n : ℕ) :
 open Classical in
 theorem volume_normLessThanOnePlus : volume (normLessThanOnePlus K) =
     NNReal.pi ^ NrComplexPlaces K * (regulator K).toNNReal := by
+  rw [normLessThanOnePlus_eq_image, volume_mapToUnitsPowComplex_set_prod_set K
+    (measurableSet_box₁ K) (fun _ h ↦ le_of_lt (pos_of_mem_box₁ K h)) (measurableSet_box₂ K)
+    (Set.pi_mono fun _ _ ↦ Set.Ioc_subset_Icc_self)
+    (by rw [← normLessThanOnePlus_eq_image]; exact normLessThanOnePlus_measurableSet K),
+    setLIntegral_mapToUnitsPow K (measurableSet_box₁ K) (fun _ h ↦ ((if_pos rfl) ▸
+      Set.mem_univ_pi.mp h w₀).1.le), Set.inter_eq_left.mpr (Set.pi_mono fun _ _ ↦
+    Set.Ioo_subset_Ioc_self), volume_pi_pi]
+  simp_rw [Real.volume_Ioo, sub_neg_eq_add, ← two_mul, prod_const, ENNReal.ofReal_mul zero_le_two,
+    ENNReal.ofReal_ofNat, mul_pow]
+  have h₁ : ∀ x : InfinitePlace K → ℝ,
+      0 < ∏ i : {w // IsComplex w}, (mapToUnitsPow₀ K) (fun w ↦ x w) i.val :=
+    fun _ ↦ Finset.prod_pos fun _ _ ↦ mapToUnitsPow₀_pos K _ _
+  have h₂ : rank K + NrComplexPlaces K + 1 = finrank ℚ K := by
+    rw [rank, add_comm _ 1, ← add_assoc, add_tsub_cancel_of_le NeZero.one_le,
+      card_eq_nrRealPlaces_add_nrComplexPlaces,  ← card_add_two_mul_card_eq_rank]
+    ring
+  calc
+    _ = (NNReal.pi : ENNReal) ^ NrComplexPlaces K * (regulator K).toNNReal * (finrank ℚ K) *
+          ∫⁻ x in box₁ K, ENNReal.ofReal |x w₀| ^ (rank K + NrComplexPlaces K) := by
+      simp_rw [← mul_assoc]
+      congr
+      · rw [mul_comm, ← mul_assoc, NrComplexPlaces, card_univ, ← mul_pow, ENNReal.inv_mul_cancel
+          two_ne_zero ENNReal.two_ne_top, one_pow, one_mul, ← ENNReal.ofReal_coe_nnreal,
+          NNReal.coe_real_pi]
+      · ext x
+        simp_rw [mapToUnitsPow_apply, Pi.smul_apply, smul_eq_mul, Real.toNNReal_mul (abs_nonneg _),
+          ENNReal.coe_mul, ENNReal.coe_RealtoNNReal]
+        rw [Finset.prod_mul_distrib, Finset.prod_const, mul_mul_mul_comm,
+          ← ENNReal.ofReal_prod_of_nonneg (fun _ _ ↦ (mapToUnitsPow₀_pos K _ _).le),
+          ENNReal.ofReal_inv_of_pos (h₁ x), ENNReal.inv_mul_cancel
+          (ENNReal.ofReal_ne_zero_iff.mpr (h₁ x)) ENNReal.ofReal_ne_top, mul_one, pow_add,
+          NrComplexPlaces, card_univ]
+    _ = NNReal.pi ^ NrComplexPlaces K * (regulator K).toNNReal := by
+      rw [volume_normLessThanOnePlus_aux, ← Nat.cast_add_one, h₂, mul_assoc, ENNReal.mul_inv_cancel,
+        mul_one]
+      · rw [Nat.cast_ne_zero]
+        refine ne_of_gt ?_
+        exact finrank_pos
+      · exact ENNReal.natCast_ne_top _
+
+#exit
+
   rw [normLessThanOnePlus_eq_image, volume_mapToUnitsPowComplex_set_prod_set K (Set.pi_mono
     fun _ _ ↦ Set.Ioc_subset_Icc_self), setLIntegral_mapToUnitsPow K (measurableSet_box₁ K)
     (fun _ h ↦ ((if_pos rfl) ▸ Set.mem_univ_pi.mp h w₀).1.le), Set.inter_eq_left.mpr

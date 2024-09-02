@@ -3,6 +3,25 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section rpow
+
+theorem Real.rpow_comm {x : ℝ} (hx : 0 ≤ x)  (y z : ℝ) :
+    (x ^ y) ^ z = (x ^ z) ^ y := by
+  rw [← rpow_mul hx, ← rpow_mul hx, mul_comm]
+
+end rpow
+
+section ennreal
+
+@[simp]
+theorem ENNReal.coe_RealtoNNReal (r : ℝ) : (Real.toNNReal r : ENNReal) = ENNReal.ofReal r := rfl
+
+theorem ENNReal.ofReal_ne_zero_iff {r : ℝ} :
+    ENNReal.ofReal r ≠ 0 ↔ 0 < r := by
+  rw [← zero_lt_iff, ENNReal.ofReal_pos]
+
+end ennreal
+
 section topo
 
 theorem measurableSet_frontier {α : Type*} {s : Set α} [TopologicalSpace α] [MeasurableSpace α]
