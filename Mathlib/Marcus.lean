@@ -38,14 +38,14 @@ theorem realToMixed_apply_of_isComplex (x : InfinitePlace K → ℝ) {w : Infini
 
 @[simp]
 theorem normAtPlace_realToMixed (w : InfinitePlace K) (x : InfinitePlace K → ℝ) :
-    normAtPlace w (realToMixed x) = |x w| := by
+    normAtPlace w (realToMixed x) = ‖x w‖ := by
   obtain hw | hw := isReal_or_isComplex w
   · simp [normAtPlace_apply_isReal hw, realToMixed]
   · simp [normAtPlace_apply_isComplex hw, realToMixed]
 
 @[simp]
 theorem norm_realToMixed (x : InfinitePlace K → ℝ) :
-    mixedEmbedding.norm (realToMixed x) = ∏ w, |x w| ^ w.mult :=
+    mixedEmbedding.norm (realToMixed x) = ∏ w, ‖x w‖ ^ w.mult :=
   Finset.prod_congr rfl fun w _ ↦ by simp
 
 theorem pos_norm_realToMixed {x : InfinitePlace K → ℝ} (hx : ∀ w, 0 < x w) :
@@ -57,35 +57,91 @@ theorem logMap_realToMixed {x : InfinitePlace K → ℝ}
     (hx : mixedEmbedding.norm (realToMixed x) = 1) :
     logMap (realToMixed x) = fun w ↦ (mult w.val) * Real.log (x w.val) := by
   ext
-  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.log_abs]
+  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.norm_eq_abs, Real.log_abs]
 
-def vectorNormAtPlace (x : E K) : InfinitePlace K → ℝ := fun w ↦ normAtPlace w x
+open Classical in
+def mixedToReal (x : E K) : InfinitePlace K → ℝ :=
+    fun w ↦ if hw : IsReal w then x.1 ⟨w, hw⟩ else ‖x.2 ⟨w, not_isReal_iff_isComplex.mp hw⟩‖
 
-theorem vectorNormAtPlace_smul (x : E K) {r : ℝ} (hr : 0 ≤ r) :
-    vectorNormAtPlace (r • x) = r • vectorNormAtPlace x := by
-  ext
-  rw [vectorNormAtPlace, Pi.smul_apply, vectorNormAtPlace, normAtPlace_smul, smul_eq_mul,
-    abs_of_nonneg hr]
+theorem mixedToReal_apply_of_isReal {x : E K} {w : InfinitePlace K} (hw : IsReal w) :
+    mixedToReal x w = x.1 ⟨w, hw⟩ := by
+  rw [mixedToReal, dif_pos hw]
+
+theorem mixedToReal_apply_of_isComplex {x : E K} {w : InfinitePlace K} (hw : IsComplex w) :
+    mixedToReal x w = ‖x.2 ⟨w, hw⟩‖ := by
+  rw [mixedToReal, dif_neg (not_isReal_iff_isComplex.mpr hw)]
+
+-- def vectorNormAtPlace (x : E K) : InfinitePlace K → ℝ := fun w ↦ normAtPlace w x
+
+theorem mixedToReal_smul (x : E K) {r : ℝ} (hr : 0 ≤ r) :
+    mixedToReal (r • x) = r • mixedToReal x := by
+  ext w
+  obtain hw | hw := isReal_or_isComplex w
+  · simp_rw [Pi.smul_apply, mixedToReal_apply_of_isReal hw, Prod.smul_fst, Pi.smul_apply]
+  · simp_rw [Pi.smul_apply, mixedToReal_apply_of_isComplex hw, Prod.smul_snd, Pi.smul_apply,
+      _root_.norm_smul, Real.norm_eq_abs, abs_of_nonneg hr, smul_eq_mul]
+
+-- theorem vectorNormAtPlace_smul (x : E K) {r : ℝ} (hr : 0 ≤ r) :
+--     vectorNormAtPlace (r • x) = r • vectorNormAtPlace x := by
+--   ext
+--   rw [vectorNormAtPlace, Pi.smul_apply, vectorNormAtPlace, normAtPlace_smul, smul_eq_mul,
+--     abs_of_nonneg hr]
+
+theorem mixedToRealToMixed (x : E K) :
+    realToMixed (mixedToReal x) = (fun w ↦ x.1 w, fun w ↦ (‖x.2 w‖ : ℂ)) := by
+  ext w
+  · rw [realToMixed_apply_of_isReal, mixedToReal_apply_of_isReal]
+  · rw [realToMixed_apply_of_isComplex, mixedToReal_apply_of_isComplex]
 
 @[simp]
-theorem norm_realToMixed_vectorNormAtPlace (x : E K) :
-    mixedEmbedding.norm (realToMixed (vectorNormAtPlace x)) = mixedEmbedding.norm x := by
-  simp_rw [norm_realToMixed, vectorNormAtPlace, mixedEmbedding.norm_apply, abs_of_nonneg
-    (normAtPlace_nonneg _ _)]
+theorem norm_mixedToReal (x : E K) (w : InfinitePlace K) :
+    ‖mixedToReal x w‖ = normAtPlace w x := by
+  obtain hw | hw := isReal_or_isComplex w
+  · rw [mixedToReal_apply_of_isReal hw, normAtPlace_apply_isReal]
+  · rw [mixedToReal_apply_of_isComplex hw, normAtPlace_apply_isComplex, norm_norm]
 
-theorem logMap_realToMixed_vectorNormAtPlace_of_norm_one {x : E K}
+-- @[simp]
+-- theorem norm_realToMixed_vectorNormAtPlace (x : E K) :
+--     mixedEmbedding.norm (realToMixed (vectorNormAtPlace x)) = mixedEmbedding.norm x := by
+--   simp_rw [norm_realToMixed, vectorNormAtPlace, mixedEmbedding.norm_apply, Real.norm_eq_abs,
+--     abs_of_nonneg (normAtPlace_nonneg _ _)]
+
+@[simp]
+theorem norm_mixedToRealToMixed (x : E K) :
+    mixedEmbedding.norm (realToMixed (mixedToReal x)) = mixedEmbedding.norm x := by
+  simp_rw [norm_realToMixed, norm_mixedToReal, mixedEmbedding.norm_apply]
+
+-- @[simp]
+-- theorem logMap_realToMixed_vectorNormAtPlace_of_norm_one {x : E K}
+--     (hx : mixedEmbedding.norm x = 1) :
+--     logMap (realToMixed (vectorNormAtPlace x)) = logMap x := by
+--   ext
+--   rw [logMap_apply_of_norm_one hx, logMap_apply_of_norm_one
+--     (by rwa [norm_realToMixed_vectorNormAtPlace]), normAtPlace_realToMixed, Real.norm_eq_abs,
+--     Real.log_abs, vectorNormAtPlace]
+
+@[simp]
+theorem logMap_mixedToRealToMixed_of_norm_one {x : E K}
     (hx : mixedEmbedding.norm x = 1) :
-    logMap (realToMixed (vectorNormAtPlace x)) = logMap x := by
+    logMap (realToMixed (mixedToReal x)) = logMap x := by
   ext
-  rw [logMap_apply_of_norm_one hx, logMap_apply_of_norm_one
-    (by rwa [norm_realToMixed_vectorNormAtPlace]), normAtPlace_realToMixed, Real.log_abs,
-    vectorNormAtPlace]
+  rw [logMap_apply_of_norm_one hx, logMap_apply_of_norm_one (by rwa [norm_mixedToRealToMixed]),
+    normAtPlace_realToMixed, ← norm_mixedToReal]
 
-theorem vectorNormAtPlace_realToMixed_of_nonneg {x : InfinitePlace K → ℝ} (hx : ∀ w, 0 ≤ x w) :
-    vectorNormAtPlace (realToMixed x) = x := by
-  ext
-  rw [vectorNormAtPlace, normAtPlace_realToMixed, abs_of_nonneg (hx _)]
+-- theorem vectorNormAtPlace_realToMixed_of_nonneg {x : InfinitePlace K → ℝ} (hx : ∀ w, 0 ≤ x w) :
+--     vectorNormAtPlace (realToMixed x) = x := by
+--   ext
+--   rw [vectorNormAtPlace, normAtPlace_realToMixed, Real.norm_eq_abs, abs_of_nonneg (hx _)]
 
+@[simp]
+theorem realToMixedToReal_eq_self_of_nonneg {x : InfinitePlace K → ℝ}
+    (hx : ∀ w, IsComplex w → 0 ≤ x w) :
+    mixedToReal (realToMixed x) = x := by
+  ext w
+  obtain hw | hw := isReal_or_isComplex w
+  · rw [mixedToReal_apply_of_isReal hw, realToMixed_apply_of_isReal]
+  · rw [mixedToReal_apply_of_isComplex hw, realToMixed_apply_of_isComplex, Complex.norm_real,
+      Real.norm_eq_abs, abs_of_nonneg (hx w hw)]
 
 variable (K)
 
@@ -167,8 +223,8 @@ theorem mapToUnitsPow₀_target :
   intro hx
   rw [← Real.exp_injective.eq_iff, Real.exp_zero, Real.exp_sum, norm_realToMixed]
   refine Eq.congr (Finset.prod_congr rfl fun _ _ ↦ ?_) rfl
-  rw [← Real.log_rpow (hx _), Real.exp_log (Real.rpow_pos_of_pos (hx _) _), abs_of_pos (hx _),
-    Real.rpow_natCast]
+  rw [← Real.log_rpow (hx _), Real.exp_log (Real.rpow_pos_of_pos (hx _) _), Real.norm_eq_abs,
+    abs_of_pos (hx _), Real.rpow_natCast]
 
 theorem norm_mapToUnitsPow₀ (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
     mixedEmbedding.norm (realToMixed (mapToUnitsPow₀ K c)) = 1 := by
@@ -192,7 +248,7 @@ theorem mapToUnitsPow₀_aux_symm_apply_of_norm_one {x : InfinitePlace K → ℝ
     (hx : mixedEmbedding.norm (realToMixed x) = 1) :
     (mapToUnitsPow₀_aux K).symm x = logMap (realToMixed x) := by
   ext
-  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.log_abs]
+  rw [logMap_apply_of_norm_one hx, normAtPlace_realToMixed, Real.norm_eq_abs, Real.log_abs]
   rfl
 
 open Classical in
@@ -228,7 +284,7 @@ theorem norm_realToMixed_prod_fundSystem_rpow (c : {w : InfinitePlace K // w ≠
    calc
     _ = |∏ w : InfinitePlace K,
           ∏ i, (w (fundSystem K (equivFinRank.symm i)) ^ c i) ^ w.mult| := by
-      simp_rw [norm_realToMixed, ← abs_pow, ← Finset.abs_prod, ← Finset.prod_pow]
+      simp_rw [norm_realToMixed, Real.norm_eq_abs, ← abs_pow, ← Finset.abs_prod, ← Finset.prod_pow]
     _ = |∏ w : InfinitePlace K,
           ∏ i, (w (fundSystem K (equivFinRank.symm i)) ^ w.mult) ^ c i| := by
       congr!
@@ -258,30 +314,31 @@ theorem realToMixed_mapToUnitsPow₀_mem_fundamentalCone_iff
     norm_realToMixed_prod_fundSystem_rpow, and_iff_left one_ne_zero, Equiv.forall_congr_right
     (q := fun i ↦ c i ∈ Set.Ico 0 1)]
 
--- Use the above to golf this proof
-theorem vectorNormAtPlace_normEqOne_eq_image :
-    vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) =
+theorem mixedToReal_normEqOne_eq :
+    mixedToReal '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) =
       mapToUnitsPow₀ K '' (Set.univ.pi fun _ ↦ Set.Ico 0 1) := by
   classical
   ext x
   refine ⟨?_, ?_⟩
-  · rintro ⟨x, ⟨⟨⟨hx, hx₁⟩, hx₂⟩, _⟩, rfl⟩
+  · rintro ⟨x, ⟨⟨⟨hx, hx₁⟩, hx₂⟩, hx₃⟩, rfl⟩
     rw [Set.mem_preimage, Zspan.mem_fundamentalDomain] at hx
-    refine ⟨fun i ↦
-      (((basisUnitLattice K).ofZlatticeBasis ℝ (unitLattice K) ).repr (logMap x))
-        (equivFinRank.symm i), ?_, ?_⟩
-    · exact fun i _ ↦ hx (equivFinRank.symm i)
-    · rw [← logMap_realToMixed_vectorNormAtPlace_of_norm_one hx₂]
-      rw [← norm_realToMixed_vectorNormAtPlace] at hx₂
-      simp_rw [← mapToUnitsPow₀_symm_apply_of_norm_one (x := vectorNormAtPlace x) hx₂,
-        Equiv.apply_symm_apply]
-      rw [PartialEquiv.right_inv]
+    refine ⟨(mapToUnitsPow₀ K).symm (mixedToReal x), ?_, ?_⟩
+    · rw [Set.mem_univ_pi]
+      intro i
+      rw [← equivFinRank.apply_symm_apply i, mapToUnitsPow₀_symm_apply_of_norm_one K (by
+        rwa [norm_mixedToRealToMixed]), logMap_mixedToRealToMixed_of_norm_one hx₂]
+      exact hx (equivFinRank.symm i)
+    · rw [PartialEquiv.right_inv]
       rw [mapToUnitsPow₀_target]
-      refine ⟨?_, hx₂⟩
-      intro _
-      rw [vectorNormAtPlace]
-      exact lt_iff_le_and_ne.mpr ⟨normAtPlace_nonneg _ _,
-        (mixedEmbedding.norm_ne_zero_iff.mp hx₁ _).symm⟩
+      refine ⟨?_, ?_⟩
+      · intro w
+        obtain hw | hw := isReal_or_isComplex w
+        · rw [mixedToReal_apply_of_isReal hw]
+          exact hx₃ ⟨w, hw⟩
+        · rw [mixedToReal_apply_of_isComplex hw, ← normAtPlace_apply_isComplex hw]
+          refine lt_iff_le_and_ne.mpr ⟨normAtPlace_nonneg _ _,
+            (mixedEmbedding.norm_ne_zero_iff.mp hx₁ w).symm⟩
+      · rwa [norm_mixedToRealToMixed]
   · rintro ⟨c, hc, rfl⟩
     refine ⟨realToMixed (mapToUnitsPow₀ K c), ⟨⟨?_, ?_⟩, ?_⟩, ?_⟩
     · rw [mem_fundamentalCone]
@@ -298,7 +355,50 @@ theorem vectorNormAtPlace_normEqOne_eq_image :
     · exact norm_mapToUnitsPow₀ K c
     · intro _
       exact mapToUnitsPow₀_pos K c _
-    · rw [vectorNormAtPlace_realToMixed_of_nonneg (fun _ ↦ (mapToUnitsPow₀_pos K c _).le)]
+    · rw [realToMixedToReal_eq_self_of_nonneg]
+      exact fun _ _ ↦ (mapToUnitsPow₀_pos K c _).le
+
+-- Use the above to golf this proof
+-- theorem vectorNormAtPlace_normEqOne_eq_image :
+--     vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) =
+--       mapToUnitsPow₀ K '' (Set.univ.pi fun _ ↦ Set.Ico 0 1) := by
+--   classical
+--   ext x
+--   refine ⟨?_, ?_⟩
+--   · rintro ⟨x, ⟨⟨⟨hx, hx₁⟩, hx₂⟩, _⟩, rfl⟩
+--     rw [Set.mem_preimage, Zspan.mem_fundamentalDomain] at hx
+--     refine ⟨fun i ↦
+--       (((basisUnitLattice K).ofZlatticeBasis ℝ (unitLattice K) ).repr (logMap x))
+--         (equivFinRank.symm i), ?_, ?_⟩
+--     · exact fun i _ ↦ hx (equivFinRank.symm i)
+--     · rw [← logMap_realToMixed_vectorNormAtPlace_of_norm_one hx₂]
+--       rw [← norm_realToMixed_vectorNormAtPlace] at hx₂
+--       simp_rw [← mapToUnitsPow₀_symm_apply_of_norm_one (x := vectorNormAtPlace x) hx₂,
+--         Equiv.apply_symm_apply]
+--       rw [PartialEquiv.right_inv]
+--       rw [mapToUnitsPow₀_target]
+--       refine ⟨?_, hx₂⟩
+--       intro _
+--       rw [vectorNormAtPlace]
+--       exact lt_iff_le_and_ne.mpr ⟨normAtPlace_nonneg _ _,
+--         (mixedEmbedding.norm_ne_zero_iff.mp hx₁ _).symm⟩
+--   · rintro ⟨c, hc, rfl⟩
+--     refine ⟨realToMixed (mapToUnitsPow₀ K c), ⟨⟨?_, ?_⟩, ?_⟩, ?_⟩
+--     · rw [mem_fundamentalCone]
+--       refine ⟨?_, ?_⟩
+--       · rw [Zspan.mem_fundamentalDomain]
+--         intro _
+--         rw [← mapToUnitsPow₀_symm_apply_of_norm_one]
+--         · rw [PartialEquiv.left_inv]
+--           exact hc _ trivial
+--           trivial
+--         · exact norm_mapToUnitsPow₀ K c
+--       · rw [norm_mapToUnitsPow₀]
+--         exact one_ne_zero
+--     · exact norm_mapToUnitsPow₀ K c
+--     · intro _
+--       exact mapToUnitsPow₀_pos K c _
+--     · rw [vectorNormAtPlace_realToMixed_of_nonneg (fun _ ↦ (mapToUnitsPow₀_pos K c _).le)]
 
 theorem mapToUnitsPow₀_ne_zero (c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
     mapToUnitsPow₀ K c ≠ 0 := by
@@ -321,7 +421,7 @@ theorem mapToUnitsPow₀_symm_apply {x : InfinitePlace K → ℝ}
     LinearEquiv.coe_toEquiv_symm, LinearEquiv.symm_symm, EquivLike.coe_coe, Function.comp_apply]
   congr with x
   rw [logMap_apply_of_norm_one hx, mapToUnitsPow₀_aux, PartialEquiv.coe_symm_mk,
-    normAtPlace_realToMixed, Real.log_abs]
+    normAtPlace_realToMixed, Real.norm_eq_abs, Real.log_abs]
 
 open Classical in
 theorem continuous_mapToUnitsPow₀ :
@@ -573,8 +673,8 @@ theorem prod_mapToUnitsPow₀(c : {w : InfinitePlace K // w ≠ w₀} → ℝ) :
   simp_rw [Equiv.subtypeEquivRight_apply_coe]
   rw [mul_assoc, ← sq, ← Finset.prod_pow]
   congr with w
-  · rw [abs_of_pos (mapToUnitsPow₀_pos K c _), mult, if_pos w.prop, pow_one]
-  · rw [abs_of_pos (mapToUnitsPow₀_pos K c _), mult, if_neg w.prop]
+  · rw [Real.norm_eq_abs, abs_of_pos (mapToUnitsPow₀_pos K c _), mult, if_pos w.prop, pow_one]
+  · rw [Real.norm_eq_abs, abs_of_pos (mapToUnitsPow₀_pos K c _), mult, if_neg w.prop]
 
 open Classical in
 theorem jacobian_det {c : InfinitePlace K → ℝ} (hc : 0 ≤ c w₀) :
@@ -691,35 +791,37 @@ theorem mem_Ico_of_mem_box₁ {c : InfinitePlace K → ℝ} (hc : c ∈ box₁ K
   simp_rw [if_neg hw] at this
   exact this
 
-theorem vectorNormAtPlace_normLessThanOne_eq_image :
-    vectorNormAtPlace '' (normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}) =
-      mapToUnitsPow K '' (box₁ K) := by
+theorem mixedToReal_normLessThanOne_eq :
+    mixedToReal '' (normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}) = mapToUnitsPow K '' (box₁ K) := by
   classical
   rw [normLessThanOne_eq_union_smul_normEqOne, Set.iUnion₂_inter, Set.image_iUnion₂]
   ext
   rw [Set.mem_iUnion₂, Set.mem_image]
   refine ⟨?_, ?_⟩
   · rintro ⟨r, hr, ⟨_, ⟨⟨x, hx, rfl⟩, hx₂⟩, rfl⟩⟩
-    have : vectorNormAtPlace x ∈ vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) := by
-      have hn : ∀ w, normAtPlace w (fun w ↦ |x.1 w|, x.2) = normAtPlace w x := by
+    have : mixedToReal x ∈ mixedToReal '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) := by
+      have hx₃ : ∀ w, normAtPlace w (fun w ↦ |x.1 w|, x.2) = normAtPlace w x := by
         intro w
         obtain hw | hw := isReal_or_isComplex w
         · simp_rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_abs]
         · simp_rw [normAtPlace_apply_isComplex hw]
+      have hx₄ : ∀ w, 0 < x.1 w := by
+        intro w
+        simp_rw [Set.mem_setOf_eq, Prod.smul_fst, Pi.smul_apply, smul_eq_mul] at hx₂
+        exact pos_of_mul_pos_right (hx₂ w) hr.1.le
       refine ⟨(fun w ↦ |x.1 w|, x.2), ⟨?_, ?_⟩, ?_⟩
-      · exact mem_normEqOne_of_normAtPlace_eq K hx hn
+      · exact mem_normEqOne_of_normAtPlace_eq K hx hx₃
       · intro w
-        dsimp only
-        rw [← Real.norm_eq_abs, ← normAtPlace_apply_isReal]
-        exact normAtPlace_pos_of_mem hx.1 w
+        exact abs_pos_of_pos (hx₄ w)
       · ext w
-        rw [vectorNormAtPlace, vectorNormAtPlace, hn]
-    rw [vectorNormAtPlace_normEqOne_eq_image] at this
+        obtain hw | hw := isReal_or_isComplex w
+        · simp_rw [mixedToReal_apply_of_isReal hw, abs_of_pos (hx₄ ⟨w, hw⟩)]
+        · simp_rw [mixedToReal_apply_of_isComplex hw]
+    rw [mixedToReal_normEqOne_eq] at this
     obtain ⟨c, hc₁, hc₂⟩ := this
     refine ⟨?_, ?_, ?_⟩
     · exact fun w ↦ if hw : w = w₀ then r else c ⟨w, hw⟩
-    · -- simp_rw [Set.mem_pi, Set.mem_univ, true_implies]
-      intro w _
+    · intro w _
       by_cases hw : w = w₀
       · simp_rw [hw, dite_true, if_true]
         exact hr
@@ -729,7 +831,7 @@ theorem vectorNormAtPlace_normLessThanOne_eq_image :
       conv_lhs =>
         enter [2, 2, w]
         rw [dif_neg w.prop]
-      rw [hc₂, abs_of_nonneg hr.1.le, vectorNormAtPlace_smul _ hr.1.le]
+      rw [hc₂, abs_of_nonneg hr.1.le, mixedToReal_smul _ hr.1.le]
   · rintro ⟨c, hc, rfl⟩
     refine ⟨c w₀, mem_Ioc_of_mem_box₁ K hc, ⟨?_, ⟨?_, ?_⟩, ?_⟩⟩
     · exact realToMixed (mapToUnitsPow K c)
@@ -748,8 +850,70 @@ theorem vectorNormAtPlace_normLessThanOne_eq_image :
       rw [realToMixed_apply_of_isReal]
       refine mapToUnitsPow_pos K ?_ _
       exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
-    · rw [vectorNormAtPlace_realToMixed_of_nonneg]
-      exact fun _ ↦ (mapToUnitsPow_pos K (mem_Ioc_of_mem_box₁ K hc).1.ne.symm _).le
+    · refine realToMixedToReal_eq_self_of_nonneg ?_
+      intro w _
+      refine (mapToUnitsPow_pos K ?_ _).le
+      exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
+
+-- theorem vectorNormAtPlace_normLessThanOne_eq_image :
+--     vectorNormAtPlace '' (normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}) =
+--       mapToUnitsPow K '' (box₁ K) := by
+--   classical
+--   rw [normLessThanOne_eq_union_smul_normEqOne, Set.iUnion₂_inter, Set.image_iUnion₂]
+--   ext
+--   rw [Set.mem_iUnion₂, Set.mem_image]
+--   refine ⟨?_, ?_⟩
+--   · rintro ⟨r, hr, ⟨_, ⟨⟨x, hx, rfl⟩, hx₂⟩, rfl⟩⟩
+--     have : vectorNormAtPlace x ∈ vectorNormAtPlace '' (normEqOne K ∩ {x | ∀ w, 0 < x.1 w}) := by
+--       have hn : ∀ w, normAtPlace w (fun w ↦ |x.1 w|, x.2) = normAtPlace w x := by
+--         intro w
+--         obtain hw | hw := isReal_or_isComplex w
+--         · simp_rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_abs]
+--         · simp_rw [normAtPlace_apply_isComplex hw]
+--       refine ⟨(fun w ↦ |x.1 w|, x.2), ⟨?_, ?_⟩, ?_⟩
+--       · exact mem_normEqOne_of_normAtPlace_eq K hx hn
+--       · intro w
+--         dsimp only
+--         rw [← Real.norm_eq_abs, ← normAtPlace_apply_isReal]
+--         exact normAtPlace_pos_of_mem hx.1 w
+--       · ext w
+--         rw [vectorNormAtPlace, vectorNormAtPlace, hn]
+--     rw [vectorNormAtPlace_normEqOne_eq_image] at this
+--     obtain ⟨c, hc₁, hc₂⟩ := this
+--     refine ⟨?_, ?_, ?_⟩
+--     · exact fun w ↦ if hw : w = w₀ then r else c ⟨w, hw⟩
+--     · -- simp_rw [Set.mem_pi, Set.mem_univ, true_implies]
+--       intro w _
+--       by_cases hw : w = w₀
+--       · simp_rw [hw, dite_true, if_true]
+--         exact hr
+--       · simp_rw [dif_neg hw, if_neg hw]
+--         exact hc₁ _ (Set.mem_univ _)
+--     · simp_rw [mapToUnitsPow_apply, dite_true, Subtype.coe_eta]
+--       conv_lhs =>
+--         enter [2, 2, w]
+--         rw [dif_neg w.prop]
+--       rw [hc₂, abs_of_nonneg hr.1.le, vectorNormAtPlace_smul _ hr.1.le]
+--   · rintro ⟨c, hc, rfl⟩
+--     refine ⟨c w₀, mem_Ioc_of_mem_box₁ K hc, ⟨?_, ⟨?_, ?_⟩, ?_⟩⟩
+--     · exact realToMixed (mapToUnitsPow K c)
+--     · rw [smul_normEqOne K (mem_Ioc_of_mem_box₁ K hc).1]
+--       refine ⟨?_, ?_⟩
+--       · rw [mapToUnitsPow_apply, _root_.map_smul, smul_mem_iff_mem,
+--           realToMixed_mapToUnitsPow₀_mem_fundamentalCone_iff]
+--         · exact fun i ↦ mem_Ico_of_mem_box₁ K hc i.prop
+--         · rw [abs_ne_zero]
+--           exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
+--       · rw [mapToUnitsPow_apply, _root_.map_smul, mixedEmbedding.norm_smul, norm_mapToUnitsPow₀,
+--           mul_one, abs_of_pos, abs_of_pos]
+--         · exact (mem_Ioc_of_mem_box₁ K hc).1
+--         · refine abs_pos_of_pos (mem_Ioc_of_mem_box₁ K hc).1
+--     · intro w
+--       rw [realToMixed_apply_of_isReal]
+--       refine mapToUnitsPow_pos K ?_ _
+--       exact (mem_Ioc_of_mem_box₁ K hc).1.ne.symm
+--     · rw [vectorNormAtPlace_realToMixed_of_nonneg]
+--       exact fun _ ↦ (mapToUnitsPow_pos K (mem_Ioc_of_mem_box₁ K hc).1.ne.symm _).le
 
 open Classical in
 def realProdComplexProdMeasurableEquiv :
@@ -1222,29 +1386,39 @@ theorem normLessThanOnePlus_measurableSet :
       MeasurableSet.iInter fun _ ↦  measurableSet_lt measurable_const <|
         (measurable_pi_apply _).comp' measurable_fst
 
-theorem vectorNormAtPlace_mapToUnitsPowComplex
+theorem mixedToReal_mapToUnitsPowComplex
     (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
-    vectorNormAtPlace (mapToUnitsPowComplex K x) = mapToUnitsPow K x.1 := by
+    mixedToReal (mapToUnitsPowComplex K x) = mapToUnitsPow K x.1 := by
   ext w
-  simp_rw [mapToUnitsPowComplex_apply, vectorNormAtPlace]
+  simp_rw [mapToUnitsPowComplex_apply]
   obtain hw | hw := isReal_or_isComplex w
-  · rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_of_nonneg (mapToUnitsPow_nonneg K x.1 _)]
-  · rw [normAtPlace_apply_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
+  · rw [mixedToReal_apply_of_isReal hw]
+  · rw [mixedToReal_apply_of_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
       abs_of_nonneg (mapToUnitsPow_nonneg K x.1 w)]
 
+-- theorem vectorNormAtPlace_mapToUnitsPowComplex
+--     (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
+--     vectorNormAtPlace (mapToUnitsPowComplex K x) = mapToUnitsPow K x.1 := by
+--   ext w
+--   simp_rw [mapToUnitsPowComplex_apply, vectorNormAtPlace]
+--   obtain hw | hw := isReal_or_isComplex w
+--   · rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_of_nonneg (mapToUnitsPow_nonneg K x.1 _)]
+--   · rw [normAtPlace_apply_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
+--       abs_of_nonneg (mapToUnitsPow_nonneg K x.1 w)]
+
 theorem toto (A : Set (E K)) (t : Set (InfinitePlace K → ℝ))
-    (hA₁ : ∀ x, x ∈ A ↔ vectorNormAtPlace x ∈ vectorNormAtPlace '' A)
-    (hA₂ : vectorNormAtPlace '' A = mapToUnitsPow K '' t)
+    (hA₁ : ∀ x, x ∈ A ↔ mixedToReal x ∈ mixedToReal '' A)
+    (hA₂ : mixedToReal '' A = mapToUnitsPow K '' t)
     (hA₃ : A ⊆ {x | ∀ w, 0 ≤ x.1 w}) :
     mapToUnitsPowComplex K '' (t ×ˢ (box₂ K)) = A := by
   ext x
   refine ⟨?_, ?_⟩
   · rintro ⟨y, hy, rfl⟩
-    rw [hA₁, vectorNormAtPlace_mapToUnitsPowComplex]
+    rw [hA₁, mixedToReal_mapToUnitsPowComplex]
     refine ⟨mapToUnitsPowComplex K y, ?_, ?_⟩
-    · rw [hA₁, hA₂, vectorNormAtPlace_mapToUnitsPowComplex]
+    · rw [hA₁, hA₂, mixedToReal_mapToUnitsPowComplex]
       refine ⟨y.1, hy.1, rfl⟩
-    · exact vectorNormAtPlace_mapToUnitsPowComplex K y
+    · exact mixedToReal_mapToUnitsPowComplex K y
   · intro h
     have hx : ∀ w, 0 ≤ x.1 w := fun w ↦ hA₃ h w
     rw [hA₁, hA₂] at h
@@ -1255,24 +1429,52 @@ theorem toto (A : Set (E K)) (t : Set (InfinitePlace K → ℝ))
       intro w
       exact Complex.arg_mem_Ioc (x.2 w)
     · ext w
-      · simp_rw [mapToUnitsPowComplex_apply, hc₂, vectorNormAtPlace, normAtPlace_apply_isReal
-          w.prop, Real.norm_eq_abs, abs_of_nonneg (hx _)]
-      · simp_rw [mapToUnitsPowComplex_apply, Complex.polarCoord_symm_apply, hc₂, vectorNormAtPlace,
-          normAtPlace_apply_isComplex w.prop, Complex.norm_eq_abs, Complex.ofReal_cos,
+      · simp_rw [mapToUnitsPowComplex_apply, hc₂, mixedToReal_apply_of_isReal w.prop]
+      · simp_rw [mapToUnitsPowComplex_apply, Complex.polarCoord_symm_apply, hc₂,
+          mixedToReal_apply_of_isComplex w.prop, Complex.norm_eq_abs, Complex.ofReal_cos,
           Complex.ofReal_sin, Complex.abs_mul_cos_add_sin_mul_I]
+
+-- theorem toto (A : Set (E K)) (t : Set (InfinitePlace K → ℝ))
+--     (hA₁ : ∀ x, x ∈ A ↔ vectorNormAtPlace x ∈ vectorNormAtPlace '' A)
+--     (hA₂ : vectorNormAtPlace '' A = mapToUnitsPow K '' t)
+--     (hA₃ : A ⊆ {x | ∀ w, 0 ≤ x.1 w}) :
+--     mapToUnitsPowComplex K '' (t ×ˢ (box₂ K)) = A := by
+--   ext x
+--   refine ⟨?_, ?_⟩
+--   · rintro ⟨y, hy, rfl⟩
+--     rw [hA₁, vectorNormAtPlace_mapToUnitsPowComplex]
+--     refine ⟨mapToUnitsPowComplex K y, ?_, ?_⟩
+--     · rw [hA₁, hA₂, vectorNormAtPlace_mapToUnitsPowComplex]
+--       refine ⟨y.1, hy.1, rfl⟩
+--     · exact vectorNormAtPlace_mapToUnitsPowComplex K y
+--   · intro h
+--     have hx : ∀ w, 0 ≤ x.1 w := fun w ↦ hA₃ h w
+--     rw [hA₁, hA₂] at h
+--     obtain ⟨c, hc₁, hc₂⟩ := h
+--     refine ⟨⟨c, ?_⟩, ⟨hc₁, ?_⟩, ?_⟩
+--     · exact fun w ↦ (x.2 w).arg
+--     · rw [Set.mem_univ_pi]
+--       intro w
+--       exact Complex.arg_mem_Ioc (x.2 w)
+--     · ext w
+--       · simp_rw [mapToUnitsPowComplex_apply, hc₂, vectorNormAtPlace, normAtPlace_apply_isReal
+--           w.prop, Real.norm_eq_abs, abs_of_nonneg (hx _)]
+--       · simp_rw [mapToUnitsPowComplex_apply, Complex.polarCoord_symm_apply, hc₂, vectorNormAtPlace,
+--           normAtPlace_apply_isComplex w.prop, Complex.norm_eq_abs, Complex.ofReal_cos,
+--           Complex.ofReal_sin, Complex.abs_mul_cos_add_sin_mul_I]
 
 theorem normLessThanOnePlus_eq_image :
     normLessThanOnePlus K = mapToUnitsPowComplex K '' (box K) := by
   refine (toto _ _ _ ?_ ?_ ?_).symm
   · intro x
     refine ⟨fun hx ↦ ⟨x, hx, rfl⟩, fun ⟨y, hy, hyx⟩ ↦ ⟨?_, ?_⟩⟩
-    ·
-      sorry
-    · 
-      sorry
-  · exact vectorNormAtPlace_normLessThanOne_eq_image K
+    · refine mem_normLessThanOne_of_normAtPlace_eq hy.1 fun w ↦ ?_
+      rw [← norm_mixedToReal, ← norm_mixedToReal, hyx]
+    · intro w
+      rw [← mixedToReal_apply_of_isReal w.prop, ← hyx, mixedToReal_apply_of_isReal w.prop]
+      exact hy.2 w
+  · exact mixedToReal_normLessThanOne_eq K
   · exact fun _ h w ↦ (h.2 w).le
-
 
 theorem pos_of_mem_box₁ {x : InfinitePlace K → ℝ}  (hx : x ∈ box₁ K) :
     0 < x w₀ := by
@@ -1401,6 +1603,8 @@ theorem volume_interior_eq_volume_closure :
         interior_Icc]]
   exact interior_ae_eq_of_null_frontier ((convex_Icc 0 1).addHaar_frontier volume)
 
+#print axioms volume_interior_eq_volume_closure
+
 theorem volume_normLessThanOnePlus_aux (n : ℕ) :
     ∫⁻ x in box₁ K, ENNReal.ofReal |x w₀| ^ n = (n + 1 : ENNReal)⁻¹ := by
   classical
@@ -1471,6 +1675,8 @@ theorem volume_normLessThanOnePlus : volume (normLessThanOnePlus K) =
         refine ne_of_gt ?_
         exact finrank_pos
       · exact ENNReal.natCast_ne_top _
+
+#print axioms volume_normLessThanOnePlus
 
 #exit
 

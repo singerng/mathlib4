@@ -333,14 +333,13 @@ theorem MeasurePreserving.arrowCongr' {α₁ β₁ α₂ β₂ : Type*} [Fintype
     (hm : ∀ i, MeasurePreserving hβ (μ i) (ν (hα i))) :
     MeasurePreserving (MeasurableEquiv.arrowCongr' hα hβ) (Measure.pi fun i ↦ μ i)
       (Measure.pi fun i ↦ ν i) := by
-  haveI : ∀ i, SigmaFinite (μ i) := fun i ↦ (hm i).sigmaFinite
-  sorry
---  convert (measurePreserving_piCongrLeft (fun i : α₂ ↦ ν i) hα).comp
---    (measurePreserving_pi (fun i : α₁ ↦ μ i) (fun i : α₁ ↦ ν (hα i)) (fun i ↦ hm i))
---  simp only [MeasurableEquiv.arrowCongr', Equiv.arrowCongr', Equiv.arrowCongr, EquivLike.coe_coe,
---    MeasurableEquiv.coe_mk, Equiv.coe_fn_mk, MeasurableEquiv.piCongrLeft, Equiv.piCongrLeft,
---    Equiv.symm_symm_apply, Equiv.piCongrLeft'_symm, Equiv.symm_symm]
---  rfl
+  classical
+  convert (measurePreserving_piCongrLeft (fun i : α₂ ↦ ν i) hα).comp
+    (measurePreserving_pi μ (fun i : α₁ ↦ ν (hα i)) hm)
+  simp only [MeasurableEquiv.arrowCongr', Equiv.arrowCongr', Equiv.arrowCongr, EquivLike.coe_coe,
+    MeasurableEquiv.coe_mk, Equiv.coe_fn_mk, MeasurableEquiv.piCongrLeft, Equiv.piCongrLeft,
+    Equiv.symm_symm_apply, Equiv.piCongrLeft'_symm, Equiv.symm_symm]
+  rfl
 
 theorem MeasureTheory.volume_preserving.arrowCongr' {α₁ β₁ α₂ β₂ : Type*} [Fintype α₁] [Fintype α₂]
     [MeasureSpace β₁] [MeasureSpace β₂] [SigmaFinite (volume : Measure β₂)]
