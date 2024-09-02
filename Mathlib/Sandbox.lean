@@ -551,6 +551,11 @@ theorem ContinuousLinearEquiv.symm_neg {R : Type*} {M : Type*} [Semiring R] [Add
     [TopologicalSpace M] [ContinuousNeg M] [Module R M] :
     (neg R : M ≃L[R] M).symm = neg R := rfl
 
+@[simp]
+theorem ContinuousLinearEquiv.refl_apply (R₁ : Type*) [Semiring R₁] (M₁ : Type*)
+    [TopologicalSpace M₁] [AddCommMonoid M₁] [Module R₁ M₁] (x : M₁) :
+    ContinuousLinearEquiv.refl R₁ M₁ x = x := rfl
+
 open MeasureTheory
 
 #exit
