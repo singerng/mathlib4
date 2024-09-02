@@ -1222,9 +1222,57 @@ theorem normLessThanOnePlus_measurableSet :
       MeasurableSet.iInter fun _ ↦  measurableSet_lt measurable_const <|
         (measurable_pi_apply _).comp' measurable_fst
 
+theorem vectorNormAtPlace_mapToUnitsPowComplex
+    (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
+    vectorNormAtPlace (mapToUnitsPowComplex K x) = mapToUnitsPow K x.1 := by
+  ext w
+  simp_rw [mapToUnitsPowComplex_apply, vectorNormAtPlace]
+  obtain hw | hw := isReal_or_isComplex w
+  · rw [normAtPlace_apply_isReal hw, Real.norm_eq_abs, abs_of_nonneg (mapToUnitsPow_nonneg K x.1 _)]
+  · rw [normAtPlace_apply_isComplex hw, Complex.norm_eq_abs, Complex.polarCoord_symm_abs,
+      abs_of_nonneg (mapToUnitsPow_nonneg K x.1 w)]
+
+theorem toto (A : Set (E K)) (t : Set (InfinitePlace K → ℝ))
+    (hA₁ : ∀ x, x ∈ A ↔ vectorNormAtPlace x ∈ vectorNormAtPlace '' A)
+    (hA₂ : vectorNormAtPlace '' A = mapToUnitsPow K '' t)
+    (hA₃ : A ⊆ {x | ∀ w, 0 ≤ x.1 w}) :
+    mapToUnitsPowComplex K '' (t ×ˢ (box₂ K)) = A := by
+  ext x
+  refine ⟨?_, ?_⟩
+  · rintro ⟨y, hy, rfl⟩
+    rw [hA₁, vectorNormAtPlace_mapToUnitsPowComplex]
+    refine ⟨mapToUnitsPowComplex K y, ?_, ?_⟩
+    · rw [hA₁, hA₂, vectorNormAtPlace_mapToUnitsPowComplex]
+      refine ⟨y.1, hy.1, rfl⟩
+    · exact vectorNormAtPlace_mapToUnitsPowComplex K y
+  · intro h
+    have hx : ∀ w, 0 ≤ x.1 w := fun w ↦ hA₃ h w
+    rw [hA₁, hA₂] at h
+    obtain ⟨c, hc₁, hc₂⟩ := h
+    refine ⟨⟨c, ?_⟩, ⟨hc₁, ?_⟩, ?_⟩
+    · exact fun w ↦ (x.2 w).arg
+    · rw [Set.mem_univ_pi]
+      intro w
+      exact Complex.arg_mem_Ioc (x.2 w)
+    · ext w
+      · simp_rw [mapToUnitsPowComplex_apply, hc₂, vectorNormAtPlace, normAtPlace_apply_isReal
+          w.prop, Real.norm_eq_abs, abs_of_nonneg (hx _)]
+      · simp_rw [mapToUnitsPowComplex_apply, Complex.polarCoord_symm_apply, hc₂, vectorNormAtPlace,
+          normAtPlace_apply_isComplex w.prop, Complex.norm_eq_abs, Complex.ofReal_cos,
+          Complex.ofReal_sin, Complex.abs_mul_cos_add_sin_mul_I]
+
 theorem normLessThanOnePlus_eq_image :
     normLessThanOnePlus K = mapToUnitsPowComplex K '' (box K) := by
-  sorry
+  refine (toto _ _ _ ?_ ?_ ?_).symm
+  · intro x
+    refine ⟨fun hx ↦ ⟨x, hx, rfl⟩, fun ⟨y, hy, hyx⟩ ↦ ⟨?_, ?_⟩⟩
+    ·
+      sorry
+    · 
+      sorry
+  · exact vectorNormAtPlace_normLessThanOne_eq_image K
+  · exact fun _ h w ↦ (h.2 w).le
+
 
 theorem pos_of_mem_box₁ {x : InfinitePlace K → ℝ}  (hx : x ∈ box₁ K) :
     0 < x w₀ := by
