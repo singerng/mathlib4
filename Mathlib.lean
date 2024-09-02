@@ -3071,6 +3071,7 @@ import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.UnitaryGroup
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Logic.Basic
+import Mathlib.Logic.BreadthFirstSearch
 import Mathlib.Logic.Denumerable
 import Mathlib.Logic.Embedding.Basic
 import Mathlib.Logic.Embedding.Set
