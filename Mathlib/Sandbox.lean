@@ -3,6 +3,15 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section finset
+
+@[simp]
+theorem Finset.union_nonempty {α : Type*} [DecidableEq α] {s : Finset α}  {t : Finset α} :
+    (s ∪ t : Finset α).Nonempty ↔ s.Nonempty ∨ t.Nonempty := by
+  rw [← Finset.coe_nonempty, Finset.coe_union, Set.union_nonempty, coe_nonempty, coe_nonempty]
+
+end finset
+
 section rpow
 
 theorem Real.rpow_comm {x : ℝ} (hx : 0 ≤ x)  (y z : ℝ) :

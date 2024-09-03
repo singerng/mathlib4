@@ -13,9 +13,111 @@ noncomputable section
 
 namespace NumberField.mixedEmbedding
 
+variable {K}
+
 /-- The space `ℝ^r₁ × ℂ^r₂` with `(r₁, r₂)` the signature of `K`. -/
 local notation "E" K =>
   ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ)
+
+open Classical in
+def negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
+    (E K) ≃L[ℝ] (E K) :=
+  ContinuousLinearEquiv.prod (ContinuousLinearEquiv.piCongrRight
+    fun w ↦ if w ∈ s then ContinuousLinearEquiv.neg ℝ else ContinuousLinearEquiv.refl ℝ ℝ)
+      (ContinuousLinearEquiv.refl ℝ _)
+
+theorem negAt_apply_of_isReal_and_mem  (s : Finset {w // IsReal w}) (x : E K)
+    {w : {w // IsReal w}} (hw : w ∈ s) :
+    (negAt s x).1 w = - x.1 w := by
+  simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
+    if_pos hw, ContinuousLinearEquiv.neg_apply]
+
+theorem negAt_apply_of_isReal_and_not_mem  (s : Finset {w // IsReal w}) (x : E K)
+    {w : {w // IsReal w}} (hw : w ∉ s) :
+    (negAt s x).1 w = x.1 w := by
+  simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
+    if_neg hw, ContinuousLinearEquiv.refl_apply]
+
+theorem negAt_apply_of_isComplex  (s : Finset {w // IsReal w}) (x : E K)
+    {w : {w // IsComplex w}}  :
+    (negAt s x).2 w = x.2 w := rfl
+
+open Classical in
+theorem volume_preserving_negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
+    MeasurePreserving (negAt s) := by
+  refine MeasurePreserving.prod (volume_preserving_pi fun w ↦ ?_) (MeasurePreserving.id _)
+  by_cases hw : w ∈ s
+  · simp_rw [if_pos hw]
+    exact measurePreserving_neg _
+  · simp_rw [if_neg hw]
+    exact MeasurePreserving.id _
+
+variable (A : Set (E K)) (hA₁ : MeasurableSet A) (hA₂ : ∀ x, x ∈ A ↔ (fun w ↦ ‖x.1 w‖, x.2) ∈ A)
+
+def plusPart : Set (E K) := A ∩ {x | ∀ w, 0 ≤ x.1 w}
+
+open Classical in
+theorem volume_eq_zero (w : {w // IsReal w}):
+    volume ({x : E K | x.1 w = 0}) = 0 := by
+  let A : AffineSubspace ℝ (E K) :=
+    Submodule.toAffineSubspace (Submodule.mk ⟨⟨{x | x.1 w = 0}, by aesop⟩, rfl⟩ (by aesop))
+  convert Measure.addHaar_affineSubspace volume A fun h ↦ ?_
+  have : 1 ∈ A := h ▸ Set.mem_univ _
+  simp [A] at this
+
+def negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) : Set (E K) :=
+    negAt s '' (plusPart A)
+
+open Classical in
+theorem res1 : Pairwise (AEDisjoint volume on (negAtPlus A)) := by
+  intro s t hst
+  have : (∃ w ∈ s, w ∉ t) ∨ (∃ w ∈ t, w ∉ s) := by
+    obtain h | h := Finset.union_nonempty.mp (Finset.symmDiff_nonempty.mpr hst)
+    · left
+      simp_rw [← Finset.mem_sdiff]
+      exact Finset.Nonempty.exists_mem h
+    · right
+      simp_rw [← Finset.mem_sdiff]
+      exact Finset.Nonempty.exists_mem h
+  sorry
+
+open Classical in
+def signSet (x : E K) : Finset {w : InfinitePlace K // IsReal w} :=
+  Set.toFinset (fun w ↦ x.1 w ≤ 0)
+
+theorem mem_signSet (x : E K) (w : {w // IsReal w}) :
+    w ∈ signSet x ↔ x.1 w ≤ 0 := by
+  simp_rw [signSet, Set.mem_toFinset, Set.mem_def]
+
+theorem res21 (s) : negAtPlus A s ⊆ A := sorry
+
+theorem res22 (x : E K) (hx : x ∈ A) :
+    x ∈ negAtPlus A (signSet x) := sorry
+
+theorem res2 : A = ⋃ s, negAtPlus A s := by
+  ext x
+  rw [Set.mem_iUnion]
+  exact ⟨fun h ↦ ⟨signSet x, res22 A x h⟩, fun ⟨s, hs⟩ ↦ res21 A s hs⟩
+
+open Classical in
+theorem res3 (s) : volume (negAtPlus A s) = volume (plusPart A) := sorry
+
+open Classical in
+example : volume A = 2 ^ NrRealPlaces K * volume (plusPart A) := by
+  nth_rewrite 1 [res2 A, measure_iUnion₀]
+  · simp_rw [res3]
+    rw [tsum_fintype, Finset.sum_const, ← Fintype.card, Fintype.card_finset, NrRealPlaces,
+      nsmul_eq_mul, Nat.cast_pow, Nat.cast_ofNat]
+  · exact res1 A
+  · sorry
+
+
+-- open Classical in
+-- example (A : Set (E K)) (hA : MeasurableSet A) :
+--     volume A = 2 ^ NrRealPlaces K * volume (A ∩ {x | ∀ w, 0 ≤ x.1 w}) := by
+--   let B : Finset {w : InfinitePlace K // IsReal w} →
+
+#exit
 
 namespace fundamentalCone
 
@@ -1699,28 +1801,7 @@ end fundamentalCone
 
 variable {K}
 
-open Classical in
-def negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
-    (E K) ≃L[ℝ] (E K) :=
-  ContinuousLinearEquiv.prod (ContinuousLinearEquiv.piCongrRight
-    fun w ↦ if w ∈ s then ContinuousLinearEquiv.neg ℝ else ContinuousLinearEquiv.refl ℝ ℝ)
-      (ContinuousLinearEquiv.refl ℝ _)
 
-theorem negAt_of_isReal_and_mem  (s : Finset {w : InfinitePlace K // IsReal w}) (x : E K)
-    {w : {w // IsReal w}} (hw : w ∈ s) :
-    (negAt s x).1 w = - x.1 w := by
-  simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
-    if_pos hw, ContinuousLinearEquiv.neg_apply]
-
-theorem negAt_of_isReal_and_not_mem  (s : Finset {w : InfinitePlace K // IsReal w}) (x : E K)
-    {w : {w // IsReal w}} (hw : w ∉ s) :
-    (negAt s x).1 w = x.1 w := by
-  simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
-    if_neg hw, ContinuousLinearEquiv.refl_apply]
-
-theorem negAt_of_isComplex  (s : Finset {w : InfinitePlace K // IsReal w}) (x : E K)
-    {w : {w // IsComplex w}}  :
-    (negAt s x).2 w = x.2 w := rfl
 
 end NumberField.mixedEmbedding
 
