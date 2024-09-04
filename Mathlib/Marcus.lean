@@ -26,21 +26,30 @@ def negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
     fun w ↦ if w ∈ s then ContinuousLinearEquiv.neg ℝ else ContinuousLinearEquiv.refl ℝ ℝ)
       (ContinuousLinearEquiv.refl ℝ _)
 
-theorem negAt_apply_of_isReal_and_mem  (s : Finset {w // IsReal w}) (x : E K)
+theorem negAt_apply_of_isReal_and_mem  {s : Finset {w // IsReal w}} (x : E K)
     {w : {w // IsReal w}} (hw : w ∈ s) :
     (negAt s x).1 w = - x.1 w := by
   simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
     if_pos hw, ContinuousLinearEquiv.neg_apply]
 
-theorem negAt_apply_of_isReal_and_not_mem  (s : Finset {w // IsReal w}) (x : E K)
+theorem negAt_apply_of_isReal_and_not_mem {s : Finset {w // IsReal w}} (x : E K)
     {w : {w // IsReal w}} (hw : w ∉ s) :
     (negAt s x).1 w = x.1 w := by
   simp_rw [negAt, ContinuousLinearEquiv.prod_apply, ContinuousLinearEquiv.piCongrRight_apply,
     if_neg hw, ContinuousLinearEquiv.refl_apply]
 
-theorem negAt_apply_of_isComplex  (s : Finset {w // IsReal w}) (x : E K)
-    {w : {w // IsComplex w}}  :
+theorem negAt_apply_of_isComplex (s : Finset {w // IsReal w}) (x : E K)
+    (w : {w // IsComplex w})  :
     (negAt s x).2 w = x.2 w := rfl
+
+theorem normAtPlace_negAt_eq (s : Finset {w // IsReal w}) (x : E K) (w : InfinitePlace K) :
+    normAtPlace w (negAt s x) = normAtPlace w x := by
+  obtain hw | hw := isReal_or_isComplex w
+  · simp_rw [normAtPlace_apply_isReal hw]
+    · by_cases hw' : ⟨w, hw⟩ ∈ s
+      · rw [negAt_apply_of_isReal_and_mem _ hw', norm_neg]
+      · rw [negAt_apply_of_isReal_and_not_mem _ hw']
+  · simp_rw [normAtPlace_apply_isComplex hw, negAt_apply_of_isComplex _ _ ⟨w, hw⟩]
 
 open Classical in
 theorem volume_preserving_negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
@@ -52,9 +61,41 @@ theorem volume_preserving_negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
   · simp_rw [if_neg hw]
     exact MeasurePreserving.id _
 
-variable (A : Set (E K)) (hA₁ : MeasurableSet A) (hA₂ : ∀ x, x ∈ A ↔ (fun w ↦ ‖x.1 w‖, x.2) ∈ A)
+theorem negAt_symm (s : Finset {w : InfinitePlace K // IsReal w}) :
+    (negAt s).symm = negAt s := by
+  ext x w
+  · by_cases h : w ∈ s
+    · simp_rw [negAt, ContinuousLinearEquiv.prod_symm, ContinuousLinearEquiv.prod_apply,
+        ContinuousLinearEquiv.piCongrRight_symm_apply, ContinuousLinearEquiv.piCongrRight_apply,
+        if_pos h, ContinuousLinearEquiv.symm_neg]
+    · simp_rw [negAt, ContinuousLinearEquiv.prod_symm, ContinuousLinearEquiv.prod_apply,
+        ContinuousLinearEquiv.piCongrRight_symm_apply, ContinuousLinearEquiv.piCongrRight_apply,
+        if_neg h, ContinuousLinearEquiv.refl_symm]
+  · rfl
 
-def plusPart : Set (E K) := A ∩ {x | ∀ w, 0 ≤ x.1 w}
+variable (A : Set (E K)) (hA₁ : MeasurableSet A) (hA₂ : ∀ s, negAt s '' A ⊆ A)
+
+abbrev plusPart : Set (E K) := A ∩ {x | ∀ w, 0 ≤ x.1 w}
+
+abbrev plusPart' : Set (E K) := A ∩ {x | ∀ w, 0 < x.1 w}
+
+include hA₁ in
+theorem measurableSet_plusPart :
+    MeasurableSet (plusPart A) := by
+  convert_to MeasurableSet (A ∩ (⋂ w, {x | 0 ≤ x.1 w}))
+  · ext; simp
+  · refine MeasurableSet.inter hA₁ ?_
+    refine MeasurableSet.iInter fun _ ↦ ?_
+    exact measurableSet_le measurable_const ((measurable_pi_apply _).comp'  measurable_fst)
+
+include hA₁ in
+theorem measurableSet_plusPart' :
+    MeasurableSet (plusPart' A) := by
+  convert_to MeasurableSet (A ∩ (⋂ w, {x | 0 < x.1 w}))
+  · ext; simp
+  · refine MeasurableSet.inter hA₁ ?_
+    refine MeasurableSet.iInter fun _ ↦ ?_
+    exact measurableSet_lt measurable_const ((measurable_pi_apply _).comp'  measurable_fst)
 
 open Classical in
 theorem volume_eq_zero (w : {w // IsReal w}):
@@ -65,63 +106,115 @@ theorem volume_eq_zero (w : {w // IsReal w}):
   have : 1 ∈ A := h ▸ Set.mem_univ _
   simp [A] at this
 
-def negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) : Set (E K) :=
+abbrev negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) : Set (E K) :=
     negAt s '' (plusPart A)
+
+include hA₁ in
+theorem measurableSet_negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) :
+    MeasurableSet (negAtPlus A s) := by
+  rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage]
+  exact (measurableSet_plusPart A hA₁).preimage (negAt s).continuous.measurable
+
+theorem negAtPlus_nonpos_of_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
+    {w : {w // IsReal w}} (hw : w ∈ s) :
+    x.1 w ≤ 0 := by
+  obtain ⟨y, hy, rfl⟩ := hx
+  rw [negAt_apply_of_isReal_and_mem _ hw, Left.neg_nonpos_iff]
+  exact hy.2 w
+
+theorem negAtPlus_nonneg_of_not_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
+    {w : {w // IsReal w}} (hw : w ∉ s) :
+    0 ≤ x.1 w := by
+  obtain ⟨y, hy, rfl⟩ := hx
+  rw [negAt_apply_of_isReal_and_not_mem _ hw]
+  exact hy.2 w
 
 open Classical in
 theorem res1 : Pairwise (AEDisjoint volume on (negAtPlus A)) := by
   intro s t hst
-  have : (∃ w ∈ s, w ∉ t) ∨ (∃ w ∈ t, w ∉ s) := by
-    obtain h | h := Finset.union_nonempty.mp (Finset.symmDiff_nonempty.mpr hst)
+  have : ∃ w, (w ∈ s ∧ w ∉ t) ∨ (w ∈ t ∧ w ∉ s) := by
+    obtain ⟨w, hw⟩ := Finset.symmDiff_nonempty.mpr hst
+    refine ⟨w, ?_⟩
+    obtain h | h := Finset.mem_union.mp hw
     · left
-      simp_rw [← Finset.mem_sdiff]
-      exact Finset.Nonempty.exists_mem h
+      rwa [← Finset.mem_sdiff]
     · right
-      simp_rw [← Finset.mem_sdiff]
-      exact Finset.Nonempty.exists_mem h
-  sorry
+      rwa [← Finset.mem_sdiff]
+  obtain ⟨w, hw⟩ := this
+  refine measure_mono_null ?_ (volume_eq_zero w)
+  intro x hx
+  obtain hw | hw := hw
+  · exact le_antisymm (negAtPlus_nonpos_of_mem A hx.1 hw.1)
+      (negAtPlus_nonneg_of_not_mem A hx.2 hw.2)
+  ·  exact le_antisymm (negAtPlus_nonpos_of_mem A hx.2 hw.1)
+      (negAtPlus_nonneg_of_not_mem A hx.1 hw.2)
 
 open Classical in
 def signSet (x : E K) : Finset {w : InfinitePlace K // IsReal w} :=
   Set.toFinset (fun w ↦ x.1 w ≤ 0)
 
-theorem mem_signSet (x : E K) (w : {w // IsReal w}) :
+theorem mem_signSet {x : E K} {w : {w // IsReal w}} :
     w ∈ signSet x ↔ x.1 w ≤ 0 := by
   simp_rw [signSet, Set.mem_toFinset, Set.mem_def]
 
-theorem res21 (s) : negAtPlus A s ⊆ A := sorry
+include hA₂ in
+theorem res21 (s) : negAtPlus A s ⊆ A := by
+  rintro _ ⟨x, hx, rfl⟩
+  exact hA₂ s (Set.mem_image_of_mem (negAt s) hx.1)
 
+include hA₂ in
 theorem res22 (x : E K) (hx : x ∈ A) :
-    x ∈ negAtPlus A (signSet x) := sorry
+    x ∈ negAtPlus A (signSet x) := by
+  have : (negAt (signSet x)) (fun w ↦ |x.1 w|, x.2) = x := by
+    ext w
+    · by_cases hw : w ∈ signSet x
+      · simp_rw [negAt_apply_of_isReal_and_mem _ hw, abs_of_nonpos (mem_signSet.mp hw), neg_neg]
+      · simp_rw [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos
+          (not_le.mp (mem_signSet.not.mp hw))]
+    · rfl
+  refine ⟨(fun w ↦ |x.1 w|, x.2), ⟨?_, ?_⟩, ?_⟩
+  · specialize hA₂ (signSet x)
+    refine hA₂ ?_
+    rwa [← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage, Set.mem_preimage, this]
+  · exact fun _ ↦ abs_nonneg _
+  · exact this
 
+include hA₂ in
 theorem res2 : A = ⋃ s, negAtPlus A s := by
   ext x
   rw [Set.mem_iUnion]
-  exact ⟨fun h ↦ ⟨signSet x, res22 A x h⟩, fun ⟨s, hs⟩ ↦ res21 A s hs⟩
+  exact ⟨fun h ↦ ⟨signSet x, res22 A hA₂ x h⟩, fun ⟨s, hs⟩ ↦ res21 A hA₂ s hs⟩
+
+include hA₁ in
+open Classical in
+theorem res3 (s) : volume (negAtPlus A s) = volume (plusPart A) := by
+  rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage,
+    (volume_preserving_negAt s).measure_preimage (measurableSet_plusPart A hA₁).nullMeasurableSet]
 
 open Classical in
-theorem res3 (s) : volume (negAtPlus A s) = volume (plusPart A) := sorry
+theorem plusPart'_ae_plusPart :
+    plusPart' A =ᵐ[volume] plusPart A := by
+  refine ae_eq_set_inter ae_eq_rfl ?_
+  rw [← measure_symmDiff_eq_zero_iff, symmDiff_of_le (fun _ h w ↦ (h w).le)]
+  have : {x : E K | ∀ w, 0 ≤ x.1 w} \ {x | ∀ w, 0 < x.1 w} ⊆ ⋃ w, {x | x.1 w = 0} := by
+    intro _ ⟨h₁, h₂⟩
+    obtain ⟨w, h⟩ := not_forall.mp h₂
+    exact Set.mem_iUnion.mpr ⟨w, le_antisymm (not_lt.mp h) (h₁ w)⟩
+  refine measure_mono_null this ?_
+  rw [measure_iUnion_null_iff]
+  exact fun _ ↦ volume_eq_zero _
 
+include hA₁ hA₂ in
 open Classical in
-example : volume A = 2 ^ NrRealPlaces K * volume (plusPart A) := by
-  nth_rewrite 1 [res2 A, measure_iUnion₀]
-  · simp_rw [res3]
+theorem main : volume A = 2 ^ NrRealPlaces K * volume (plusPart A) := by
+  nth_rewrite 1 [res2 A hA₂, measure_iUnion₀]
+  · simp_rw [res3 _ hA₁]
     rw [tsum_fintype, Finset.sum_const, ← Fintype.card, Fintype.card_finset, NrRealPlaces,
       nsmul_eq_mul, Nat.cast_pow, Nat.cast_ofNat]
   · exact res1 A
-  · sorry
-
-
--- open Classical in
--- example (A : Set (E K)) (hA : MeasurableSet A) :
---     volume A = 2 ^ NrRealPlaces K * volume (A ∩ {x | ∀ w, 0 ≤ x.1 w}) := by
---   let B : Finset {w : InfinitePlace K // IsReal w} →
-
-#exit
+  · exact fun _ ↦ (measurableSet_negAtPlus A hA₁ _).nullMeasurableSet
 
 namespace fundamentalCone
-
-variable {K}
 
 def equivFinRank : Fin (rank K) ≃ {w : InfinitePlace K // w ≠ w₀} := by
   classical
@@ -1482,15 +1575,11 @@ theorem measurableSet_box₂ :
 theorem measurableSet_box :
     MeasurableSet (box K) := MeasurableSet.prod (measurableSet_box₁ K) (measurableSet_box₂ K)
 
-abbrev normLessThanOnePlus : (Set (E K)) := normLessThanOne K ∩ {x | ∀ w, 0 < x.1 w}
+abbrev normLessThanOnePlus : (Set (E K)) := plusPart' (normLessThanOne K)
 
 theorem normLessThanOnePlus_measurableSet :
-    MeasurableSet (normLessThanOnePlus K) := by
-  convert_to MeasurableSet (normLessThanOne K ∩ (⋂ w, {x | 0 < x.1 w}))
-  · ext; simp
-  · exact (measurableSet_normLessThanOne K).inter <|
-      MeasurableSet.iInter fun _ ↦  measurableSet_lt measurable_const <|
-        (measurable_pi_apply _).comp' measurable_fst
+    MeasurableSet (normLessThanOnePlus K) :=
+  measurableSet_plusPart' _ (measurableSet_normLessThanOne K)
 
 theorem mixedToReal_mapToUnitsPowComplex
     (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
@@ -1797,11 +1886,21 @@ theorem volume_frontier_normLessThanOnePlus :
     rw [volume_normLessThanOnePlus]
     exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
 
+open Classical in
+theorem volume_normLessThanOne :
+    volume (normLessThanOne K) =
+      2 ^ NrRealPlaces K * NNReal.pi ^ NrComplexPlaces K * (regulator K).toNNReal := by
+  rw [main]
+  have := plusPart'_ae_plusPart (normLessThanOne K)
+  have : volume (plusPart' (normLessThanOne K)) = volume (plusPart (normLessThanOne K)) := by
+    exact measure_congr this
+  rw [← this]
+  rw [volume_normLessThanOnePlus, mul_assoc]
+  · exact measurableSet_normLessThanOne K
+  · rintro _ _ ⟨x, hx, rfl⟩
+    exact mem_normLessThanOne_of_normAtPlace_eq hx fun w ↦ normAtPlace_negAt_eq _ _ _
+
 end fundamentalCone
-
-variable {K}
-
-
 
 end NumberField.mixedEmbedding
 
