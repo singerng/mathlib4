@@ -1,4 +1,5 @@
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.FundamentalCone
+import Mathlib.NumberTheory.NumberField.Discriminant
 
 variable (K : Type*) [Field K] [NumberField K]
 
@@ -2049,7 +2050,7 @@ local notation "E" K =>
   ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ)
 
 /-- Docs. -/
-def Λ : AddSubgroup (E₂ K) :=
+abbrev Λ : AddSubgroup (E₂ K) :=
     (span ℤ (Set.range ((latticeBasis K).map (CLE K).symm))).toAddSubgroup
 
 open Classical in
@@ -2062,19 +2063,33 @@ instance : IsZlattice ℝ (Λ K) where
       ← Submodule.map_span, Zspan.span_top, Submodule.map_top, LinearEquivClass.range]
 
 /-- Docs. -/
-abbrev X : Set (E₂ K) := (euclideanSpace.linearEquiv K)⁻¹' (fundamentalCone K)
+abbrev X : Set (E₂ K) := (CLE K)⁻¹' (fundamentalCone K)
 
 /-- Docs. -/
-abbrev X₁ : Set (E₂ K) := {x ∈ X K | mixedEmbedding.norm (euclideanSpace.linearEquiv K x) ≤ 1}
+abbrev X₁ : Set (E₂ K) := {x ∈ X K | mixedEmbedding.norm (CLE K x) ≤ 1}
 
 theorem aux₁ :
-    {x | x ∈ X K ∧ mixedEmbedding.norm ((euclideanSpace.linearEquiv K) x) ≤ 1} =
-       (CLE K)⁻¹' (normLessThanOne K) := sorry
+    {x | x ∈ X K ∧ mixedEmbedding.norm ((CLE K) x) ≤ 1} =
+       (CLE K)⁻¹' (normLessThanOne K) := by
+  simp only [Set.mem_preimage, normLessThanOne, Set.preimage_setOf_eq]
+
+theorem aux₂ :
+    (Λ K : Set (E₂ K)) ∩ (X K) = (CLE K)⁻¹' (integralPoint K) := by
+  classical
+  rw [integralPoint, Set.inter_comm _ (X K), Set.preimage_inter]
+  congr
+  ext x
+  rw [Λ]
+  rw [coe_toAddSubgroup, SetLike.mem_coe]
+  rw [Set.mem_preimage, ← Set.range_comp, ← RingHom.coe_comp, ← RingHom.coe_range]
+  rw [SetLike.mem_coe]
+  rw [← mem_span_latticeBasis]
+  rfl
 
 open Submodule Ideal nonZeroDivisors
 
 open Classical in
-example :
+theorem final₁ :
     Tendsto (fun n : ℕ ↦
       (Nat.card {I : (Ideal (𝓞 K))⁰ | IsPrincipal (I : Ideal (𝓞 K)) ∧
         absNorm (I : Ideal (𝓞 K)) ≤ n} * torsionOrder K : ℝ) / n) atTop
@@ -2082,13 +2097,47 @@ example :
   refine Tendsto.congr' ?_
     (Tendsto.comp (Zlattice.covolume.tendsto_card_le_div' (Λ K) ?_ ?_ ?_ ?_ ?_)
       tendsto_natCast_atTop_atTop)
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  · sorry
+  · filter_upwards with n
+    have := card_isPrincipal_norm_le K n
+    simp_rw [Function.comp_apply, ← Nat.cast_mul]
+    rw [this]
+    simp_rw [Set.setOf_inter_eq_sep, ← and_assoc, ← Set.mem_inter_iff]
+    congr 2
+    refine Nat.card_congr ?_
+    rw [@Set.coe_setOf, Set.coe_setOf]
+    simp_rw [intNorm_le_iff]
+    refine Equiv.trans ?_ (Equiv.subtypeSubtypeEquivSubtypeInter
+      (· ∈ integralPoint K) (fun a ↦ mixedEmbedding.norm a ≤ n)).symm
+    refine Equiv.subtypeEquiv (CLE K).toEquiv ?_
+    intro x
+    rw [aux₂]
+    simp
+  · intro x r hx hr
+    rwa [Set.mem_preimage, _root_.map_smul, (smul_mem_iff_mem (ne_of_lt hr).symm)]
+  · intro x r hr
+    rw [_root_.map_smul, mixedEmbedding.norm_smul, euclideanSpace.finrank, abs_of_pos hr]
+  · rw [aux₁]
+    exact isBounded_normLessThanOne K
+  · rw [aux₁]
+    exact (CLE K).continuous.measurable (measurableSet_normLessThanOne K)
   · rw [aux₁, euclideanSpace.coe_homeomorph, ← Homeomorph.preimage_frontier,
       ←  euclideanSpace.coe_homeomorph, (measurePreserving_CLE K).measure_preimage]
-    sorry
+    exact volume_frontier_normLessThanOne K
+    refine  measurableSet_frontier.nullMeasurableSet
+
+
+def residue₀ : ℝ :=
+  (2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
+    (torsionOrder K *  Real.sqrt |discr K|)
+
+open Classical in
+theorem final₂ :
+    Tendsto (fun n : ℕ ↦
+      (Nat.card {I : (Ideal (𝓞 K))⁰ | IsPrincipal (I : Ideal (𝓞 K)) ∧
+        absNorm (I : Ideal (𝓞 K)) ≤ n} : ℝ) / n) atTop
+          (𝓝 (residue₀ K)) := by
+  sorry
+
+#print axioms final₂
 
 end
