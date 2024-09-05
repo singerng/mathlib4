@@ -311,6 +311,7 @@ instance instDiscreteTopology [Finite ι] : DiscreteTopology (span ℤ (Set.rang
 
 theorem setFinite_inter [ProperSpace E] [Finite ι] {s : Set E} (hs : Bornology.IsBounded s) :
     Set.Finite (s ∩ (span ℤ (Set.range b))) := by
+  have : DiscreteTopology (span ℤ (Set.range b)) := by infer_instance
   refine Metric.finite_isBounded_inter_isClosed hs ?_
   change IsClosed (span ℤ (Set.range b)).toAddSubgroup
   exact inferInstance

@@ -135,7 +135,7 @@ theorem finrank_mul_regulator_eq_det (w' : InfinitePlace K) (e : {w // w ≠ w'}
       rw [ne_eq, Equiv.apply_eq_iff_eq_symm_apply]
       exact Fin.succAbove_ne (e'.symm w') _
     rw [← Matrix.det_reindex_self e'.symm, Matrix.det_succ_column _ (e'.symm w')]
-    simp [(·∘·)]
+    simp [Function.comp_def]
     simp_rw [Equiv.apply_eq_iff_eq_symm_apply]
     rw [Fintype.sum_ite_eq', abs_mul, abs_mul, Nat.abs_cast, abs_pow, abs_neg, abs_one, one_pow,
       one_mul, regulator_eq_det K w' e, ← Matrix.det_reindex_self e]

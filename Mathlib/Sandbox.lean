@@ -3,6 +3,36 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 
+section frontier
+
+theorem frontier_union_subset' {X : Type*} [TopologicalSpace X] (s : Set X) (t : Set X) :
+    frontier (s ∪ t) ⊆ frontier s ∪ frontier t :=
+  (frontier_union_subset s t).trans <|
+    Set.union_subset_union Set.inter_subset_left Set.inter_subset_right
+
+theorem Finset.frontier_biUnion {ι : Type*} (s : Finset ι) {X : Type*} [TopologicalSpace X]
+    (t : ι → Set X) :
+    frontier (⋃ i ∈ s, t i) ⊆ ⋃ i ∈ s, frontier (t i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert _ h_ind =>
+      simp_rw [mem_insert, Set.iUnion_iUnion_eq_or_left]
+      exact (frontier_union_subset' _ _).trans ( Set.union_subset_union subset_rfl h_ind)
+
+example {α β : Type*} (f : α → Set β) :
+    ⋃ a, f a = ⋃ a ∈ Set.univ, f a := by
+  exact Eq.symm (Set.biUnion_univ f)
+
+theorem frontier_iUnion {ι : Type*} [Fintype ι] {X : Type*} [TopologicalSpace X]
+    (t : ι → Set X) :
+    frontier (⋃ i, t i) ⊆ ⋃ i, frontier (t i) := by
+  have := Finset.frontier_biUnion Finset.univ t
+  simp only [Finset.mem_univ, Set.iUnion_true] at this
+  exact this
+
+end frontier
+
 section finset
 
 @[simp]
@@ -230,7 +260,7 @@ theorem Complex.lintegral_pi_comp_polarCoord_symm_aux {ι : Type*} [DecidableEq 
                 (fun p ↦ ↑(∏ i ∈ insert i₀ s, (p i).1.toNNReal) *
                   (f fun i ↦ Complex.polarCoord.symm (p i))) ∘ fun p ↦ Function.update p i₀ x
               ∂fun _ ↦ volume.restrict polarCoord.target) a := by
-            simp_rw [h_ind _ hf, lmarginal_update_of_not_mem (h s) hi₀, Function.comp,
+            simp_rw [h_ind _ hf, lmarginal_update_of_not_mem (h s) hi₀, Function.comp_def,
               ENNReal.smul_def, smul_eq_mul, ← lmarginal_const_smul' _ ENNReal.coe_ne_top,
               Pi.smul_def, Finset.prod_insert hi₀, Function.update_same, smul_eq_mul,
               ENNReal.coe_mul, mul_assoc]
@@ -452,7 +482,7 @@ theorem lintegral_comp_abs {f : ℝ → ENNReal} (hf : Measurable f) :
       rw [restrict_Iio_eq_restrict_Iic]
       congr 1
       · refine setLIntegral_congr_fun measurableSet_Iic ?_
-        exact Filter.Eventually.of_forall fun x hx ↦ by rw [abs_of_nonpos (by convert hx)]
+        exact Filter.Eventually.of_forall fun x hx ↦ by rw [abs_of_nonpos hx]
       · refine setLIntegral_congr_fun measurableSet_Ioi ?_
         exact Filter.Eventually.of_forall fun x hx ↦ by rw [abs_of_pos (by convert hx)]
     _ = 2 * ∫⁻ x in Ioi 0, f x := by

@@ -129,6 +129,12 @@ theorem negAtPlus_nonneg_of_not_mem {s : Finset {w // IsReal w}} {x : E K} (hx :
   rw [negAt_apply_of_isReal_and_not_mem _ hw]
   exact hy.2 w
 
+-- Use this to golf proofs?
+theorem plusPart_eq_preimage (s : Finset {w // IsReal w} ):
+    plusPart A = negAt s ⁻¹' (negAtPlus A s) := by
+  rw [negAtPlus, ContinuousLinearEquiv.image_eq_preimage,
+    ContinuousLinearEquiv.preimage_symm_preimage]
+
 open Classical in
 theorem res1 : Pairwise (AEDisjoint volume on (negAtPlus A)) := by
   intro s t hst
@@ -357,7 +363,7 @@ def mapToUnitsPow₀_aux :
   map_source' _ _ := by
     dsimp only
     refine ⟨Set.mem_setOf.mpr fun w ↦ by split_ifs <;> exact Real.exp_pos _, ?_⟩
-    rw [Set.mem_setOf_eq, ← Finset.univ.sum_erase_add _ (Finset.mem_univ w₀), dif_pos rfl]
+    simp_rw [Set.mem_setOf_eq, ← Finset.univ.sum_erase_add _ (Finset.mem_univ w₀), dif_pos]
     rw [Finset.sum_subtype _ (by aesop : ∀ w, w ∈ Finset.univ.erase w₀ ↔ w ≠ w₀)]
     conv_lhs => enter [1,2,w]; rw [dif_neg w.prop]
     simp_rw [Real.log_exp, neg_mul, mul_neg, mul_inv_cancel_left₀ mult_coe_ne_zero,
@@ -1886,6 +1892,11 @@ theorem volume_frontier_normLessThanOnePlus :
     rw [volume_normLessThanOnePlus]
     exact Batteries.compareOfLessAndEq_eq_lt.mp rfl
 
+theorem negAt_normLessThanOne (s : Finset {w // IsReal w}) :
+    (negAt s) '' normLessThanOne K ⊆ normLessThanOne K := by
+  rintro _ ⟨x, hx, rfl⟩
+  exact mem_normLessThanOne_of_normAtPlace_eq hx fun w ↦ normAtPlace_negAt_eq _ _ _
+
 open Classical in
 theorem volume_normLessThanOne :
     volume (normLessThanOne K) =
@@ -1897,11 +1908,190 @@ theorem volume_normLessThanOne :
   rw [← this]
   rw [volume_normLessThanOnePlus, mul_assoc]
   · exact measurableSet_normLessThanOne K
-  · rintro _ _ ⟨x, hx, rfl⟩
-    exact mem_normLessThanOne_of_normAtPlace_eq hx fun w ↦ normAtPlace_negAt_eq _ _ _
+  · exact fun s ↦ negAt_normLessThanOne K s
+
+open Classical in
+theorem volume_frontier_normLessThanOne :
+    volume (frontier (normLessThanOne K)) = 0 := by
+  rw [res2 (normLessThanOne K) (fun s ↦ negAt_normLessThanOne K s)]
+  refine measure_mono_null (frontier_iUnion _) (measure_iUnion_null_iff.mpr fun s ↦ ?_)
+  rw [← volume_frontier_normLessThanOnePlus K]
+  rw [normLessThanOnePlus]
+  have : volume (frontier (plusPart' (normLessThanOne K))) =
+    volume (frontier (plusPart (normLessThanOne K))) :=
+    sorry
+  rw [this]
+  have := plusPart_eq_preimage (normLessThanOne K) s
+  rw [this, ← ContinuousLinearEquiv.coe_toHomeomorph, ← Homeomorph.preimage_frontier,
+    ContinuousLinearEquiv.coe_toHomeomorph, (volume_preserving_negAt s).measure_preimage
+    measurableSet_frontier.nullMeasurableSet]
 
 end fundamentalCone
 
 end NumberField.mixedEmbedding
+
+namespace NumberField.mixedEmbedding.euclideanSpace
+
+open NumberField NumberField.InfinitePlace MeasureTheory BigOperators Submodule
+
+local notation "E" K =>
+  ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ)
+
+/-- The space `ℝ^r₁ × ℂ^r₂` with `(r₁, r₂)` the signature of `K` as an Euclidean space. -/
+local notation "E₂" K =>
+    (WithLp 2 ((EuclideanSpace ℝ {w : InfinitePlace K // IsReal w}) ×
+      (EuclideanSpace ℂ {w : InfinitePlace K // IsComplex w})))
+
+/-- Docs. -/
+local instance : Ring (EuclideanSpace ℝ { w : InfinitePlace K // IsReal w }) := Pi.ring
+
+/-- Docs. -/
+local instance : Ring (EuclideanSpace ℂ { w : InfinitePlace K // IsComplex w }) := Pi.ring
+
+instance : Ring (E₂ K) := Prod.instRing
+
+instance : MeasurableSpace (E₂ K) := borel _
+
+instance : BorelSpace (E₂ K)  :=  ⟨rfl⟩
+
+open Classical in
+instance : T2Space (E₂ K) := Prod.t2Space
+
+open Classical in
+protected theorem norm_apply (x : E₂ K) :
+    ‖x‖ = Real.sqrt (∑ w, ‖x.1 w‖ ^ 2 + ∑ w, ‖x.2 w‖ ^ 2) := by
+  rw [WithLp.prod_norm_eq_add (by exact Nat.ofNat_pos), EuclideanSpace.norm_eq,
+    EuclideanSpace.norm_eq, ENNReal.toReal_ofNat, Real.rpow_two, Real.sq_sqrt (by positivity),
+    Real.rpow_two, Real.sq_sqrt (by positivity), Real.sqrt_eq_rpow]
+
+-- protected theorem inner_apply (x y : E₂ K) :
+--     ⟪x, y⟫_ℝ = ∑ w, (x.1 w) * (y.1 w) +
+--       ∑ w, ((x.2 w).re * (y.2 w).re + (x.2 w).im * (y.2 w).im) := by
+--   simp_rw [WithLp.prod_inner_apply, EuclideanSpace.inner_eq_star_dotProduct, real_inner_eq_re_inner,
+--     EuclideanSpace.inner_eq_star_dotProduct, Matrix.dotProduct, Pi.star_apply, star_trivial,
+--     RCLike.star_def, map_sum, RCLike.mul_re, RCLike.conj_re, RCLike.re_to_complex,
+--     RCLike.conj_im, WithLp.equiv_pi_apply, neg_mul, sub_neg_eq_add, RCLike.im_to_complex]
+
+/-- Docs. -/
+protected def linearEquiv : (E₂ K) ≃ₗ[ℝ] (E K) := WithLp.linearEquiv _ _ _
+
+open Classical in
+/-- Docs. -/
+def CLE : (E₂ K) ≃L[ℝ] (E K) :=
+  (euclideanSpace.linearEquiv K).toContinuousLinearEquiv
+
+/-- Docs. -/
+protected def homeomorph : (E₂ K) ≃ₜ (E K) :=
+  (euclideanSpace.CLE K).toHomeomorph
+
+/-- Docs. -/
+-- protected def addEquiv : (E₂ K) ≃+ (E K) := (euclideanSpace.linearEquiv K).toAddEquiv
+
+protected theorem coe_homeomorph :
+   ⇑(CLE K) = ⇑(euclideanSpace.homeomorph K) := rfl
+
+protected theorem coe_continuousLinearEquiv :
+    ⇑(CLE K) = ⇑(euclideanSpace.linearEquiv K) := rfl
+
+@[simp]
+theorem CLE_apply_ofIsReal (x : E₂ K) {w : InfinitePlace K} (hw : IsReal w) :
+    (CLE K x).1 ⟨w, hw⟩ = x.1 ⟨w, hw⟩ := rfl
+
+@[simp]
+theorem linearEquiv_apply_ofIsComplex (x : E₂ K) {w : InfinitePlace K} (hw : IsComplex w) :
+    (CLE K x).2 ⟨w, hw⟩ = x.2 ⟨w, hw⟩ := rfl
+
+instance : Nontrivial (E₂ K) := (CLE K).toEquiv.nontrivial
+
+protected theorem finrank :
+    FiniteDimensional.finrank ℝ (E₂ K) = FiniteDimensional.finrank ℚ K := by
+  rw [← mixedEmbedding.finrank]
+  refine  LinearEquiv.finrank_eq ?_
+  exact euclideanSpace.linearEquiv K
+
+open Classical in
+/-- Docs. -/
+protected def stdOrthonormalBasis : OrthonormalBasis (index K) ℝ (E₂ K) :=
+  OrthonormalBasis.prod (EuclideanSpace.basisFun _ ℝ)
+    ((Pi.orthonormalBasis fun _ ↦ Complex.orthonormalBasisOneI).reindex (Equiv.sigmaEquivProd _ _))
+
+open Classical in
+theorem stdOrthonormalBasis_map_equiv :
+    (euclideanSpace.stdOrthonormalBasis K).toBasis.map (CLE K) =
+      mixedEmbedding.stdBasis K := by ext _ _ <;> rfl
+
+open Classical in
+@[simp]
+theorem stdOrthonormalBasis_repr_apply (x : E₂ K) (i : index K) :
+    (euclideanSpace.stdOrthonormalBasis K).repr x i =
+      (stdBasis K).repr (CLE K x) i := rfl
+
+open Classical in
+theorem measurePreserving_CLE :
+    MeasurePreserving (CLE K) := by
+  let e := (euclideanSpace.homeomorph K).toMeasurableEquiv
+  convert e.measurable.measurePreserving volume
+  erw [← (OrthonormalBasis.addHaar_eq_volume (euclideanSpace.stdOrthonormalBasis K)),
+    Homeomorph.toMeasurableEquiv_coe, Basis.map_addHaar _ (CLE K),
+    stdOrthonormalBasis_map_equiv, eq_comm, Basis.addHaar_eq_iff, Basis.coe_parallelepiped,
+    ← measure_congr (Zspan.fundamentalDomain_ae_parallelepiped (stdBasis K) volume),
+    volume_fundamentalDomain_stdBasis K]
+
+end NumberField.mixedEmbedding.euclideanSpace
+
+open Filter NumberField NumberField.mixedEmbedding NumberField.InfinitePlace Topology MeasureTheory
+  NumberField.Units NumberField.mixedEmbedding.fundamentalCone Submodule Bornology
+  NumberField.mixedEmbedding.euclideanSpace FiniteDimensional NumberField.Units.dirichletUnitTheorem
+
+/-- The space `ℝ^r₁ × ℂ^r₂` with `(r₁, r₂)` the signature of `K` as an Euclidean space. -/
+local notation "E₂" K =>
+    (WithLp 2 ((EuclideanSpace ℝ {w : InfinitePlace K // IsReal w}) ×
+      (EuclideanSpace ℂ {w : InfinitePlace K // IsComplex w})))
+
+local notation "E" K =>
+  ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ)
+
+/-- Docs. -/
+def Λ : AddSubgroup (E₂ K) :=
+    (span ℤ (Set.range ((latticeBasis K).map (CLE K).symm))).toAddSubgroup
+
+open Classical in
+instance : DiscreteTopology (Λ K) := Zspan.instDiscreteTopology _
+
+open Classical in
+instance : IsZlattice ℝ (Λ K) where
+  span_top := by
+    simp_rw [Λ, coe_toAddSubgroup, ← Zspan.map, map_coe, LinearEquiv.restrictScalars_apply,
+      ← Submodule.map_span, Zspan.span_top, Submodule.map_top, LinearEquivClass.range]
+
+/-- Docs. -/
+abbrev X : Set (E₂ K) := (euclideanSpace.linearEquiv K)⁻¹' (fundamentalCone K)
+
+/-- Docs. -/
+abbrev X₁ : Set (E₂ K) := {x ∈ X K | mixedEmbedding.norm (euclideanSpace.linearEquiv K x) ≤ 1}
+
+theorem aux₁ :
+    {x | x ∈ X K ∧ mixedEmbedding.norm ((euclideanSpace.linearEquiv K) x) ≤ 1} =
+       (CLE K)⁻¹' (normLessThanOne K) := sorry
+
+open Submodule Ideal nonZeroDivisors
+
+open Classical in
+example :
+    Tendsto (fun n : ℕ ↦
+      (Nat.card {I : (Ideal (𝓞 K))⁰ | IsPrincipal (I : Ideal (𝓞 K)) ∧
+        absNorm (I : Ideal (𝓞 K)) ≤ n} * torsionOrder K : ℝ) / n) atTop
+          (𝓝 ((volume (X₁ K)).toReal / Zlattice.covolume (Λ K))) := by
+  refine Tendsto.congr' ?_
+    (Tendsto.comp (Zlattice.covolume.tendsto_card_le_div' (Λ K) ?_ ?_ ?_ ?_ ?_)
+      tendsto_natCast_atTop_atTop)
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · rw [aux₁, euclideanSpace.coe_homeomorph, ← Homeomorph.preimage_frontier,
+      ←  euclideanSpace.coe_homeomorph, (measurePreserving_CLE K).measure_preimage]
+    sorry
 
 end

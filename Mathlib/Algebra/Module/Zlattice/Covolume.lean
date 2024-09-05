@@ -152,7 +152,7 @@ theorem volume_image_eq_volume_div_covolume' {E : Type*} [NormedAddCommGroup E]
     volume), OrthonormalBasis.coe_toBasis, OrthonormalBasis.volume_parallelepiped,
     ENNReal.one_toReal, mul_one, mul_comm, div_eq_mul_inv, ← ENNReal.ofReal_inv_of_pos
     (by positivity), abs_inv, ← h₂]
-  rfl
+
 end Basic
 
 namespace covolume

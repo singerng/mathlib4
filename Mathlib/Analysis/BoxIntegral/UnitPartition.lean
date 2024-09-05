@@ -354,8 +354,8 @@ theorem tendsto_tsum_div_pow  :
     rw [one_div, inv_le (Nat.cast_pos.mpr <| PNat.pos n) (by convert (r 0 0).prop)]
     exact le_trans (Nat.le_ceil _) (Nat.cast_le.mpr hn)
   · exact prepartition_isHenstock n B
-  · simp only [IntegrationParams.Riemann] at h
-  · simp only [IntegrationParams.Riemann] at h
+  · simp only [IntegrationParams.Riemann, Bool.false_eq_true] at h
+  · simp only [IntegrationParams.Riemann, Bool.false_eq_true] at h
 
 include hs₁ hs₂ hs₃ in
 theorem tendsto_card_div_pow' :
