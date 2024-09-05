@@ -75,36 +75,16 @@ theorem negAt_symm (s : Finset {w : InfinitePlace K // IsReal w}) :
 
 variable (A : Set (E K)) (hA₁ : MeasurableSet A) (hA₂ : ∀ s, negAt s '' A ⊆ A)
 
-abbrev plusPart : Set (E K) := A ∩ {x | ∀ w, 0 ≤ x.1 w}
-
-abbrev plusPart' : Set (E K) := A ∩ {x | ∀ w, 0 < x.1 w}
+abbrev plusPart : Set (E K) := A ∩ {x | ∀ w, 0 < x.1 w}
 
 include hA₁ in
 theorem measurableSet_plusPart :
     MeasurableSet (plusPart A) := by
-  convert_to MeasurableSet (A ∩ (⋂ w, {x | 0 ≤ x.1 w}))
-  · ext; simp
-  · refine MeasurableSet.inter hA₁ ?_
-    refine MeasurableSet.iInter fun _ ↦ ?_
-    exact measurableSet_le measurable_const ((measurable_pi_apply _).comp'  measurable_fst)
-
-include hA₁ in
-theorem measurableSet_plusPart' :
-    MeasurableSet (plusPart' A) := by
   convert_to MeasurableSet (A ∩ (⋂ w, {x | 0 < x.1 w}))
   · ext; simp
   · refine MeasurableSet.inter hA₁ ?_
     refine MeasurableSet.iInter fun _ ↦ ?_
     exact measurableSet_lt measurable_const ((measurable_pi_apply _).comp'  measurable_fst)
-
-open Classical in
-theorem volume_eq_zero (w : {w // IsReal w}):
-    volume ({x : E K | x.1 w = 0}) = 0 := by
-  let A : AffineSubspace ℝ (E K) :=
-    Submodule.toAffineSubspace (Submodule.mk ⟨⟨{x | x.1 w = 0}, by aesop⟩, rfl⟩ (by aesop))
-  convert Measure.addHaar_affineSubspace volume A fun h ↦ ?_
-  have : 1 ∈ A := h ▸ Set.mem_univ _
-  simp [A] at this
 
 abbrev negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) : Set (E K) :=
     negAt s '' (plusPart A)
@@ -115,28 +95,27 @@ theorem measurableSet_negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) :
   rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage]
   exact (measurableSet_plusPart A hA₁).preimage (negAt s).continuous.measurable
 
-theorem negAtPlus_nonpos_of_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
+theorem negAtPlus_neg_of_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
     {w : {w // IsReal w}} (hw : w ∈ s) :
-    x.1 w ≤ 0 := by
+    x.1 w < 0 := by
   obtain ⟨y, hy, rfl⟩ := hx
-  rw [negAt_apply_of_isReal_and_mem _ hw, Left.neg_nonpos_iff]
+  rw [negAt_apply_of_isReal_and_mem _ hw, neg_lt_zero]
   exact hy.2 w
 
-theorem negAtPlus_nonneg_of_not_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
+theorem negAtPlus_pos_of_not_mem {s : Finset {w // IsReal w}} {x : E K} (hx : x ∈ negAtPlus A s)
     {w : {w // IsReal w}} (hw : w ∉ s) :
-    0 ≤ x.1 w := by
+    0 < x.1 w := by
   obtain ⟨y, hy, rfl⟩ := hx
   rw [negAt_apply_of_isReal_and_not_mem _ hw]
   exact hy.2 w
 
 -- Use this to golf proofs?
-theorem plusPart_eq_preimage (s : Finset {w // IsReal w} ):
-    plusPart A = negAt s ⁻¹' (negAtPlus A s) := by
-  rw [negAtPlus, ContinuousLinearEquiv.image_eq_preimage,
-    ContinuousLinearEquiv.preimage_symm_preimage]
+theorem negAtPlus_eq_preimage (s : Finset {w // IsReal w} ) :
+    negAtPlus A s = negAt s ⁻¹' (plusPart A) := by
+  rw [← negAt_symm, ← ContinuousLinearEquiv.image_eq_preimage]
 
-open Classical in
-theorem res1 : Pairwise (AEDisjoint volume on (negAtPlus A)) := by
+theorem res1 : Pairwise (Disjoint on (negAtPlus A)) := by
+  classical
   intro s t hst
   have : ∃ w, (w ∈ s ∧ w ∉ t) ∨ (w ∈ t ∧ w ∉ s) := by
     obtain ⟨w, hw⟩ := Finset.symmDiff_nonempty.mpr hst
@@ -147,13 +126,17 @@ theorem res1 : Pairwise (AEDisjoint volume on (negAtPlus A)) := by
     · right
       rwa [← Finset.mem_sdiff]
   obtain ⟨w, hw⟩ := this
-  refine measure_mono_null ?_ (volume_eq_zero w)
-  intro x hx
+  refine Set.disjoint_left.mpr fun _ hx hx' ↦ ?_
   obtain hw | hw := hw
-  · exact le_antisymm (negAtPlus_nonpos_of_mem A hx.1 hw.1)
-      (negAtPlus_nonneg_of_not_mem A hx.2 hw.2)
-  ·  exact le_antisymm (negAtPlus_nonpos_of_mem A hx.2 hw.1)
-      (negAtPlus_nonneg_of_not_mem A hx.1 hw.2)
+  · exact lt_irrefl _ <|
+      (negAtPlus_neg_of_mem A hx hw.1).trans (negAtPlus_pos_of_not_mem A hx' hw.2)
+  · exact lt_irrefl _ <|
+      (negAtPlus_neg_of_mem A hx' hw.1).trans (negAtPlus_pos_of_not_mem A hx hw.2)
+
+include hA₂ in
+theorem res211 (s) : negAtPlus A s ⊆ A := by
+  rintro _ ⟨x, hx, rfl⟩
+  exact hA₂ s (Set.mem_image_of_mem (negAt s) hx.1)
 
 open Classical in
 def signSet (x : E K) : Finset {w : InfinitePlace K // IsReal w} :=
@@ -163,33 +146,58 @@ theorem mem_signSet {x : E K} {w : {w // IsReal w}} :
     w ∈ signSet x ↔ x.1 w ≤ 0 := by
   simp_rw [signSet, Set.mem_toFinset, Set.mem_def]
 
-include hA₂ in
-theorem res21 (s) : negAtPlus A s ⊆ A := by
-  rintro _ ⟨x, hx, rfl⟩
-  exact hA₂ s (Set.mem_image_of_mem (negAt s) hx.1)
+theorem negAt_signSet_apply (x : E K) :
+    negAt (signSet x) x = (fun w ↦ |x.1 w|, x.2) := by
+  ext w
+  · by_cases hw : w ∈ signSet x
+    · simp_rw [negAt_apply_of_isReal_and_mem _ hw, abs_of_nonpos (mem_signSet.mp hw)]
+    · simp_rw [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos
+        (lt_of_not_ge (mem_signSet.not.mp hw))]
+  · rfl
 
 include hA₂ in
-theorem res22 (x : E K) (hx : x ∈ A) :
+theorem res22 {x : E K} (hx : x ∈ A) (hx' : ∀ w, x.1 w ≠ 0) :
     x ∈ negAtPlus A (signSet x) := by
-  have : (negAt (signSet x)) (fun w ↦ |x.1 w|, x.2) = x := by
-    ext w
-    · by_cases hw : w ∈ signSet x
-      · simp_rw [negAt_apply_of_isReal_and_mem _ hw, abs_of_nonpos (mem_signSet.mp hw), neg_neg]
-      · simp_rw [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos
-          (not_le.mp (mem_signSet.not.mp hw))]
-    · rfl
-  refine ⟨(fun w ↦ |x.1 w|, x.2), ⟨?_, ?_⟩, ?_⟩
-  · specialize hA₂ (signSet x)
-    refine hA₂ ?_
-    rwa [← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage, Set.mem_preimage, this]
-  · exact fun _ ↦ abs_nonneg _
-  · exact this
+  rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage, Set.mem_preimage]
+  refine Set.mem_inter ?_ ?_
+  · exact (hA₂ (signSet x)) (Set.mem_image_of_mem _ hx)
+  · rw [negAt_signSet_apply]
+    exact fun w ↦ abs_pos.mpr (hx' w)
+
+abbrev part₀ : Set (E K) := A ∩ (⋃ w, {x | x.1 w = 0})
 
 include hA₂ in
-theorem res2 : A = ⋃ s, negAtPlus A s := by
-  ext x
-  rw [Set.mem_iUnion]
-  exact ⟨fun h ↦ ⟨signSet x, res22 A hA₂ x h⟩, fun ⟨s, hs⟩ ↦ res21 A hA₂ s hs⟩
+theorem res21 : A = (⋃ s, negAtPlus A s) ∪ part₀ A := by
+  refine Set.Subset.antisymm_iff.mpr ⟨fun x hx ↦ ?_,
+    Set.union_subset (Set.iUnion_subset fun _ ↦ res211 A hA₂ _) Set.inter_subset_left⟩
+  by_cases hw : ∃ w, x.1 w = 0
+  · refine Set.mem_union_right _ ?_
+    refine Set.mem_inter hx ?_
+    exact Set.mem_iUnion.mpr hw
+  · refine Set.mem_union_left _ ?_
+    refine Set.mem_iUnion.mpr ⟨?_, ?_⟩
+    · exact signSet x
+    · exact res22 A hA₂ hx (not_exists.mp hw)
+
+open Classical in
+theorem volume_eq_zero (w : {w // IsReal w}):
+    volume ({x : E K | x.1 w = 0}) = 0 := by
+  let A : AffineSubspace ℝ (E K) :=
+    Submodule.toAffineSubspace (Submodule.mk ⟨⟨{x | x.1 w = 0}, by aesop⟩, rfl⟩ (by aesop))
+  convert Measure.addHaar_affineSubspace volume A fun h ↦ ?_
+  have : 1 ∈ A := h ▸ Set.mem_univ _
+  simp [A] at this
+
+open Classical in
+theorem volume_part₀ :
+    volume (part₀ A) = 0 :=
+  measure_mono_null Set.inter_subset_right (measure_iUnion_null_iff.mpr fun _ ↦ volume_eq_zero _)
+
+open Classical in
+include hA₂ in
+theorem res2 : A =ᵐ[volume] ⋃ s, negAtPlus A s := by
+  convert union_ae_eq_left_of_ae_eq_empty (ae_eq_empty.mpr (volume_part₀ A))
+  exact res21 A hA₂
 
 include hA₁ in
 open Classical in
@@ -197,28 +205,15 @@ theorem res3 (s) : volume (negAtPlus A s) = volume (plusPart A) := by
   rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage,
     (volume_preserving_negAt s).measure_preimage (measurableSet_plusPart A hA₁).nullMeasurableSet]
 
-open Classical in
-theorem plusPart'_ae_plusPart :
-    plusPart' A =ᵐ[volume] plusPart A := by
-  refine ae_eq_set_inter ae_eq_rfl ?_
-  rw [← measure_symmDiff_eq_zero_iff, symmDiff_of_le (fun _ h w ↦ (h w).le)]
-  have : {x : E K | ∀ w, 0 ≤ x.1 w} \ {x | ∀ w, 0 < x.1 w} ⊆ ⋃ w, {x | x.1 w = 0} := by
-    intro _ ⟨h₁, h₂⟩
-    obtain ⟨w, h⟩ := not_forall.mp h₂
-    exact Set.mem_iUnion.mpr ⟨w, le_antisymm (not_lt.mp h) (h₁ w)⟩
-  refine measure_mono_null this ?_
-  rw [measure_iUnion_null_iff]
-  exact fun _ ↦ volume_eq_zero _
-
 include hA₁ hA₂ in
 open Classical in
 theorem main : volume A = 2 ^ NrRealPlaces K * volume (plusPart A) := by
-  nth_rewrite 1 [res2 A hA₂, measure_iUnion₀]
+  rw [ measure_congr (res2 A hA₂), measure_iUnion]
   · simp_rw [res3 _ hA₁]
     rw [tsum_fintype, Finset.sum_const, ← Fintype.card, Fintype.card_finset, NrRealPlaces,
       nsmul_eq_mul, Nat.cast_pow, Nat.cast_ofNat]
   · exact res1 A
-  · exact fun _ ↦ (measurableSet_negAtPlus A hA₁ _).nullMeasurableSet
+  · exact fun _ ↦ measurableSet_negAtPlus A hA₁ _
 
 namespace fundamentalCone
 
@@ -1581,11 +1576,11 @@ theorem measurableSet_box₂ :
 theorem measurableSet_box :
     MeasurableSet (box K) := MeasurableSet.prod (measurableSet_box₁ K) (measurableSet_box₂ K)
 
-abbrev normLessThanOnePlus : (Set (E K)) := plusPart' (normLessThanOne K)
+abbrev normLessThanOnePlus : (Set (E K)) := plusPart (normLessThanOne K)
 
 theorem normLessThanOnePlus_measurableSet :
     MeasurableSet (normLessThanOnePlus K) :=
-  measurableSet_plusPart' _ (measurableSet_normLessThanOne K)
+  measurableSet_plusPart _ (measurableSet_normLessThanOne K)
 
 theorem mixedToReal_mapToUnitsPowComplex
     (x : (InfinitePlace K → ℝ) × ({w // IsComplex w} → ℝ)) :
@@ -1902,29 +1897,31 @@ theorem volume_normLessThanOne :
     volume (normLessThanOne K) =
       2 ^ NrRealPlaces K * NNReal.pi ^ NrComplexPlaces K * (regulator K).toNNReal := by
   rw [main]
-  have := plusPart'_ae_plusPart (normLessThanOne K)
-  have : volume (plusPart' (normLessThanOne K)) = volume (plusPart (normLessThanOne K)) := by
-    exact measure_congr this
-  rw [← this]
   rw [volume_normLessThanOnePlus, mul_assoc]
   · exact measurableSet_normLessThanOne K
   · exact fun s ↦ negAt_normLessThanOne K s
 
+theorem part₀_normLessThanOne :
+    part₀ (normLessThanOne K) = ∅ := by
+  rw [Set.eq_empty_iff_forall_not_mem]
+  rintro x ⟨hx₁, hx₂⟩
+  rw [Set.mem_iUnion] at hx₂
+  obtain ⟨w, hw⟩ := hx₂
+  have := normAtPlace_pos_of_mem hx₁.1 w
+  rw [normAtPlace_apply_isReal w.prop, hw, norm_zero] at this
+  exact (lt_irrefl _) this
+
 open Classical in
 theorem volume_frontier_normLessThanOne :
     volume (frontier (normLessThanOne K)) = 0 := by
-  rw [res2 (normLessThanOne K) (fun s ↦ negAt_normLessThanOne K s)]
+  rw [res21 (normLessThanOne K) (fun s ↦ negAt_normLessThanOne K s)]
+  rw [part₀_normLessThanOne, Set.union_empty]
   refine measure_mono_null (frontier_iUnion _) (measure_iUnion_null_iff.mpr fun s ↦ ?_)
-  rw [← volume_frontier_normLessThanOnePlus K]
-  rw [normLessThanOnePlus]
-  have : volume (frontier (plusPart' (normLessThanOne K))) =
-    volume (frontier (plusPart (normLessThanOne K))) :=
-    sorry
-  rw [this]
-  have := plusPart_eq_preimage (normLessThanOne K) s
-  rw [this, ← ContinuousLinearEquiv.coe_toHomeomorph, ← Homeomorph.preimage_frontier,
+  rw [negAtPlus_eq_preimage]
+  rw [← ContinuousLinearEquiv.coe_toHomeomorph, ← Homeomorph.preimage_frontier,
     ContinuousLinearEquiv.coe_toHomeomorph, (volume_preserving_negAt s).measure_preimage
     measurableSet_frontier.nullMeasurableSet]
+  exact volume_frontier_normLessThanOnePlus K
 
 end fundamentalCone
 
