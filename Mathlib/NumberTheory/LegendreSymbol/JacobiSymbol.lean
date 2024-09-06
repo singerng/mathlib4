@@ -169,7 +169,7 @@ theorem eq_zero_iff_not_coprime {a : ℤ} {b : ℕ} [NeZero b] : J(a | b) = 0 �
 
 /-- The symbol `J(a | b)` is nonzero when `a` and `b` are coprime. -/
 protected theorem ne_zero {a : ℤ} {b : ℕ} (h : a.gcd b = 1) : J(a | b) ≠ 0 := by
-  rcases eq_zero_or_neZero b with hb
+  rcases eq_zero_or_neZero b with hb | _
   · rw [hb, zero_right]
     exact one_ne_zero
   · contrapose! h; exact eq_zero_iff_not_coprime.1 h
