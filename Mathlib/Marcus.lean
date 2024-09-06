@@ -2151,17 +2151,13 @@ theorem final₁ :
     exact volume_frontier_normLessThanOne K
     refine  measurableSet_frontier.nullMeasurableSet
 
-def residue₀ : ℝ :=
-  (2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
-    (torsionOrder K *  Real.sqrt |discr K|)
-
 open Classical in
 theorem final₂ :
     Tendsto (fun n : ℕ ↦
       (Nat.card {I : (Ideal (𝓞 K))⁰ | IsPrincipal (I : Ideal (𝓞 K)) ∧
         absNorm (I : Ideal (𝓞 K)) ≤ n} : ℝ) / n) atTop
-        (𝓝 ((2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
-          (torsionOrder K *  Real.sqrt |discr K|))) := by
+          (𝓝 ((2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
+            (torsionOrder K *  Real.sqrt |discr K|))) := by
   convert (final₁ K).mul (tendsto_const_nhds (x := (torsionOrder K : ℝ)⁻¹)) using 2
   · rw [mul_comm_div, mul_assoc, ← mul_div_assoc, mul_inv_cancel₀ (Nat.cast_ne_zero.mpr
       (torsionOrder K).ne_zero), mul_one_div]
