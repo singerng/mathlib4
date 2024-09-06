@@ -116,7 +116,7 @@ theorem Finset.mem_enum [DecidableEq α] (s : Finset α) (xs : List α) :
   · simp [Finset.eq_empty_iff_forall_not_mem]
   · constructor
     · rintro ⟨a, h, h'⟩ x hx
-      rcases h' with _ | h' | a | b
+      rcases h' with _ | h'
       · right
         apply h
         subst a
