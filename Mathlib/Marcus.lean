@@ -1988,7 +1988,7 @@ protected def homeomorph : (E₂ K) ≃ₜ (E K) :=
 protected theorem coe_homeomorph :
    ⇑(CLE K) = ⇑(euclideanSpace.homeomorph K) := rfl
 
-protected theorem coe_continuousLinearEquiv :
+protected theorem coe_linearEquiv :
     ⇑(CLE K) = ⇑(euclideanSpace.linearEquiv K) := rfl
 
 @[simp]
@@ -2025,7 +2025,7 @@ theorem stdOrthonormalBasis_repr_apply (x : E₂ K) (i : index K) :
       (stdBasis K).repr (CLE K x) i := rfl
 
 open Classical in
-theorem measurePreserving_CLE :
+theorem volumePreserving_CLE :
     MeasurePreserving (CLE K) := by
   let e := (euclideanSpace.homeomorph K).toMeasurableEquiv
   convert e.measurable.measurePreserving volume
@@ -2069,8 +2069,7 @@ abbrev X : Set (E₂ K) := (CLE K)⁻¹' (fundamentalCone K)
 abbrev X₁ : Set (E₂ K) := {x ∈ X K | mixedEmbedding.norm (CLE K x) ≤ 1}
 
 theorem aux₁ :
-    {x | x ∈ X K ∧ mixedEmbedding.norm ((CLE K) x) ≤ 1} =
-       (CLE K)⁻¹' (normLessThanOne K) := by
+    {x ∈ X K | mixedEmbedding.norm (CLE K x) ≤ 1} = (CLE K)⁻¹' (normLessThanOne K) := by
   simp only [Set.mem_preimage, normLessThanOne, Set.preimage_setOf_eq]
 
 theorem aux₂ :
@@ -2085,6 +2084,35 @@ theorem aux₂ :
   rw [SetLike.mem_coe]
   rw [← mem_span_latticeBasis]
   rfl
+
+open Classical in
+theorem volume_X₁ :
+    (volume (X₁ K)).toReal = 2 ^ NrRealPlaces K * π^ NrComplexPlaces K *
+      (regulator K) := by
+  rw [X₁, aux₁, (volumePreserving_CLE K).measure_preimage
+    (measurableSet_normLessThanOne K).nullMeasurableSet, volume_normLessThanOne, ENNReal.toReal_mul,
+    ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_pow, ENNReal.toReal_ofNat,
+    ENNReal.coe_toReal, NNReal.coe_real_pi, ENNReal.coe_toReal, Real.coe_toNNReal _
+    (regulator_pos K).le]
+
+open Classical in
+theorem covolume_Λ :
+    Zlattice.covolume (Λ K) = (2 : ℝ)⁻¹ ^ NrComplexPlaces K * Real.sqrt |discr K| := by
+  have : IsAddFundamentalDomain (Λ K) ((CLE K) ⁻¹' Zspan.fundamentalDomain (latticeBasis K)) := by
+    rw [euclideanSpace.coe_linearEquiv, ← LinearEquiv.image_symm_eq_preimage,
+      Zspan.map_fundamentalDomain]
+    have : Λ K =
+        (span ℤ (Set.range ((latticeBasis K).map
+          (euclideanSpace.linearEquiv K).symm))).toAddSubgroup := by
+      rfl
+    rw [this]
+    exact Zspan.isAddFundamentalDomain _ volume
+  rw [Zlattice.covolume_eq_measure_fundamentalDomain (Λ K) volume this,
+    (volumePreserving_CLE K).measure_preimage
+    (Zspan.fundamentalDomain_measurableSet (latticeBasis K)).nullMeasurableSet,
+    volume_fundamentalDomain_latticeBasis,
+    ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_inv, ENNReal.toReal_ofNat,
+    ENNReal.coe_toReal, Real.coe_sqrt, coe_nnnorm, Int.norm_eq_abs]
 
 open Submodule Ideal nonZeroDivisors
 
@@ -2116,15 +2144,12 @@ theorem final₁ :
     rwa [Set.mem_preimage, _root_.map_smul, (smul_mem_iff_mem (ne_of_lt hr).symm)]
   · intro x r hr
     rw [_root_.map_smul, mixedEmbedding.norm_smul, euclideanSpace.finrank, abs_of_pos hr]
-  · rw [aux₁]
-    exact isBounded_normLessThanOne K
-  · rw [aux₁]
-    exact (CLE K).continuous.measurable (measurableSet_normLessThanOne K)
+  · exact isBounded_normLessThanOne K
+  · exact (CLE K).continuous.measurable (measurableSet_normLessThanOne K)
   · rw [aux₁, euclideanSpace.coe_homeomorph, ← Homeomorph.preimage_frontier,
-      ←  euclideanSpace.coe_homeomorph, (measurePreserving_CLE K).measure_preimage]
+      ←  euclideanSpace.coe_homeomorph, (volumePreserving_CLE K).measure_preimage]
     exact volume_frontier_normLessThanOne K
     refine  measurableSet_frontier.nullMeasurableSet
-
 
 def residue₀ : ℝ :=
   (2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
@@ -2135,9 +2160,12 @@ theorem final₂ :
     Tendsto (fun n : ℕ ↦
       (Nat.card {I : (Ideal (𝓞 K))⁰ | IsPrincipal (I : Ideal (𝓞 K)) ∧
         absNorm (I : Ideal (𝓞 K)) ≤ n} : ℝ) / n) atTop
-          (𝓝 (residue₀ K)) := by
-  sorry
-
-#print axioms final₂
+        (𝓝 ((2 ^ NrRealPlaces K * (2 * π) ^ NrComplexPlaces K * regulator K) /
+          (torsionOrder K *  Real.sqrt |discr K|))) := by
+  convert (final₁ K).mul (tendsto_const_nhds (x := (torsionOrder K : ℝ)⁻¹)) using 2
+  · rw [mul_comm_div, mul_assoc, ← mul_div_assoc, mul_inv_cancel₀ (Nat.cast_ne_zero.mpr
+      (torsionOrder K).ne_zero), mul_one_div]
+  · rw [volume_X₁, covolume_Λ]
+    ring_nf
 
 end
