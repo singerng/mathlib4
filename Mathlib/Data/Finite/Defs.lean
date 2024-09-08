@@ -28,6 +28,8 @@ instead.
 
 * `Finite α` denotes that `α` is a finite type.
 * `Infinite α` denotes that `α` is an infinite type.
+* `Set.Finite s` denotes that `s` is a finite set.
+* `Set.Infinite s` denotes that `s` is an infinite set.
 
 ## Implementation notes
 
@@ -78,6 +80,22 @@ are meant to be computable in the reduction or `#eval` sense.
 -/
 class inductive Finite (α : Sort*) : Prop
   | intro {n : ℕ} : α ≃ Fin n → Finite _
+
+namespace Set
+
+variable {α : Type*}
+
+/-- A set is finite if the corresponding `Subtype` is finite,
+i.e., if there exists a natural `n : ℕ` and an equivalence `s ≃ Fin n`. -/
+protected def Finite (s : Set α) : Prop := Finite {x // x ∈ s}
+
+/-- A set is infinite if it is not finite.
+
+This is protected so that it does not conflict with global `Infinite`. -/
+protected def Infinite (s : Set α) : Prop :=
+  ¬s.Finite
+
+end Set
 
 theorem finite_iff_exists_equiv_fin {α : Sort*} : Finite α ↔ ∃ n, Nonempty (α ≃ Fin n) :=
   ⟨fun ⟨e⟩ => ⟨_, ⟨e⟩⟩, fun ⟨_, ⟨e⟩⟩ => ⟨e⟩⟩

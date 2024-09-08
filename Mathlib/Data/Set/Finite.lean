@@ -51,15 +51,6 @@ variable {α : Type u} {β : Type v} {ι : Sort w} {γ : Type x}
 
 namespace Set
 
-/-- A set is finite if the corresponding `Subtype` is finite,
-i.e., if there exists a natural `n : ℕ` and an equivalence `s ≃ Fin n`. -/
-protected def Finite (s : Set α) : Prop := Finite s
-
--- The `protected` attribute does not take effect within the same namespace block.
-end Set
-
-namespace Set
-
 theorem finite_def {s : Set α} : s.Finite ↔ Nonempty (Fintype s) :=
   finite_iff_nonempty_fintype s
 
@@ -113,12 +104,6 @@ theorem Finite.exists_finset_coe {s : Set α} (h : s.Finite) : ∃ s' : Finset �
 
 /-- Finite sets can be lifted to finsets. -/
 instance : CanLift (Set α) (Finset α) (↑) Set.Finite where prf _ hs := hs.exists_finset_coe
-
-/-- A set is infinite if it is not finite.
-
-This is protected so that it does not conflict with global `Infinite`. -/
-protected def Infinite (s : Set α) : Prop :=
-  ¬s.Finite
 
 @[simp]
 theorem not_infinite {s : Set α} : ¬s.Infinite ↔ s.Finite :=
