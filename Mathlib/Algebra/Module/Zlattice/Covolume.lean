@@ -5,7 +5,6 @@ Authors: Xavier Roblot
 -/
 import Mathlib.Analysis.BoxIntegral.UnitPartition
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
-
 import Mathlib.Sandbox
 
 /-!

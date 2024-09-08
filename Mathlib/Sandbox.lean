@@ -1,7 +1,35 @@
+-- import Mathlib.Analysis.SpecialFunctions.PolarCoord
+-- import Mathlib.MeasureTheory.Constructions.Pi
+-- import Mathlib.MeasureTheory.Measure.Haar.Unique
+-- import Mathlib.MeasureTheory.MeasurableSpace.Embedding
+
 import Mathlib.Analysis.SpecialFunctions.PolarCoord
-import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Haar.Unique
-import Mathlib.MeasureTheory.MeasurableSpace.Embedding
+import Mathlib.Algebra.Module.Zlattice.Basic
+
+section covolume
+
+variable (K : Type*) [NormedField K]
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace K E] (L : AddSubgroup E)
+  [DiscreteTopology L] [IsZlattice K L] {F : Type*} [NormedAddCommGroup F]
+  [NormedSpace K F] (e : F ≃L[K] E)
+
+instance : DiscreteTopology (L.comap e.toAddMonoidHom) := by
+  change DiscreteTopology (e ⁻¹' L)
+  exact DiscreteTopology.preimage_of_continuous_injective _ e.continuous e.injective
+
+instance : IsZlattice K (L.comap e.toAddMonoidHom) where
+  span_top := by
+    rw [AddSubgroup.coe_comap, LinearMap.toAddMonoidHom_coe, LinearEquiv.coe_toLinearMap,
+      ← LinearEquiv.image_symm_eq_preimage, ← Submodule.map_span, IsZlattice.span_top,
+      Submodule.map_top, LinearEquivClass.range]
+
+open IsZlattice
+
+-- example : covolume (L.comap e.toAddMonoidHom) = covolume L := sorry
+
+-- Measure.addHaar_image_continuousLinearEquiv
+end covolume
 
 section frontier
 
@@ -19,10 +47,6 @@ theorem Finset.frontier_biUnion {ι : Type*} (s : Finset ι) {X : Type*} [Topolo
   | insert _ h_ind =>
       simp_rw [mem_insert, Set.iUnion_iUnion_eq_or_left]
       exact (frontier_union_subset' _ _).trans ( Set.union_subset_union subset_rfl h_ind)
-
-example {α β : Type*} (f : α → Set β) :
-    ⋃ a, f a = ⋃ a ∈ Set.univ, f a := by
-  exact Eq.symm (Set.biUnion_univ f)
 
 theorem frontier_iUnion {ι : Type*} [Fintype ι] {X : Type*} [TopologicalSpace X]
     (t : ι → Set X) :
@@ -83,32 +107,6 @@ theorem Basis.equivFunL_symm_coe :
   ⇑v.equivFunL.symm = v.equivFun.symm := rfl
 
 end basis
-
-section indicator
-
-variable {α β : Type*} [One β] {f : α → β} {s : Set α}
-
-@[to_additive]
-theorem Set.eqOn_mulIndicator' : Set.EqOn (Set.mulIndicator s f) 1 sᶜ :=
-  fun _ hx => mulIndicator_of_not_mem hx f
-
-variable [TopologicalSpace α] [TopologicalSpace β]
-
-open scoped Topology
-
-@[to_additive]
-theorem continuousAt_mulIndicator_of_not_mem_frontier (hf : ContinuousOn f (interior s))
-    {x : α} (hx : x ∉ frontier s) :
-    ContinuousAt (s.mulIndicator f) x := by
-  rw [← Set.not_mem_compl_iff, Set.not_not_mem, compl_frontier_eq_union_interior] at hx
-  obtain h | h := hx
-  · have hs : interior s ∈ 𝓝 x := mem_interior_iff_mem_nhds.mp (by rwa [interior_interior])
-    exact ContinuousAt.congr (hf.continuousAt hs) <| Filter.eventuallyEq_iff_exists_mem.mpr
-      ⟨interior s, hs, Set.eqOn_mulIndicator.symm.mono interior_subset⟩
-  · refine ContinuousAt.congr continuousAt_const <| Filter.eventuallyEq_iff_exists_mem.mpr
-      ⟨sᶜ, mem_interior_iff_mem_nhds.mp h, Set.eqOn_mulIndicator'.symm⟩
-
-end indicator
 
 section diff
 
@@ -427,10 +425,6 @@ theorem MeasureTheory.Measure.restrict_prod_eq_univ_prod {α β : Type*} [Measur
 theorem Real.rpow_ne_zero_of_pos {x : ℝ} (hx : 0 < x) (y : ℝ) : x ^ y ≠ 0 := by
   rw [rpow_def_of_pos hx]; apply exp_ne_zero _
 
--- theorem Basis.total_eq_iff_eq_repr {M R ι : Type*} [Semiring R] [AddCommMonoid M] [Module R M]
---     (B : Basis ι R M) (x : M) (c : ι →₀ R) : Finsupp.total ι M R B c = x ↔ c = B.repr x :=
---   ⟨fun h ↦ by rw [← h, B.repr_total], fun h ↦ by rw [h, B.total_repr]⟩
-
 -- Is it a good idea to use equivFun?
 theorem Basis.sum_eq_iff_eq_equivFun {M R ι : Type*} [Fintype ι] [Semiring R] [AddCommMonoid M]
     [Module R M] (B : Basis ι R M) (x : M) (c : ι → R) :
@@ -501,3 +495,5 @@ theorem ContinuousLinearEquiv.symm_neg {R : Type*} {M : Type*} [Semiring R] [Add
 theorem ContinuousLinearEquiv.refl_apply (R₁ : Type*) [Semiring R₁] (M₁ : Type*)
     [TopologicalSpace M₁] [AddCommMonoid M₁] [Module R₁ M₁] (x : M₁) :
     ContinuousLinearEquiv.refl R₁ M₁ x = x := rfl
+
+#min_imports

@@ -6,8 +6,6 @@ Authors: Xavier Roblot
 import Mathlib.Algebra.Module.Zlattice.Basic
 import Mathlib.Analysis.BoxIntegral.Integrability
 
-import Mathlib.Sandbox
-
  /-!
 # Unit Partition
 
@@ -340,7 +338,7 @@ theorem tendsto_tsum_div_pow  :
       exact le_max_left 0 _
   have h₂ : ∀ᵐ x, ContinuousAt (s.indicator F) x := by
     filter_upwards [compl_mem_ae_iff.mpr hs₃] with _ h
-      using continuousAt_indicator_of_not_mem_frontier hF.continuousOn h
+      using ContinuousOn.continuousAt_indicator (hF.continuousOn) h
   obtain ⟨r, hr₁, hr₂⟩ := (BoxIntegral.hasIntegral_iff.mp <|
       AEContinuous.hasBoxIntegral (volume : Measure (ι → ℝ)) h₁ h₂
         BoxIntegral.IntegrationParams.Riemann) (ε / 2) (half_pos hε)

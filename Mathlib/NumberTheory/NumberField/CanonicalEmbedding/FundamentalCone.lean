@@ -87,11 +87,13 @@ theorem unitSMul_eq_zero (u : (𝓞 K)ˣ) (x : E K) :
     · have := congr_fun (congr_arg Prod.fst h) w
       rw [unitSMul_smul, Prod.fst_mul, Pi.mul_apply, Prod.fst_zero, Pi.zero_apply, mul_eq_zero]
         at this
-      refine this.resolve_left (by simp)
+      refine this.resolve_left (by simp only [mixedEmbedding_apply_ofIsReal, map_eq_zero,
+        RingOfIntegers.coe_eq_zero_iff, Units.ne_zero, not_false_eq_true])
     · have := congr_fun (congr_arg Prod.snd h) w
       rw [unitSMul_smul, Prod.snd_mul, Pi.mul_apply, Prod.snd_zero, Pi.zero_apply, mul_eq_zero]
         at this
-      refine this.resolve_left (by simp)
+      refine this.resolve_left (by simp only [mixedEmbedding_apply_ofIsComplex, map_eq_zero,
+        RingOfIntegers.coe_eq_zero_iff, Units.ne_zero, not_false_eq_true])
   · rw [h, smul_zero]
 
 end UnitSMul

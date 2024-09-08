@@ -1,7 +1,7 @@
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.FundamentalCone
 import Mathlib.NumberTheory.NumberField.Discriminant
 
-variable (K : Type*) [Field K] [NumberField K]
+variable (K : Type*) [Field K]
 
 open NumberField NumberField.InfinitePlace NumberField.mixedEmbedding MeasureTheory Finset
   NumberField.Units NumberField.Units.dirichletUnitTheorem FiniteDimensional MeasureTheory.Measure
@@ -53,7 +53,7 @@ theorem normAtPlace_negAt_eq (s : Finset {w // IsReal w}) (x : E K) (w : Infinit
   · simp_rw [normAtPlace_apply_isComplex hw, negAt_apply_of_isComplex _ _ ⟨w, hw⟩]
 
 open Classical in
-theorem volume_preserving_negAt (s : Finset {w : InfinitePlace K // IsReal w}) :
+theorem volume_preserving_negAt [NumberField K] (s : Finset {w : InfinitePlace K // IsReal w}) :
     MeasurePreserving (negAt s) := by
   refine MeasurePreserving.prod (volume_preserving_pi fun w ↦ ?_) (MeasurePreserving.id _)
   by_cases hw : w ∈ s
@@ -79,7 +79,7 @@ variable (A : Set (E K)) (hA₁ : MeasurableSet A) (hA₂ : ∀ s, negAt s '' A 
 abbrev plusPart : Set (E K) := A ∩ {x | ∀ w, 0 < x.1 w}
 
 include hA₁ in
-theorem measurableSet_plusPart :
+theorem measurableSet_plusPart [NumberField K] :
     MeasurableSet (plusPart A) := by
   convert_to MeasurableSet (A ∩ (⋂ w, {x | 0 < x.1 w}))
   · ext; simp
@@ -91,7 +91,7 @@ abbrev negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) : Set (E K) :=
     negAt s '' (plusPart A)
 
 include hA₁ in
-theorem measurableSet_negAtPlus (s : Finset {w : InfinitePlace K // IsReal w}) :
+theorem measurableSet_negAtPlus [NumberField K] (s : Finset {w : InfinitePlace K // IsReal w}) :
     MeasurableSet (negAtPlus A s) := by
   rw [negAtPlus, ← negAt_symm, ContinuousLinearEquiv.image_symm_eq_preimage]
   exact (measurableSet_plusPart A hA₁).preimage (negAt s).continuous.measurable
@@ -140,14 +140,14 @@ theorem res211 (s) : negAtPlus A s ⊆ A := by
   exact hA₂ s (Set.mem_image_of_mem (negAt s) hx.1)
 
 open Classical in
-def signSet (x : E K) : Finset {w : InfinitePlace K // IsReal w} :=
+def signSet [NumberField K] (x : E K) : Finset {w : InfinitePlace K // IsReal w} :=
   Set.toFinset (fun w ↦ x.1 w ≤ 0)
 
-theorem mem_signSet {x : E K} {w : {w // IsReal w}} :
+theorem mem_signSet [NumberField K] {x : E K} {w : {w // IsReal w}} :
     w ∈ signSet x ↔ x.1 w ≤ 0 := by
   simp_rw [signSet, Set.mem_toFinset, Set.mem_def]
 
-theorem negAt_signSet_apply (x : E K) :
+theorem negAt_signSet_apply [NumberField K] (x : E K) :
     negAt (signSet x) x = (fun w ↦ |x.1 w|, x.2) := by
   ext w
   · by_cases hw : w ∈ signSet x
@@ -155,6 +155,8 @@ theorem negAt_signSet_apply (x : E K) :
     · simp_rw [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos
         (lt_of_not_ge (mem_signSet.not.mp hw))]
   · rfl
+
+variable [NumberField K]
 
 include hA₂ in
 theorem res22 {x : E K} (hx : x ∈ A) (hx' : ∀ w, x.1 w ≠ 0) :
@@ -1739,17 +1741,16 @@ local notation "E₂" K =>
     (WithLp 2 ((EuclideanSpace ℝ {w : InfinitePlace K // IsReal w}) ×
       (EuclideanSpace ℂ {w : InfinitePlace K // IsComplex w})))
 
-/-- Docs. -/
-local instance : Ring (EuclideanSpace ℝ { w : InfinitePlace K // IsReal w }) := Pi.ring
-
-/-- Docs. -/
-local instance : Ring (EuclideanSpace ℂ { w : InfinitePlace K // IsComplex w }) := Pi.ring
-
-instance : Ring (E₂ K) := Prod.instRing
+instance : Ring (E₂ K) := by
+  have : Ring (EuclideanSpace ℝ { w : InfinitePlace K // IsReal w }) := Pi.ring
+  have : Ring (EuclideanSpace ℂ { w : InfinitePlace K // IsComplex w }) := Pi.ring
+  exact Prod.instRing
 
 instance : MeasurableSpace (E₂ K) := borel _
 
 instance : BorelSpace (E₂ K)  :=  ⟨rfl⟩
+
+variable [NumberField K]
 
 open Classical in
 instance : T2Space (E₂ K) := Prod.t2Space
@@ -1836,6 +1837,8 @@ local notation "E₂" K =>
 
 local notation "E" K =>
   ({w : InfinitePlace K // IsReal w} → ℝ) × ({w : InfinitePlace K // IsComplex w} → ℂ)
+
+variable [NumberField K]
 
 /-- Docs. -/
 abbrev Λ : AddSubgroup (E₂ K) :=

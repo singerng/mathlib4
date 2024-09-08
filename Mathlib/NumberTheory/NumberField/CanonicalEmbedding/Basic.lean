@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Xavier Roblot
 -/
 import Mathlib.Algebra.Module.Zlattice.Basic
+import Mathlib.Analysis.Normed.Lp.ProdLp
 import Mathlib.NumberTheory.NumberField.FractionalIdeal
 import Mathlib.NumberTheory.NumberField.Units.Basic
 
