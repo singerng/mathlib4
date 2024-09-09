@@ -181,6 +181,12 @@ def leftMul : G → G → G := fun g : G ↦ fun x : G ↦ g * x
 @[to_additive "`rightAdd g` denotes right addition by `g`"]
 def rightMul : G → G → G := fun g : G ↦ fun x : G ↦ x * g
 
+/-- An element `a` of a type `G` with multiplication satisfies `IsSquare a` if `a = r * r`,
+for some `r : G`. -/
+@[to_additive "An element `a` of a type `G` with addition satisfies `Even a` if `a = r + r`,
+for some `r : G`."]
+def IsSquare (a : G) : Prop := ∃ r, a = r * r
+
 /-- A mixin for left cancellative multiplication. -/
 class IsLeftCancelMul (G : Type u) [Mul G] : Prop where
   /-- Multiplication is left cancellative. -/

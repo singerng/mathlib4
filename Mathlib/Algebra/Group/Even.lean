@@ -39,12 +39,6 @@ variable {F α β R : Type*}
 section Mul
 variable [Mul α]
 
-/-- An element `a` of a type `α` with multiplication satisfies `IsSquare a` if `a = r * r`,
-for some `r : α`. -/
-@[to_additive "An element `a` of a type `α` with addition satisfies `Even a` if `a = r + r`,
-for some `r : α`."]
-def IsSquare (a : α) : Prop := ∃ r, a = r * r
-
 @[to_additive (attr := simp)] lemma isSquare_mul_self (m : α) : IsSquare (m * m) := ⟨m, rfl⟩
 
 @[to_additive]
