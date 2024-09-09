@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Peter Nelson, Yaël Dillies
 -/
 import Mathlib.Data.Finset.Order
+import Mathlib.Data.Finset.Minimal
 import Mathlib.Order.Atoms
 import Mathlib.Data.Set.Finite
 
