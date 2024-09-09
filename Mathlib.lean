@@ -2131,6 +2131,7 @@ import Mathlib.Data.Finset.Density
 import Mathlib.Data.Finset.Fin
 import Mathlib.Data.Finset.Finsupp
 import Mathlib.Data.Finset.Fold
+import Mathlib.Data.Finset.FoldMaxAdd
 import Mathlib.Data.Finset.Functor
 import Mathlib.Data.Finset.Grade
 import Mathlib.Data.Finset.Image
