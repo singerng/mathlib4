@@ -565,6 +565,15 @@ theorem LinearIndependent.image {ι} {s : Set ι} {f : ι → M}
     LinearIndependent R fun x : f '' s => (x : M) := by
   convert LinearIndependent.image_of_comp s f id hs
 
+end Module
+
+section Module
+
+variable {v : ι → M}
+variable [Semiring R] [AddCommGroup M] [AddCommGroup M'] [AddCommGroup M'']
+variable [Module R M] [Module R M'] [Module R M'']
+variable {a b : R} {x y : M}
+
 theorem LinearIndependent.group_smul {G : Type*} [hG : Group G] [DistribMulAction G R]
     [DistribMulAction G M] [IsScalarTower G R M] [SMulCommClass G R M] {v : ι → M}
     (hv : LinearIndependent R v) (w : ι → G) : LinearIndependent R (w • v) := by
@@ -591,8 +600,19 @@ theorem LinearIndependent.units_smul {v : ι → M} (hv : LinearIndependent R v)
     exact (hgs i hi).symm ▸ zero_smul _ _
   · rw [← hsum, Finset.sum_congr rfl _]
     intros
-    erw [Pi.smul_apply, smul_assoc]
-    rfl
+    dsimp only
+    dsimp only [Pi.smul_apply']
+    rw [smul_assoc]
+    rw [@Units.smul_def]
+
+end Module
+
+section Module
+
+variable {v : ι → M}
+variable [Ring R] [AddCommGroup M] [AddCommGroup M'] [AddCommGroup M'']
+variable [Module R M] [Module R M'] [Module R M'']
+variable {a b : R} {x y : M}
 
 lemma LinearIndependent.eq_of_pair {x y : M} (h : LinearIndependent R ![x, y])
     {s t s' t' : R} (h' : s • x + t • y = s' • x + t' • y) : s = s' ∧ t = t' := by
@@ -624,6 +644,15 @@ lemma LinearIndependent.linear_combination_pair_of_det_ne_zero {R M : Type*} [Co
   have J1 : (a * d - b * c) * s = 0 := by linear_combination d * I1 - c * I2
   have J2 : (a * d - b * c) * t = 0 := by linear_combination -b * I1 + a * I2
   exact ⟨by simpa [h'] using mul_eq_zero.1 J1, by simpa [h'] using mul_eq_zero.1 J2⟩
+
+end Module
+
+section Module
+
+variable {v : ι → M}
+variable [Semiring R] [AddCommGroup M] [AddCommGroup M'] [AddCommGroup M'']
+variable [Module R M] [Module R M'] [Module R M'']
+variable {a b : R} {x y : M}
 
 section Maximal
 
@@ -663,6 +692,15 @@ theorem LinearIndependent.maximal_iff {ι : Type w} {R : Type u} [Ring R] [Nontr
 
 end Maximal
 
+end Module
+
+section Module
+
+variable {v : ι → M}
+variable [Ring R] [AddCommGroup M] [AddCommGroup M'] [AddCommGroup M'']
+variable [Module R M] [Module R M'] [Module R M'']
+variable {a b : R} {x y : M}
+
 /-- Linear independent families are injective, even if you multiply either side. -/
 theorem LinearIndependent.eq_of_smul_apply_eq_smul_apply {M : Type*} [AddCommGroup M] [Module R M]
     {v : ι → M} (li : LinearIndependent R v) (c d : R) (i j : ι) (hc : c ≠ 0)
@@ -678,6 +716,15 @@ theorem LinearIndependent.eq_of_smul_apply_eq_smul_apply {M : Type*} [AddCommGro
   · exact H
   · contradiction
 
+end Module
+
+section Module
+
+variable {v : ι → M}
+variable [Ring R] [AddCommGroup M] [AddCommGroup M'] [AddCommGroup M'']
+variable [Module R M] [Module R M'] [Module R M'']
+variable {a b : R} {x y : M}
+
 section Subtype
 
 /-! The following lemmas use the subtype defined by a set in `M` as the index set `ι`. -/
@@ -686,7 +733,10 @@ theorem LinearIndependent.disjoint_span_image (hv : LinearIndependent R v) {s t 
     (hs : Disjoint s t) : Disjoint (Submodule.span R <| v '' s) (Submodule.span R <| v '' t) := by
   simp only [disjoint_def, Finsupp.mem_span_image_iff_linearCombination]
   rintro _ ⟨l₁, hl₁, rfl⟩ ⟨l₂, hl₂, H⟩
-  rw [hv.injective_linearCombination.eq_iff] at H; subst l₂
+  have := Submodule.disjoint_def.mp (Finsupp.disjoint_supported_supported (M := R) (R := R) hs)
+
+  rw [hv.injective_linearCombination.eq_iff] at H
+  subst l₂
   have : l₁ = 0 := Submodule.disjoint_def.mp (Finsupp.disjoint_supported_supported hs) _ hl₁ hl₂
   simp [this]
 

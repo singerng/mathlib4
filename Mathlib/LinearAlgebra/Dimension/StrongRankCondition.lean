@@ -40,14 +40,14 @@ noncomputable section
 
 universe u v w w'
 
-variable {R : Type u} {M : Type v} [Ring R] [AddCommGroup M] [Module R M]
-variable {ι : Type w} {ι' : Type w'}
-
 open Cardinal Basis Submodule Function Set
 
 attribute [local instance] nontrivial_of_invariantBasisNumber
 
 section InvariantBasisNumber
+
+variable {R : Type u} {M : Type v} [Ring R] [AddCommGroup M] [Module R M]
+variable {ι : Type w} {ι' : Type w'}
 
 variable [InvariantBasisNumber R]
 
@@ -89,6 +89,9 @@ theorem mk_eq_mk_of_basis' {ι' : Type w} (v : Basis ι R M) (v' : Basis ι' R M
   Cardinal.lift_inj.1 <| mk_eq_mk_of_basis v v'
 
 end InvariantBasisNumber
+
+variable {R : Type u} {M : Type v} [Ring R] [AddCommGroup M] [Module R M]
+variable {ι : Type w} {ι' : Type w'}
 
 section RankCondition
 
@@ -159,6 +162,9 @@ theorem Basis.le_span {J : Set M} (v : Basis ι R M) (hJ : span R J = ⊤) : #(r
 end RankCondition
 
 section StrongRankCondition
+
+variable {R : Type u} {M : Type v} [Ring R] [AddCommGroup M] [Module R M]
+variable {ι : Type w} {ι' : Type w'}
 
 variable [StrongRankCondition R]
 
