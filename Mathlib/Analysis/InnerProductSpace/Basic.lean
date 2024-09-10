@@ -364,7 +364,7 @@ theorem inner_mul_inner_self_le (x y : F) : ‖⟪x, y⟫‖ * ‖⟪y, x⟫‖ 
       rw [← ofReal_mul, re_ofReal_mul]
       ring
     · field_simp
-      rw [inner_smul_left, mul_comm _ ⟪x, y⟫_𝕜, mul_conj, ← ofReal_pow, ofReal_re]
+      rw [inner_smul_left, mul_comm _ (⟪x, y⟫_𝕜), mul_conj, ← ofReal_pow, ofReal_re]
       ring
 
 /-- (Semi)norm constructed from an `PreInnerProductSpace.Core` structure, defined to be the square
@@ -1039,7 +1039,7 @@ theorem norm_eq_sqrt_inner (x : E) : ‖x‖ = √(re ⟪x, x⟫) :=
     ‖x‖ = √(‖x‖ ^ 2) := (sqrt_sq (norm_nonneg _)).symm
     _ = √(re ⟪x, x⟫) := congr_arg _ (norm_sq_eq_inner _)
 
-theorem norm_eq_sqrt_real_inner (x : F) : ‖x‖ = √⟪x, x⟫_ℝ :=
+theorem norm_eq_sqrt_real_inner (x : F) : ‖x‖ = √(⟪x, x⟫_ℝ) :=
   @norm_eq_sqrt_inner ℝ _ _ _ _ x
 
 theorem inner_self_eq_norm_mul_norm (x : E) : re ⟪x, x⟫ = ‖x‖ * ‖x‖ := by

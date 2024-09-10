@@ -129,7 +129,7 @@ section Complex
 variable {E' : Type*} [NormedAddCommGroup E'] [InnerProductSpace ℂ E'] [CompleteSpace E']
 
 theorem isPositive_iff_complex (T : E' →L[ℂ] E') :
-    IsPositive T ↔ ∀ x, (re ⟪T x, x⟫_ℂ : ℂ) = ⟪T x, x⟫_ℂ ∧ 0 ≤ re ⟪T x, x⟫_ℂ := by
+    IsPositive T ↔ ∀ x, (re (⟪T x, x⟫_ℂ) : ℂ) = ⟪T x, x⟫_ℂ ∧ 0 ≤ re (⟪T x, x⟫_ℂ) := by
   simp_rw [IsPositive, forall_and, isSelfAdjoint_iff_isSymmetric,
     LinearMap.isSymmetric_iff_inner_map_self_real, conj_eq_iff_re]
   rfl

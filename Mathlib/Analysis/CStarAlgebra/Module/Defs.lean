@@ -225,12 +225,12 @@ lemma norm_inner_le [CompleteSpace A] {x y : E} : ‖⟪x, y⟫‖ ≤ ‖x‖ *
     _ ≤ ‖‖x‖^ 2 • ⟪y, y⟫‖ := by
                 refine CStarRing.norm_le_norm_of_nonneg_of_le ?_ inner_mul_inner_swap_le
                 rw [← star_inner x]
-                exact star_mul_self_nonneg ⟪x, y⟫_A
+                exact star_mul_self_nonneg (⟪x, y⟫_A)
     _ = ‖x‖ ^ 2 * ‖⟪y, y⟫‖ := by simp [norm_smul]
     _ = ‖x‖ ^ 2 * ‖y‖ ^ 2 := by
                 simp only [norm_eq_sqrt_norm_inner_self, norm_nonneg, Real.sq_sqrt]
     _ = (‖x‖ * ‖y‖) ^ 2 := by simp only [mul_pow]
-  refine (pow_le_pow_iff_left (R := ℝ) (norm_nonneg ⟪x, y⟫_A) ?_ (by norm_num)).mp this
+  refine (pow_le_pow_iff_left (R := ℝ) (norm_nonneg (⟪x, y⟫_A)) ?_ (by norm_num)).mp this
   exact mul_nonneg CStarModule.norm_nonneg CStarModule.norm_nonneg
 
 protected lemma norm_triangle [CompleteSpace A] (x y : E) : ‖x + y‖ ≤ ‖x‖ + ‖y‖ := by
