@@ -12,7 +12,7 @@ import Mathlib.Order.GameAdd
 /-!
 # Combinatorial (pre-)games.
 
-The basic theory of combinatorial games, following Conway's book `On Numbers and Games`. We
+The basic theory of combinatorial games, following Conway's book "On Numbers and Games". We
 construct "pregames", define an ordering and arithmetic operations on them, then show that the
 operations descend to "games", defined via the equivalence relation `p ≈ q ↔ p ≤ q ∧ q ≤ p`.
 
@@ -23,7 +23,8 @@ takes two types (thought of as indexing the possible moves for the players Left 
 pair of functions out of these types to `SetTheory.PGame` (thought of as describing the resulting
 game after making a move).
 
-Combinatorial games themselves, as a quotient of pregames, are constructed in `Game.lean`.
+Combinatorial games themselves, as a quotient of pregames, are constructed in
+`Mathlib/SetTheory/Game/Basic.lean`.
 
 ## Conway induction
 
@@ -92,7 +93,7 @@ The material here is all drawn from
 
 An interested reader may like to formalise some of the material from
 * [Andreas Blass, *A game semantics for linear logic*][MR1167694]
-* [André Joyal, *Remarques sur la théorie des jeux à deux personnes*][joyal1997]
+* [André Joyal, *Remarques sur la théorie des jeux à deux personnes*][joyal1977]
 -/
 
 namespace SetTheory
@@ -104,7 +105,7 @@ open Function Relation
 universe u
 
 /-- The type of pre-games, before we have quotiented
-  by equivalence (`PGame.Setoid`). In ZFC, a combinatorial game is constructed from
+  by equivalence (`PGame.setoid`). In ZFC, a combinatorial game is constructed from
   two sets of combinatorial games that have been constructed at an earlier
   stage. To do this in type theory, we say that a pre-game is built
   inductively from two families of pre-games indexed over any type
@@ -294,10 +295,6 @@ theorem Subsequent.mk_right' (xL : xl → PGame) (xR : xr → PGame) (j : RightM
     Subsequent ((xR i).moveLeft j) (mk xl xr xL xR) := by
   pgame_wf_tac
 
--- Porting note: linter claims these lemmas don't simplify?
-open Subsequent in attribute [nolint simpNF] mk_left mk_right mk_right'
-  moveRight_mk_left moveRight_mk_right moveLeft_mk_left moveLeft_mk_right
-
 /-! ### Basic pre-games -/
 
 
@@ -350,7 +347,7 @@ instance isEmpty_one_rightMoves : IsEmpty (RightMoves 1) :=
 /-- The less or equal relation on pre-games.
 
 If `0 ≤ x`, then Left can win `x` as the second player. -/
-instance le : LE PGame :=
+instance instLE : LE PGame :=
   ⟨Sym2.GameAdd.fix wf_isOption fun x y le =>
       (∀ i, ¬le y (x.moveLeft i) (Sym2.GameAdd.snd_fst <| IsOption.moveLeft i)) ∧
         ∀ j, ¬le (y.moveRight j) x (Sym2.GameAdd.fst_snd <| IsOption.moveRight j)⟩
@@ -384,7 +381,7 @@ The ordering here is chosen so that `And.left` refer to moves by Left, and `And.
 moves by Right. -/
 theorem le_iff_forall_lf {x y : PGame} :
     x ≤ y ↔ (∀ i, x.moveLeft i ⧏ y) ∧ ∀ j, x ⧏ y.moveRight j := by
-  unfold LE.le le
+  unfold LE.le instLE
   simp only
   rw [Sym2.GameAdd.fix_eq]
   rfl
@@ -456,7 +453,7 @@ private theorem le_trans_aux {x y z : PGame}
     fun j => PGame.not_le.1 fun h => (h₂ h hxy).not_gf <| hyz.lf_moveRight j
 
 instance : Preorder PGame :=
-  { PGame.le with
+  { PGame.instLE with
     le_refl := fun x => by
       induction x with | mk _ _ _ _ IHl IHr => _
       exact
@@ -498,7 +495,6 @@ theorem lf_of_le_of_lf {x y z : PGame} (h₁ : x ≤ y) (h₂ : y ⧏ z) : x ⧏
   rw [← PGame.not_le] at h₂ ⊢
   exact fun h₃ => h₂ (h₃.trans h₁)
 
--- Porting note (#10754): added instance
 instance : Trans (· ≤ ·) (· ⧏ ·) (· ⧏ ·) := ⟨lf_of_le_of_lf⟩
 
 @[trans]
@@ -506,7 +502,6 @@ theorem lf_of_lf_of_le {x y z : PGame} (h₁ : x ⧏ y) (h₂ : y ≤ z) : x ⧏
   rw [← PGame.not_le] at h₁ ⊢
   exact fun h₃ => h₁ (h₂.trans h₃)
 
--- Porting note (#10754): added instance
 instance : Trans (· ⧏ ·) (· ≤ ·) (· ⧏ ·) := ⟨lf_of_lf_of_le⟩
 
 alias _root_.LE.le.trans_lf := lf_of_le_of_lf
@@ -615,25 +610,25 @@ theorem le_zero_of_isEmpty_leftMoves (x : PGame) [IsEmpty x.LeftMoves] : x ≤ 0
 left. -/
 noncomputable def rightResponse {x : PGame} (h : x ≤ 0) (i : x.LeftMoves) :
     (x.moveLeft i).RightMoves :=
-  Classical.choose <| (le_zero.1 h) i
+  Classical.choose <| le_zero.1 h i
 
 /-- Show that the response for right provided by `rightResponse` preserves the right-player-wins
 condition. -/
 theorem rightResponse_spec {x : PGame} (h : x ≤ 0) (i : x.LeftMoves) :
     (x.moveLeft i).moveRight (rightResponse h i) ≤ 0 :=
-  Classical.choose_spec <| (le_zero.1 h) i
+  Classical.choose_spec <| le_zero.1 h i
 
 /-- Given a game won by the left player when they play second, provide a response to any move by
 right. -/
 noncomputable def leftResponse {x : PGame} (h : 0 ≤ x) (j : x.RightMoves) :
     (x.moveRight j).LeftMoves :=
-  Classical.choose <| (zero_le.1 h) j
+  Classical.choose <| zero_le.1 h j
 
 /-- Show that the response for left provided by `leftResponse` preserves the left-player-wins
 condition. -/
 theorem leftResponse_spec {x : PGame} (h : 0 ≤ x) (j : x.RightMoves) :
     0 ≤ (x.moveRight j).moveLeft (leftResponse h j) :=
-  Classical.choose_spec <| (zero_le.1 h) j
+  Classical.choose_spec <| zero_le.1 h j
 
 /-- A small family of pre-games is bounded above. -/
 lemma bddAbove_range_of_small {ι : Type*} [Small.{u} ι] (f : ι → PGame.{u}) :
@@ -675,8 +670,6 @@ instance : IsEquiv _ PGame.Equiv where
   refl _ := ⟨le_rfl, le_rfl⟩
   trans := fun _ _ _ ⟨xy, yx⟩ ⟨yz, zy⟩ => ⟨xy.trans yz, zy.trans yx⟩
   symm _ _ := And.symm
-
--- Porting note: moved the setoid instance from Basic.lean to here
 
 instance setoid : Setoid PGame :=
   ⟨Equiv, refl, symm, Trans.trans⟩
@@ -807,12 +800,11 @@ theorem lt_or_equiv_of_le {x y : PGame} (h : x ≤ y) : x < y ∨ (x ≈ y) :=
   and_or_left.mp ⟨h, (em <| y ≤ x).symm.imp_left PGame.not_le.1⟩
 
 theorem lf_or_equiv_or_gf (x y : PGame) : x ⧏ y ∨ (x ≈ y) ∨ y ⧏ x := by
-  by_cases h : x ⧏ y
-  · exact Or.inl h
-  · right
-    cases' lt_or_equiv_of_le (PGame.not_lf.1 h) with h' h'
-    · exact Or.inr h'.lf
-    · exact Or.inl (Equiv.symm h')
+  rw [or_iff_not_imp_left]
+  intro h
+  cases' lt_or_equiv_of_le (PGame.not_lf.1 h) with h' h'
+  · exact Or.inr h'.lf
+  · exact Or.inl (Equiv.symm h')
 
 theorem equiv_congr_left {y₁ y₂ : PGame} : (y₁ ≈ y₂) ↔ ∀ x₁, (x₁ ≈ y₁) ↔ (x₁ ≈ y₂) :=
   ⟨fun h _ => ⟨fun h' => Equiv.trans h' h, fun h' => Equiv.trans h' (Equiv.symm h)⟩,
@@ -1118,7 +1110,7 @@ theorem isOption_neg {x y : PGame} : IsOption x (-y) ↔ IsOption (-x) y := by
     · apply exists_congr
       intro
       rw [neg_eq_iff_eq_neg]
-      rfl
+      simp only [neg_def, moveRight_mk, moveLeft_mk]
 
 @[simp]
 theorem isOption_neg_neg {x y : PGame} : IsOption (-x) (-y) ↔ IsOption x y := by
