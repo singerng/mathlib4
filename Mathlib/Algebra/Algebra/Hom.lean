@@ -447,15 +447,6 @@ lemma toIntAlgHom_injective [Ring R] [Ring S] :
     Function.Injective (RingHom.toIntAlgHom : (R →+* S) → _) :=
   fun _ _ e ↦ DFunLike.ext _ _ (fun x ↦ DFunLike.congr_fun e x)
 
-@[simp]
-lemma coe_toIntAlgHom [Ring R] [Ring S] [Algebra ℤ R] [Algebra ℤ S] (f : R →+* S) :
-    f.toIntAlgHom = (f : R → S) :=
-  rfl
-
-lemma toIntAlgHom_apply [Ring R] [Ring S] [Algebra ℤ R] [Algebra ℤ S] (f : R →+* S) {x : R} :
-    f.toIntAlgHom x = f x :=
-  rfl
-
 end RingHom
 
 namespace Algebra

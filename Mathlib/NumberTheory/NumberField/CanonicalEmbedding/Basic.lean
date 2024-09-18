@@ -146,7 +146,7 @@ theorem mem_span_latticeBasis [NumberField K] (x : (K →+* ℂ) → ℂ) :
   rw [h₁, ← Submodule.map_span, ← SetLike.mem_coe, Submodule.map_coe]
   rw [← RingHom.map_range, Subring.mem_map, Set.mem_image]
   simp only [SetLike.mem_coe, mem_span_integralBasis K, AlgHom.coe_toLinearMap,
-    RingHom.coe_toIntAlgHom]
+    RingHom.toIntAlgHom_coe]
 
 theorem mem_rat_span_latticeBasis [NumberField K] (x : K) :
     canonicalEmbedding K x ∈ Submodule.span ℚ (Set.range (latticeBasis K)) := by
@@ -609,7 +609,7 @@ theorem mem_span_latticeBasis (x : (mixedSpace K)) :
   rw [h₁]
   rw [← Submodule.map_span, ← SetLike.mem_coe, Submodule.map_coe]
   simp only [Set.mem_image, SetLike.mem_coe, mem_span_integralBasis K,
-    RingHom.mem_range, exists_exists_eq_and, AlgHom.coe_toLinearMap, RingHom.coe_toIntAlgHom,
+    RingHom.mem_range, exists_exists_eq_and, AlgHom.coe_toLinearMap, RingHom.toIntAlgHom_coe,
     RingHom.coe_comp, Function.comp_apply]
 
 theorem span_latticeBasis :
@@ -703,7 +703,7 @@ theorem mem_span_fractionalIdealLatticeBasis (x : (mixedSpace K)) :
   have h₂ : Submodule.span ℤ (Set.range (basisOfFractionalIdeal K I)) = (I : Set K) := by
     ext; erw [mem_span_basisOfFractionalIdeal]
   rw [h₁, ← Submodule.map_span, ← SetLike.mem_coe, Submodule.map_coe, h₂, AlgHom.coe_toLinearMap,
-    RingHom.coe_toIntAlgHom]
+    RingHom.toIntAlgHom_coe]
 
 end integerLattice
 
