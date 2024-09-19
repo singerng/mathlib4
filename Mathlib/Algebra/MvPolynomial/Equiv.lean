@@ -205,7 +205,8 @@ lemma aeval_injective_iff_of_isEmpty [IsEmpty σ] [CommSemiring S₁] [Algebra R
     ext i
     exact IsEmpty.elim' ‹IsEmpty σ› i
   rw [this, ← Injective.of_comp_iff' _ (@isEmptyAlgEquiv R σ _ _).bijective]
-  rfl
+  simp only [AlgEquiv.toAlgHom_eq_coe, AlgHom.coe_comp, AlgHom.coe_coe, EquivLike.injective_comp,
+    funext (Algebra.ofId_apply S₁)] -- coe_ofId
 
 /-- The ring isomorphism between multivariable polynomials in no variables
 and the ground ring. -/
