@@ -46,7 +46,7 @@ open Function Matrix
 
 /-- From a basis `e : ι → M` and a family of vectors `v : ι' → M`, make the matrix whose columns
 are the vectors `v i` written in the basis `e`. -/
-def Basis.toMatrix (e : Basis ι R M) (v : ι' → M) : Matrix ι ι' R := fun i j => e.repr (v j) i
+def Basis.toMatrix (e : Basis ι R M) (v : ι' → M) : Matrix ι ι' R := .of fun i j => e.repr (v j) i
 
 variable (e : Basis ι R M) (v : ι' → M) (i : ι) (j : ι')
 
@@ -78,7 +78,7 @@ theorem toMatrix_self [DecidableEq ι] : e.toMatrix e = 1 := by
 theorem toMatrix_update [DecidableEq ι'] (x : M) :
     e.toMatrix (Function.update v j x) = Matrix.updateColumn (e.toMatrix v) j (e.repr x) := by
   ext i' k
-  rw [Basis.toMatrix, Matrix.updateColumn_apply, e.toMatrix_apply]
+  rw [Basis.toMatrix, Matrix.updateColumn_apply, e.toMatrix_apply, of_apply]
   split_ifs with h
   · rw [h, update_same j x v]
   · rw [update_noteq h]
