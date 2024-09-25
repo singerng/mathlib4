@@ -141,6 +141,11 @@ section unicodeLinter
 open Mathlib.Linter.TextBased
 open Mathlib.Linter.TextBased.UnicodeLinter
 
+-- test parsing back error message in `parse?_errorContext` for unicode errors
+#guard let errContext : ErrorContext := {
+    error := .unwantedUnicode '\u1234', lineNumber := 4, path:="./MYFILE.lean"}
+  (parse?_errorContext <| outputMessage errContext .exceptionsFile) == some errContext
+
 -- test parsing back error message in `parse?_errorContext` for variant selector errors
 
 -- "missing" selector
