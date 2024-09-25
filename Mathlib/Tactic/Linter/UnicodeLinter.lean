@@ -58,4 +58,9 @@ def emojis := #[
 /-- Unicode symbols in mathilb that should always be followed by the text-variant selector. -/
 def nonEmojis : Array Char := #[]
 
+/-- If `false` the character is not allowed in Mathlib.
+-/
+def isAllowedCharacter (c : Char) : Bool :=
+  c != '\u00A0' -- non-breaking space
+
 end Mathlib.Linter.TextBased.UnicodeLinter
