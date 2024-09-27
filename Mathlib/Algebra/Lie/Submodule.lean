@@ -653,16 +653,17 @@ def lieSpan : LieSubmodule R L M :=
 variable {R L s}
 
 theorem mem_lieSpan {x : M} : x ∈ lieSpan R L s ↔ ∀ N : LieSubmodule R L M, s ⊆ N → x ∈ N := by
-  change x ∈ (lieSpan R L s : Set M) ↔ _; erw [sInf_coe]; exact mem_iInter₂
+  rw [← SetLike.mem_coe, lieSpan, sInf_coe]
+  exact mem_iInter₂
 
 theorem subset_lieSpan : s ⊆ lieSpan R L s := by
   intro m hm
-  erw [mem_lieSpan]
+  rw [SetLike.mem_coe, mem_lieSpan]
   intro N hN
   exact hN hm
 
 theorem submodule_span_le_lieSpan : Submodule.span R s ≤ lieSpan R L s := by
-  rw [Submodule.span_le]
+  rw [Submodule.span_le, coe_toSubmodule]
   apply subset_lieSpan
 
 @[simp]
@@ -976,7 +977,8 @@ theorem comap_mono : Monotone (comap f) := fun J₁ J₂ h ↦ by
 
 theorem map_of_image (h : f '' I = J) : I.map f = J := by
   apply le_antisymm
-  · erw [LieSubmodule.lieSpan_le, Submodule.map_coe, h]
+  · rw [map, LieSubmodule.lieSpan_le, Submodule.map_coe, LieHom.coe_toLinearMap,
+      coe_to_lieSubalgebra_to_submodule, LieSubmodule.coe_toSubmodule, h]
   · rw [← SetLike.coe_subset_coe, ← h]; exact LieSubmodule.subset_lieSpan
 
 /-- Note that this is not a special case of `LieSubmodule.subsingleton_of_bot`. Indeed, given

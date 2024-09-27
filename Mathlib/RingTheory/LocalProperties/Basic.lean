@@ -324,7 +324,7 @@ theorem eq_zero_of_localization (r : R)
   apply ideal_eq_bot_of_localization
   intro J hJ
   delta IsLocalization.coeSubmodule
-  erw [Submodule.map_span, Submodule.span_eq_bot]
+  rw [Ideal.span, Submodule.map_span, Submodule.span_eq_bot]
   rintro _ ⟨_, h', rfl⟩
   cases Set.mem_singleton_iff.mpr h'
   exact h J hJ
