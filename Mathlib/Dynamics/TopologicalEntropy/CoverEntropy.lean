@@ -310,7 +310,8 @@ lemma coverMincard_mul_le_pow {T : X → X} {F : Set X} (F_inv : MapsTo T F F) {
   rcases n.eq_zero_or_pos with rfl | n_pos
   · rw [mul_zero, coverMincard_zero T F_nonempty (U ○ U), pow_zero]
   rcases eq_top_or_lt_top (coverMincard T F U m) with h | h
-  · exact h ▸ (le_top (α := ℕ∞)).trans_eq (ENat.top_pow n_pos).symm
+  · rw [h, ENat.top_pow n_pos]
+    exact le_top
   · rcases (coverMincard_finite_iff T F U m).1 h with ⟨s, s_cover, s_coverMincard⟩
     rcases s_cover.iterate_le_pow F_inv U_symm n with ⟨t, t_cover, t_le_sn⟩
     rw [← s_coverMincard]
@@ -390,8 +391,7 @@ lemma log_coverMincard_le_add {T : X → X} {F : Set X} (F_inv : MapsTo T F F)
     exact bot_le
   have h_nm : (0 : EReal) ≤ (n / m : ℕ) := Nat.cast_nonneg' (n / m)
   have h_log := log_coverMincard_nonneg T F_nemp U m
-  have n_div_n := EReal.div_self (natCast_ne_bot n) (natCast_ne_top n)
-    (Nat.cast_pos'.2 n_pos).ne.symm
+  have n_div_n := EReal.div_self (natCast_ne_bot n) (natCast_ne_top n) (Nat.cast_pos'.2 n_pos).ne'
   apply le_trans <| div_le_div_right_of_nonneg (Nat.cast_pos'.2 n_pos).le
     (log_monotone (ENat.toENNReal_le.2 (coverMincard_le_pow F_inv U_symm m_pos n)))
   rw [ENat.toENNReal_pow, log_pow, Nat.cast_add, Nat.cast_one, right_distrib_of_nonneg h_nm
