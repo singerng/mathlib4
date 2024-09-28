@@ -70,7 +70,8 @@ variable {α β : Type*} [OrderedRing α] [OrderedRing β] [LocallyFiniteOrder �
         (Icc (-n : α) n).card * (Icc (-n : β) n).card := by
   rw [box_succ_eq_sdiff, card_sdiff (Icc_neg_mono n.le_succ), Finset.card_Icc_prod,
     Finset.card_Icc_prod]
-  rfl
+  simp_rw [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, neg_add_rev, fst_add, fst_neg,
+    fst_one, fst_natCast, snd_add, snd_neg, snd_one, snd_natCast]
 
 end Prod
 

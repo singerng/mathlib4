@@ -644,7 +644,7 @@ theorem closedPoint_mem_iff (U : TopologicalSpace.Opens <| PrimeSpectrum R) :
   · rw [eq_top_iff]
     exact fun h x _ => (specializes_closedPoint x).mem_open U.2 h
   · rintro rfl
-    trivial
+    exact TopologicalSpace.Opens.mem_top _
 
 @[simp]
 theorem PrimeSpectrum.comap_residue (T : Type u) [CommRing T] [LocalRing T]
