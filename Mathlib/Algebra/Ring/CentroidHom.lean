@@ -113,6 +113,11 @@ instance : CoeFun (CentroidHom α) fun _ ↦ α → α :=
 -- the LHS simplifies to the RHS anyway.)
 theorem toFun_eq_coe {f : CentroidHom α} : f.toFun = f := rfl
 
+@[simp]
+theorem coe_mk (f map_mul_left map_mul_right) :
+    ⇑(⟨f, map_mul_left, map_mul_right⟩ : CentroidHom α) = f :=
+  rfl
+
 @[ext]
 theorem ext {f g : CentroidHom α} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -472,12 +477,11 @@ def centerToCentroidCenter :
         ext a
         exact map_mul_left g (↑z) a }
   map_zero' := by
-    simp only [ZeroMemClass.coe_zero, map_zero]
-    exact rfl
+    ext
+    simp
   map_add' := fun _ _ => by
-    dsimp
-    simp only [map_add]
-    rfl
+    ext
+    simp [(AddMonoidHom.add_apply)]
   map_mul' z₁ z₂ := by ext a; exact (z₁.prop.left_assoc z₂ a).symm
 
 instance : FunLike (Subsemiring.center (CentroidHom α)) α α where
