@@ -250,6 +250,7 @@ variable {α ι: Type*}
 
 open Real
 
+-- TODO name
 lemma Real.HasSum_rexp_HasProd (f : ι → α → ℝ) (hfn : ∀ x n, 0 < f n x)
     (hf : ∀ x : α, HasSum (fun n => log (f n x)) (∑' i, log (f i x))) (a : α) :
        HasProd (fun b ↦ f b a) (∏' n : ι, (f n a)) := by
