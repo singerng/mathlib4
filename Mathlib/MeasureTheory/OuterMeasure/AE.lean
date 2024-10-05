@@ -47,13 +47,13 @@ def ae (μ : F) : Filter α :=
 /-- `∀ᵐ a ∂μ, p a` means that `p a` for a.e. `a`, i.e. `p` holds true away from a null set.
 
 This is notation for `Filter.Eventually p (MeasureTheory.ae μ)`. -/
-local notation3 "∀ᵐ "(...)" ∂"μ", "r:(scoped p => Filter.Eventually p <| MeasureTheory.ae μ) => r
+notation3 "∀ᵐ "(...)" ∂"μ", "r:(scoped p => Filter.Eventually p <| MeasureTheory.ae μ) => r
 
 /-- `∃ᵐ a ∂μ, p a` means that `p` holds `∂μ`-frequently,
 i.e. `p` holds on a set of positive measure.
 
 This is notation for `Filter.Frequently p (MeasureTheory.ae μ)`. -/
-local notation3 "∃ᵐ "(...)" ∂"μ", "r:(scoped P => Filter.Frequently P <| MeasureTheory.ae μ) => r
+notation3 "∃ᵐ "(...)" ∂"μ", "r:(scoped P => Filter.Frequently P <| MeasureTheory.ae μ) => r
 
 /-- `f =ᵐ[μ] g` means `f` and `g` are eventually equal along the a.e. filter,
 i.e. `f=g` away from a null set.
@@ -65,7 +65,7 @@ local notation:50 f " =ᵐ[" μ:50 "] " g:50 => Filter.EventuallyEq (MeasureTheo
 i.e. `f ≤ g` away from a null set.
 
 This is notation for `Filter.EventuallyLE (MeasureTheory.ae μ) f g`. -/
-notation:50 f " ≤ᵐ[" μ:50 "] " g:50 => Filter.EventuallyLE (MeasureTheory.ae μ) f g
+local notation:50 f " ≤ᵐ[" μ:50 "] " g:50 => Filter.EventuallyLE (MeasureTheory.ae μ) f g
 
 theorem mem_ae_iff {s : Set α} : s ∈ ae μ ↔ μ sᶜ = 0 :=
   Iff.rfl
