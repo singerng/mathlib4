@@ -81,8 +81,8 @@ open Lean Elab Term Meta Qq MeasureTheory
 
 /-- Try to elaborate `μ` as a term of type `T` where `OuterMeasureClass T ?Ω`. If that fails, try to
 elaborate `μ` as `Measure ?Ω`. -/
-def elabMeasure (μ : TSyntax `term) : TermElabM Expr := do
-  let ⟨u, T, _⟩ ← inferTypeQ (← elabTerm μ none)
+def elabMeasure (μ : TSyntax `term) (expectedType? : Option Expr) : TermElabM Expr := do
+  let ⟨u, T, _⟩ ← inferTypeQ (← elabTerm μ expectedType?)
   match u, T with
   | .succ v, ~q(OuterMeasure $α) => elabTerm μ <| .some q(OuterMeasure $α)
   | .succ v, _ =>
@@ -108,7 +108,7 @@ We elabore `f =ᵐ[μ] g` as `Filter.EventuallyEq (MeasureTheory.ae μ) f g`. -/
 @[term_elab aeEq]
 def elabAEEq : TermElab
   | `($f =ᵐ[$μ] $g), expectedType? => do
-    let μ' ← elabMeasure μ
+    let μ' ← elabMeasure μ expectedType?
     elabTerm (← `(Filter.EventuallyEq (MeasureTheory.ae $(← μ'.toSyntax)) $f $g)) expectedType?
   | _, _ => throwUnsupportedSyntax
 
@@ -118,7 +118,7 @@ We elabore `f ≤ᵐ[μ] g` as `Filter.EventuallyEq (MeasureTheory.ae μ) f g`. 
 @[term_elab aeLE]
 def elabAELE : TermElab
   | `($f ≤ᵐ[$μ] $g), expectedType? => do
-    let μ' ← elabMeasure μ
+    let μ' ← elabMeasure μ expectedType?
     elabTerm (← `(Filter.EventuallyLE (MeasureTheory.ae $(← μ'.toSyntax)) $f $g)) expectedType?
   | _, _ => throwUnsupportedSyntax
 
