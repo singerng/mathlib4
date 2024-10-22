@@ -5,7 +5,6 @@ Authors: Alex J. Best, Yaël Dillies
 -/
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Field.Defs
-import Mathlib.Algebra.SMulWithZero
 
 /-!
 # Pointwise operations on ordered algebraic objects
