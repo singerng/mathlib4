@@ -72,7 +72,7 @@ private def mkZModAux {ι : Type} [DecidableEq ι] (n : ι → ℕ) [∀ i, NeZe
 
 private lemma mkZModAux_injective {ι : Type} [DecidableEq ι] {n : ι → ℕ} [∀ i, NeZero (n i)] :
     Injective (mkZModAux n) :=
-  AddChar.directSum_injective.comp fun f g h ↦ by simpa [Function.funext_iff] using h
+  AddChar.directSum_injective.comp fun f g h ↦ by simpa [funext_iff] using h
 
 /-- The circle-valued characters of a finite abelian group are the same as its complex-valued
 characters. -/
