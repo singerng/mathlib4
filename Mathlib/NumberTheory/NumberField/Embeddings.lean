@@ -257,17 +257,25 @@ namespace NumberField.InfinitePlace
 
 open NumberField
 
+def val : (InfinitePlace K) → (AbsoluteValue K ℝ) := Subtype.val
+
+instance {K : Type*} [Field K] : Coe (InfinitePlace K) (AbsoluteValue K ℝ) := ⟨val⟩
+
 instance {K : Type*} [Field K] : FunLike (InfinitePlace K) K ℝ where
-  coe w x := w.1 x
+  coe w x := w.val x
   coe_injective' _ _ h := Subtype.eq (AbsoluteValue.ext fun x => congr_fun h x)
 
+@[simp]
+lemma coe_mk_ {K : Type*} [Field K] (w : AbsoluteValue K ℝ) (hw) :
+    ⇑(show InfinitePlace K from Subtype.mk w hw) = w := rfl
+
 instance : MonoidWithZeroHomClass (InfinitePlace K) K ℝ where
-  map_mul w _ _ := w.1.map_mul _ _
-  map_one w := w.1.map_one
-  map_zero w := w.1.map_zero
+  map_mul w _ _ := w.val.map_mul _ _
+  map_one w := w.val.map_one
+  map_zero w := w.val.map_zero
 
 instance : NonnegHomClass (InfinitePlace K) K ℝ where
-  apply_nonneg w _ := w.1.nonneg _
+  apply_nonneg w _ := w.val.nonneg _
 
 @[simp]
 theorem apply (φ : K →+* ℂ) (x : K) : (mk φ) x = Complex.abs (φ x) := rfl
@@ -278,6 +286,15 @@ noncomputable def embedding (w : InfinitePlace K) : K →+* ℂ := w.2.choose
 @[simp]
 theorem mk_embedding (w : InfinitePlace K) : mk (embedding w) = w := Subtype.ext w.2.choose_spec
 
+variable (w : InfinitePlace K)
+#check w.2.choose_spec
+
+theorem xxx : place w.embedding = w := w.2.choose_spec
+theorem yyy (x) : place w.embedding x = w x := by
+  rw [xxx]
+  rfl
+
+
 @[simp]
 theorem mk_conjugate_eq (φ : K →+* ℂ) : mk (ComplexEmbedding.conjugate φ) = mk φ := by
   refine DFunLike.ext _ _ (fun x => ?_)
@@ -286,7 +303,7 @@ theorem mk_conjugate_eq (φ : K →+* ℂ) : mk (ComplexEmbedding.conjugate φ) 
 theorem norm_embedding_eq (w : InfinitePlace K) (x : K) :
     ‖(embedding w) x‖ = w x := by
   nth_rewrite 2 [← mk_embedding w]
-  rfl
+  simp [mk]
 
 theorem eq_iff_eq (x : K) (r : ℝ) : (∀ w : InfinitePlace K, w x = r) ↔ ∀ φ : K →+* ℂ, ‖φ x‖ = r :=
   ⟨fun hw φ => hw (mk φ), by rintro hφ ⟨w, ⟨φ, rfl⟩⟩; exact hφ φ⟩
@@ -416,6 +433,25 @@ lemma isComplex_mk_iff {φ : K →+* ℂ} :
 @[simp]
 theorem not_isReal_of_mk_isComplex {φ : K →+* ℂ} (h : IsComplex (mk φ)) :
     ¬ ComplexEmbedding.IsReal φ := by rwa [← isComplex_mk_iff]
+
+@[simp]
+lemma AbsoluteValue.comp_apply {R : Type*} {S : Type*} {T : Type*} [Semiring T] [Semiring R]
+    [OrderedSemiring S] (v : AbsoluteValue R S) {f : T →+* R} (hf : Function.Injective ⇑f) (t : T) :
+    v.comp hf t = v (f t) := rfl
+
+/-- The absolute value of an infinite place factors through its associated complex embedding. -/
+theorem abs_eq_comp (v : InfinitePlace K) :
+    v.1 = Complex.abs.comp v.embedding.injective := by
+  ext
+  rw [← yyy v]
+  simp
+
+/-- The absolute value of a real infinite place factors through its associated real embedding. -/
+theorem abs_of_isReal_eq_comp {v : InfinitePlace K} (hv : IsReal v) :
+    v.1 = AbsoluteValue.abs.comp (v.embedding_of_isReal hv).injective := by
+  ext x
+  rw [(show v.1 x = v x by rfl), ← v.norm_embedding_of_isReal hv]
+  rfl
 
 /-- The multiplicity of an infinite place, that is the number of distinct complex embeddings that
 define it, see `card_filter_mk_eq`. -/
