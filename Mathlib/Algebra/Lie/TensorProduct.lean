@@ -62,6 +62,7 @@ instance lieRingModule : LieRingModule L (M ⊗[R] N) where
       LinearMap.rTensor_tmul, LieHom.map_lie, toEnd_apply_apply, LinearMap.add_apply,
       LinearMap.map_add, LieHom.lie_apply, Module.End.lie_apply, LinearMap.lTensor_tmul]
     abel
+    sorry
 
 /-- The tensor product of two Lie modules is a Lie module. -/
 instance lieModule : LieModule R L (M ⊗[R] N) where

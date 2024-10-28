@@ -64,6 +64,7 @@ into a single statement about nilpotency of Lie modules. This is not usually emp
 
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
 
 universe u₁ u₂ u₃ u₄
 

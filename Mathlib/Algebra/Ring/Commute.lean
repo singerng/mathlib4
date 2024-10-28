@@ -231,11 +231,16 @@ variable [NonUnitalNonAssocRing R]
 
 namespace Ring
 
-instance (priority := 100) instBracket : Bracket R R := ⟨fun x y => x * y - y * x⟩
+-- instance (priority := 100) instBracket : Bracket R R := ⟨fun x y => x * y - y * x⟩
+def bracket : Bracket R R := ⟨fun x y => x * y - y * x⟩
+
+attribute [local instance] bracket
 
 theorem lie_def (x y : R) : ⁅x, y⁆ = x * y - y * x := rfl
 
 end Ring
+
+attribute [local instance] Ring.bracket
 
 theorem commute_iff_lie_eq {x y : R} : Commute x y ↔ ⁅x, y⁆ = 0 := sub_eq_zero.symm
 

@@ -27,6 +27,8 @@ lie ring, lie algebra, extension of scalars, restriction of scalars, base change
 
 suppress_compilation
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 open scoped TensorProduct
 
 variable (R A L M : Type*)

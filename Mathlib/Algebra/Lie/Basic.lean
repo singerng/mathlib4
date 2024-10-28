@@ -248,8 +248,8 @@ instance Module.Dual.instLieModule : LieModule R L (M →ₗ[R] R) where
 end BasicProperties
 
 /-- A morphism of Lie algebras is a linear map respecting the bracket operations. -/
-structure LieHom (R L L' : Type*) [CommRing R] [LieRing L] [LieAlgebra R L]
-  [LieRing L'] [LieAlgebra R L'] extends L →ₗ[R] L' where
+structure LieHom (R L L' : Type*) [CommRing R] [AddCommGroup L] [Module R L] [Bracket L L]
+  [AddCommGroup L'] [Module R L'] [Bracket L' L'] extends L →ₗ[R] L' where
   /-- A morphism of Lie algebras is compatible with brackets. -/
   map_lie' : ∀ {x y : L}, toFun ⁅x, y⁆ = ⁅toFun x, toFun y⁆
 
@@ -260,9 +260,13 @@ namespace LieHom
 
 variable {R : Type u} {L₁ : Type v} {L₂ : Type w} {L₃ : Type w₁}
 variable [CommRing R]
-variable [LieRing L₁] [LieAlgebra R L₁]
-variable [LieRing L₂] [LieAlgebra R L₂]
-variable [LieRing L₃] [LieAlgebra R L₃]
+-- variable [LieRing L₁] [LieAlgebra R L₁]
+-- variable [LieRing L₂] [LieAlgebra R L₂]
+-- variable [LieRing L₃] [LieAlgebra R L₃]
+variable [AddCommGroup L₁] [Module R L₁] [Bracket L₁ L₁]
+variable [AddCommGroup L₂] [Module R L₂] [Bracket L₂ L₂]
+variable [AddCommGroup L₃] [Module R L₃] [Bracket L₃ L₃]
+
 
 attribute [coe] LieHom.toLinearMap
 
@@ -320,14 +324,14 @@ theorem id_apply (x : L₁) : (id : L₁ →ₗ⁅R⁆ L₁) x = x :=
   rfl
 
 /-- The constant 0 map is a Lie algebra morphism. -/
-instance : Zero (L₁ →ₗ⁅R⁆ L₂) :=
+instance {L₂ : Type*} [LieRing L₂] [LieAlgebra R L₂] : Zero (L₁ →ₗ⁅R⁆ L₂) :=
   ⟨{ (0 : L₁ →ₗ[R] L₂) with map_lie' := by simp }⟩
 
 @[norm_cast, simp]
-theorem coe_zero : ((0 : L₁ →ₗ⁅R⁆ L₂) : L₁ → L₂) = 0 :=
+theorem coe_zero {L₂ : Type*} [LieRing L₂] [LieAlgebra R L₂] : ((0 : L₁ →ₗ⁅R⁆ L₂) : L₁ → L₂) = 0 :=
   rfl
 
-theorem zero_apply (x : L₁) : (0 : L₁ →ₗ⁅R⁆ L₂) x = 0 :=
+theorem zero_apply {L₂ : Type*} [LieRing L₂] [LieAlgebra R L₂] (x : L₁) : (0 : L₁ →ₗ⁅R⁆ L₂) x = 0 :=
   rfl
 
 /-- The identity map is a Lie algebra morphism. -/
@@ -341,7 +345,7 @@ theorem coe_one : ((1 : L₁ →ₗ⁅R⁆ L₁) : L₁ → L₁) = _root_.id :=
 theorem one_apply (x : L₁) : (1 : L₁ →ₗ⁅R⁆ L₁) x = x :=
   rfl
 
-instance : Inhabited (L₁ →ₗ⁅R⁆ L₂) :=
+instance {L₂ : Type*} [LieRing L₂] [LieAlgebra R L₂] : Inhabited (L₁ →ₗ⁅R⁆ L₂) :=
   ⟨0⟩
 
 theorem coe_injective : @Function.Injective (L₁ →ₗ⁅R⁆ L₂) (L₁ → L₂) (↑) := by

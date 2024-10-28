@@ -32,6 +32,7 @@ make such a definition in this file.
 lie algebra, ring commutator, adjoint action
 -/
 
+attribute [local instance] Ring.bracket
 
 universe u v w w₁ w₂
 
@@ -39,10 +40,15 @@ section OfAssociative
 
 variable {A : Type v} [Ring A]
 
+-- This is the key to avoid data-bearing bracket instances
+-- We need to rewrite a bunch of the library to use it instead of `LieRing.ofAssociativeRing`
+class IsCommutatorBracket (A : Type*) [Mul A] [Sub A] [Bracket A A] : Prop :=
+  lie_eq_mul_sub_mul : ∀ a b : A, ⁅a, b⁆ = a * b - b * a
+
 namespace LieRing
 
 /-- An associative ring gives rise to a Lie ring by taking the bracket to be the ring commutator. -/
-instance (priority := 100) ofAssociativeRing : LieRing A where
+def ofAssociativeRing : LieRing A where
   add_lie _ _ _ := by simp only [Ring.lie_def, right_distrib, left_distrib]; abel
   lie_add _ _ _ := by simp only [Ring.lie_def, right_distrib, left_distrib]; abel
   lie_self := by simp only [Ring.lie_def, forall_const, sub_self]
@@ -57,6 +63,8 @@ theorem lie_apply {α : Type*} (f g : α → A) (a : α) : ⁅f, g⁆ a = ⁅f a
   rfl
 
 end LieRing
+
+attribute [local instance] LieRing.ofAssociativeRing
 
 section AssociativeModule
 
@@ -165,6 +173,8 @@ end LieAlgebra
 
 end OfAssociative
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 section AdjointAction
 
 variable (R : Type u) (L : Type v) (M : Type w)
@@ -174,7 +184,6 @@ variable [LieRingModule L M] [LieModule R L M]
 /-- A Lie module yields a Lie algebra morphism into the linear endomorphisms of the module.
 
 See also `LieModule.toModuleHom`. -/
-@[simps]
 def LieModule.toEnd : L →ₗ⁅R⁆ Module.End R M where
   toFun x :=
     { toFun := fun m => ⁅x, m⁆
@@ -183,6 +192,8 @@ def LieModule.toEnd : L →ₗ⁅R⁆ Module.End R M where
   map_add' x y := by ext m; apply add_lie
   map_smul' t x := by ext m; apply smul_lie
   map_lie' {x y} := by ext m; apply lie_lie
+
+@[simp] lemma LieModule.toEnd_apply_apply (x : L) (m : M) : toEnd R L M x m = ⁅x, m⁆ := rfl
 
 /-- The adjoint action of a Lie algebra on itself. -/
 def LieAlgebra.ad : L →ₗ⁅R⁆ Module.End R L :=
@@ -232,6 +243,7 @@ local notation "φ" => LieModule.toEnd R L M
 lemma LieModule.toEnd_lie (x y : L) (z : M) :
     (φ x) ⁅y, z⁆ = ⁅ad R L x y, z⁆ + ⁅y, φ x z⁆ := by
   simp
+
 
 lemma LieAlgebra.ad_lie (x y z : L) :
     (ad R L x) ⁅y, z⁆ = ⁅ad R L x y, z⁆ + ⁅y, ad R L x z⁆ :=

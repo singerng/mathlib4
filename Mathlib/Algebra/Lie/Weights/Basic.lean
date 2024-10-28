@@ -45,6 +45,8 @@ Basic definitions and properties of the above ideas are provided in this file.
 lie character, eigenvalue, eigenspace, weight, weight vector, root, root vector
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 variable {K R L M : Type*} [CommRing R] [LieRing L] [LieAlgebra R L]
   [AddCommGroup M] [Module R M] [LieRingModule L M] [LieModule R L M]
 
@@ -54,16 +56,17 @@ open Set Function TensorProduct LieModule
 
 section notation_genWeightSpaceOf
 
-/-- Until we define `LieModule.genWeightSpaceOf`, it is useful to have some notation as follows: -/
-local notation3 "𝕎("M", " χ", " x")" => (toEnd R L M x).maxGenEigenspace χ
+-- /-- Until we define `LieModule.genWeightSpaceOf`, it is useful to have some notation as follows: -/
+-- local notation3 "𝕎("M", " χ", " x")" => (toEnd R L M x).maxGenEigenspace χ
 
 /-- See also `bourbaki1975b` Chapter VII §1.1, Proposition 2 (ii). -/
 protected theorem weight_vector_multiplication (M₁ M₂ M₃ : Type*)
     [AddCommGroup M₁] [Module R M₁] [LieRingModule L M₁] [LieModule R L M₁] [AddCommGroup M₂]
     [Module R M₂] [LieRingModule L M₂] [LieModule R L M₂] [AddCommGroup M₃] [Module R M₃]
     [LieRingModule L M₃] [LieModule R L M₃] (g : M₁ ⊗[R] M₂ →ₗ⁅R,L⁆ M₃) (χ₁ χ₂ : R) (x : L) :
-    LinearMap.range ((g : M₁ ⊗[R] M₂ →ₗ[R] M₃).comp (mapIncl 𝕎(M₁, χ₁, x) 𝕎(M₂, χ₂, x))) ≤
-      𝕎(M₃, χ₁ + χ₂, x) := by
+    LinearMap.range ((g : M₁ ⊗[R] M₂ →ₗ[R] M₃).comp
+      (mapIncl ((toEnd R L M₁ x).maxGenEigenspace χ₁) ((toEnd R L M₂ x).maxGenEigenspace χ₂))) ≤
+      ((toEnd R L M₃ x).maxGenEigenspace (χ₁ + χ₂)) := by
   -- Unpack the statement of the goal.
   intro m₃
   simp only [TensorProduct.mapIncl, LinearMap.mem_range, LinearMap.coe_comp,
@@ -131,8 +134,9 @@ protected theorem weight_vector_multiplication (M₁ M₂ M₃ : Type*)
   · rw [LinearMap.mul_apply, LinearMap.pow_map_zero_of_le hj hf₂, LinearMap.map_zero]
 
 lemma lie_mem_maxGenEigenspace_toEnd
-    {χ₁ χ₂ : R} {x y : L} {m : M} (hy : y ∈ 𝕎(L, χ₁, x)) (hm : m ∈ 𝕎(M, χ₂, x)) :
-    ⁅y, m⁆ ∈ 𝕎(M, χ₁ + χ₂, x) := by
+    {χ₁ χ₂ : R} {x y : L} {m : M} (hy : y ∈ ((toEnd R L L x).maxGenEigenspace χ₁))
+    (hm : m ∈ ((toEnd R L M x).maxGenEigenspace χ₂)) :
+    ⁅y, m⁆ ∈ ((toEnd R L M x).maxGenEigenspace (χ₁ + χ₂)) := by
   apply LieModule.weight_vector_multiplication L M M (toModuleHom R L M) χ₁ χ₂
   simp only [LieModuleHom.coe_toLinearMap, Function.comp_apply, LinearMap.coe_comp,
     TensorProduct.mapIncl, LinearMap.mem_range]
@@ -146,7 +150,7 @@ variable (M)
 
 It is a Lie submodule because `L` is nilpotent. -/
 def genWeightSpaceOf [LieAlgebra.IsNilpotent R L] (χ : R) (x : L) : LieSubmodule R L M :=
-  { 𝕎(M, χ, x) with
+  { ((toEnd R L M x).maxGenEigenspace χ) with
     lie_mem := by
       intro y m hm
       simp only [AddSubsemigroup.mem_carrier, AddSubmonoid.mem_toSubsemigroup,

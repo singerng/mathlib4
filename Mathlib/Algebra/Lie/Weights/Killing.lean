@@ -34,6 +34,8 @@ forms.
 
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 variable (R K L : Type*) [CommRing R] [LieRing L] [LieAlgebra R L] [Field K] [LieAlgebra K L]
 
 namespace LieAlgebra

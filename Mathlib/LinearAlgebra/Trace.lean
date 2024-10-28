@@ -106,6 +106,7 @@ theorem trace_conj (g : M →ₗ[R] M) (f : (M →ₗ[R] M)ˣ) :
   rw [trace_mul_comm]
   simp
 
+attribute [local instance] Ring.bracket
 @[simp]
 lemma trace_lie {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] (f g : Module.End R M) :
     trace R M ⁅f, g⁆ = 0 := by

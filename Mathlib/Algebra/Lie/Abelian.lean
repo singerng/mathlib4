@@ -32,6 +32,8 @@ lie algebra, abelian, commutative, center
 
 universe u v w w₁ w₂
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 /-- A Lie (ring) module is trivial iff all brackets vanish. -/
 class LieModule.IsTrivial (L : Type v) (M : Type w) [Bracket L M] [Zero M] : Prop where
   trivial : ∀ (x : L) (m : M), ⁅x, m⁆ = 0

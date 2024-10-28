@@ -33,7 +33,6 @@ enveloping algebra of `L`, together with its universal property.
 lie algebra, universal enveloping algebra, tensor algebra
 -/
 
-
 universe u₁ u₂ u₃
 
 variable (R : Type u₁) (L : Type u₂)
@@ -78,6 +77,8 @@ def mkAlgHom : TensorAlgebra R L →ₐ[R] UniversalEnvelopingAlgebra R L :=
   RingQuot.mkAlgHom R (Rel R L)
 
 variable {L}
+variable [Bracket (UniversalEnvelopingAlgebra R L) (UniversalEnvelopingAlgebra R L)]
+  [IsCommutatorBracket (UniversalEnvelopingAlgebra R L)]
 
 /-- The natural Lie algebra morphism from a Lie algebra to its universal enveloping algebra. -/
 @[simps!] -- Porting note (#11445): added
@@ -85,10 +86,11 @@ def ι : L →ₗ⁅R⁆ UniversalEnvelopingAlgebra R L :=
   { (mkAlgHom R L).toLinearMap.comp ιₜ with
     map_lie' := fun {x y} => by
       suffices mkAlgHom R L (ιₜ ⁅x, y⁆ + ιₜ y * ιₜ x) = mkAlgHom R L (ιₜ x * ιₜ y) by
-        rw [map_mul] at this; simp [LieRing.of_associative_ring_bracket, ← this]
+        rw [map_mul] at this
+        simp [IsCommutatorBracket.lie_eq_mul_sub_mul (A := UniversalEnvelopingAlgebra R L), ← this]
       exact RingQuot.mkAlgHom_rel _ (Rel.lie_compat x y) }
 
-variable {A : Type u₃} [Ring A] [Algebra R A] (f : L →ₗ⁅R⁆ A)
+variable {A : Type u₃} [Ring A] [Algebra R A] [Bracket A A] [IsCommutatorBracket A] (f : L →ₗ⁅R⁆ A)
 
 /-- The universal property of the universal enveloping algebra: Lie algebra morphisms into
 associative algebras lift to associative algebra morphisms from the universal enveloping algebra. -/
@@ -97,9 +99,9 @@ def lift : (L →ₗ⁅R⁆ A) ≃ (UniversalEnvelopingAlgebra R L →ₐ[R] A) 
     RingQuot.liftAlgHom R
       ⟨TensorAlgebra.lift R (f : L →ₗ[R] A), by
         intro a b h; induction h
-        simp only [LieRing.of_associative_ring_bracket, map_add, TensorAlgebra.lift_ι_apply,
+        simp only [IsCommutatorBracket.lie_eq_mul_sub_mul, map_add, TensorAlgebra.lift_ι_apply,
           LieHom.coe_toLinearMap, LieHom.map_lie, map_mul, sub_add_cancel]⟩
-  invFun F := (F : UniversalEnvelopingAlgebra R L →ₗ⁅R⁆ A).comp (ι R)
+  invFun F := (F : UniversalEnvelopingAlgebra R L →ₗ⁅R⁆ A).comp (ι R) -- `AlgHom.toLieHom` needs refactor
   left_inv f := by
     ext
     -- Porting note: was

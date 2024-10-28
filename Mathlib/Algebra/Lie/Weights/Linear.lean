@@ -39,6 +39,8 @@ or `R` has characteristic zero.
 
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 open Set
 
 variable (R L M : Type*) [CommRing R] [LieRing L] [LieAlgebra R L]

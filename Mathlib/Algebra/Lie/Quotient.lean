@@ -27,6 +27,7 @@ is a statement and proof of the universal property of these quotients.
 lie algebra, quotient
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
 
 universe u v w w₁ w₂
 

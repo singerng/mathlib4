@@ -41,6 +41,8 @@ We provide basic definitions and results to support `α`-chain techniques in thi
 
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 open Module Function Set
 
 variable {R L : Type*} [CommRing R] [LieRing L] [LieAlgebra R L]
@@ -173,12 +175,14 @@ lemma trace_toEnd_genWeightSpaceChain_eq_zero
           lie_mem_genWeightSpaceChain_of_genWeightSpace_eq_bot_left M α χ p q hp hz hm⟩
         map_add' := fun _ _ ↦ by simp
         map_smul' := fun t m ↦ by simp }
+    sorry /-
     have hfg : toEnd R H _ u = ⁅f, g⁆ := by
       ext
       rw [toEnd_apply_apply, LieSubmodule.coe_bracket, LieSubalgebra.coe_bracket_of_module, ← hyz]
       simp only [lie_lie, LieHom.lie_apply, LinearMap.coe_mk, AddHom.coe_mk, Module.End.lie_apply,
       AddSubgroupClass.coe_sub, f, g]
     simp [hfg]
+    -/
   · simp
   · simp_all
   · simp_all

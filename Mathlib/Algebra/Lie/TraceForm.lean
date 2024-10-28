@@ -32,6 +32,8 @@ We define the trace / Killing form in this file and prove some basic properties.
    form on `L` via the trace form construction.
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 variable (R K L M : Type*) [CommRing R] [LieRing L] [LieAlgebra R L]
   [AddCommGroup M] [Module R M] [LieRingModule L M] [LieModule R L M]
 

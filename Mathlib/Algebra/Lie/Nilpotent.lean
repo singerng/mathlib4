@@ -28,6 +28,8 @@ carries a natural concept of nilpotency. We define these here via the lower cent
 lie algebra, lower central series, nilpotent
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 universe u v w w₁ w₂
 
 section NilpotentModules
@@ -418,6 +420,8 @@ theorem nontrivial_max_triv_of_isNilpotent [Nontrivial M] [IsNilpotent R L M] :
     Nontrivial (maxTrivSubmodule R L M) :=
   Set.nontrivial_mono (lowerCentralSeriesLast_le_max_triv R L M)
     (nontrivial_lowerCentralSeriesLast R L M)
+
+attribute [local instance] LieRing.ofAssociativeRing
 
 @[simp]
 theorem coe_lcs_range_toEnd_eq (k : ℕ) :

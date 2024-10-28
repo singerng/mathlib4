@@ -29,6 +29,8 @@ about simple and semisimple Lie algebras.
 lie algebra, radical, simple, semisimple
 -/
 
+attribute [local instance] LieRing.ofAssociativeRing
+
 section Irreducible
 
 variable (R L M : Type*) [CommRing R] [LieRing L] [AddCommGroup M] [Module R M] [LieRingModule L M]
