@@ -5,6 +5,7 @@ Authors: Thomas Browning
 -/
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.Transfer
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
 
 /-!
 # Z Groups
@@ -16,21 +17,57 @@ import Mathlib.GroupTheory.Transfer
 
 -/
 
-def Sylow.mapSurjective {G G' : Type*} [Group G] [Group G']
-    {f : G →* G'} (hf : Function.Surjective f) {p : ℕ} (P : Sylow p G) : Sylow p G' :=
+def IsPGroup.toSylow {G : Type*} [Group G] {P : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hP1 : IsPGroup p P) (hP2 : ¬ p ∣ P.index) : Sylow p G :=
+  { P with
+    isPGroup' := hP1
+    is_maximal' := by
+      intro Q hQ hPQ
+      have hP : P.index ≠ 0 := by
+        intro h
+        rw [h] at hP2
+        exact hP2 (dvd_zero p)
+      have : P.FiniteIndex := ⟨hP⟩
+      let N := P.normalCore
+      have : N.FiniteIndex := inferInstance
+      have : Q.FiniteIndex := Subgroup.finiteIndex_of_le hPQ
+      refine le_antisymm (Subgroup.relindex_eq_one.mp ?_) hPQ
+      have key : IsPGroup p (Q ⧸ (N.subgroupOf Q)) := hQ.to_quotient (N.subgroupOf Q)
+      obtain ⟨k, hk⟩ := key.exists_card_eq
+      rw [← Subgroup.index, ← Subgroup.relindex] at hk
+      have h1 : P.relindex Q ∣ N.relindex Q := Subgroup.relindex_dvd_of_le_left Q P.normalCore_le
+      have h2 : P.relindex Q ∣ P.index := by exact Subgroup.relindex_dvd_index_of_le hPQ
+      rw [hk] at h1
+      obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow Fact.out).mp h1
+      rw [hj] at h2 ⊢
+      cases j
+      · rfl
+      · rw [pow_succ] at h2
+        have key := dvd_of_mul_left_dvd h2
+        exact (hP2 key).elim }
+
+def Sylow.ofCard' {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (H : Subgroup G)
+    (card_eq : Nat.card H = p ^ (Nat.card G).factorization p) : Sylow p G :=
+  (IsPGroup.of_card card_eq).toSylow (fun h0 ↦ by
+    have key := mul_dvd_mul_left (p ^ (Nat.card G).factorization p) h0
+    rw [← pow_succ, ← card_eq, H.card_mul_index, Nat.factorization_def _ Fact.out] at key
+    exact pow_succ_padicValNat_not_dvd Nat.card_pos.ne' key)
+
+def Sylow.mapSurjective {G G' : Type*} [Group G] [Finite G] [Group G']
+    {f : G →* G'} (hf : Function.Surjective f) {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    Sylow p G' :=
   { P.1.map f with
     isPGroup' := P.2.map f
-    is_maximal' := by
+    is_maximal' := fun hQ hPQ ↦ ((P.2.map f).toSylow (fun h ↦ not_dvd_index_sylow P
+        (Subgroup.index_ne_zero_of_finite) (h.trans (P.index_map_dvd hf)))).3 hQ hPQ }
 
-      sorry }
-
-theorem Sylow.coe_mapSurjective {G G' : Type*} [Group G] [Group G']
-    {f : G →* G'} (hf : Function.Surjective f) {p : ℕ} (P : Sylow p G) :
+theorem Sylow.coe_mapSurjective {G G' : Type*} [Group G] [Finite G] [Group G']
+    {f : G →* G'} (hf : Function.Surjective f) {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
     (P.mapSurjective hf : Subgroup G') = P.map f :=
   rfl
 
-theorem Sylow.mapSurjective_surjective {G G' : Type*} [Group G] [Group G']
-    {f : G →* G'} (hf : Function.Surjective f) (p : ℕ) :
+theorem Sylow.mapSurjective_surjective {G G' : Type*} [Group G] [Finite G] [Group G']
+    {f : G →* G'} (hf : Function.Surjective f) (p : ℕ) [Fact p.Prime] :
     Function.Surjective (Sylow.mapSurjective hf : Sylow p G → Sylow p G') := by
   sorry
 
@@ -55,9 +92,10 @@ theorem of_injective (hG' : IsZGroup G') (hf : Function.Injective f) : IsZGroup 
   have := isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe h).surjective
   exact isCyclic_of_surjective _ (Subgroup.equivMapOfInjective P f hf).symm.surjective
 
-theorem of_surjective (hG' : IsZGroup G) (hf : Function.Surjective f) : IsZGroup G' := by
+theorem of_surjective [Finite G] (hG' : IsZGroup G) (hf : Function.Surjective f) : IsZGroup G' := by
   rw [IsZGroup_iff] at hG' ⊢
   intro p hp P
+  have := Fact.mk hp
   obtain ⟨Q, rfl⟩ := Sylow.mapSurjective_surjective hf p P
   specialize hG' p hp Q
   exact isCyclic_of_surjective _ (f.subgroupMap_surjective Q)
