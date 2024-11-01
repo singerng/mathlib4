@@ -46,6 +46,10 @@ def IsPGroup.toSylow {G : Type*} [Group G] {P : Subgroup G} {p : ℕ} [Fact p.Pr
         have key := dvd_of_mul_left_dvd h2
         exact (hP2 key).elim }
 
+theorem IsPGroup.toSylow_coe {G : Type*} [Group G] {P : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hP1 : IsPGroup p P) (hP2 : ¬ p ∣ P.index) : (hP1.toSylow hP2) = P :=
+  rfl
+
 def Sylow.ofCard' {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (H : Subgroup G)
     (card_eq : Nat.card H = p ^ (Nat.card G).factorization p) : Sylow p G :=
   (IsPGroup.of_card card_eq).toSylow (fun h0 ↦ by
@@ -69,7 +73,26 @@ theorem Sylow.coe_mapSurjective {G G' : Type*} [Group G] [Finite G] [Group G']
 theorem Sylow.mapSurjective_surjective {G G' : Type*} [Group G] [Finite G] [Group G']
     {f : G →* G'} (hf : Function.Surjective f) (p : ℕ) [Fact p.Prime] :
     Function.Surjective (Sylow.mapSurjective hf : Sylow p G → Sylow p G') := by
-  sorry
+  have : Finite G' := Finite.of_surjective f hf
+  intro P
+  let Q : Sylow p (P.comap f) := Sylow.nonempty.some
+  let Q' : Subgroup G := Q.map (P.comap f).subtype
+  have hQ' : IsPGroup p Q' := Q.2.map (P.comap f).subtype
+  have hQ'' : ¬ p ∣ Q'.index := by
+    rw [← Subgroup.relindex_mul_index (Subgroup.map_subtype_le Q.1),
+      P.index_comap_of_surjective hf,
+      Subgroup.relindex, Subgroup.subgroupOf,
+      Q.comap_map_eq_self_of_injective (P.comap f).subtype_injective]
+    exact Nat.Prime.not_dvd_mul Fact.out (not_dvd_index_sylow Q (Subgroup.index_ne_zero_of_finite))
+      (not_dvd_index_sylow P (Subgroup.index_ne_zero_of_finite))
+  refine ⟨hQ'.toSylow hQ'', Sylow.ext ?_⟩
+  rw [coe_mapSurjective, IsPGroup.toSylow_coe]
+  have hQ''' : ¬ p ∣ (Q'.map f).index :=
+    fun h ↦ hQ'' (h.trans (Q'.index_map_dvd hf))
+  symm
+  apply ((hQ'.map f).toSylow hQ''').3 P.2
+  rw [IsPGroup.toSylow_coe, Subgroup.map_le_iff_le_comap]
+  exact Subgroup.map_subtype_le Q.1
 
 variable (G G' : Type*) [Group G] [Group G'] (f : G →* G')
 
