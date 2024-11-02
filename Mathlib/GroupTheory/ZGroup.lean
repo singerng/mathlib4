@@ -113,8 +113,6 @@ theorem Subgroup.autmap_ker {G : Type*} [Group G] (H : Subgroup G) :
   simp [DFunLike.ext_iff, mem_subgroupOf, autmap, mem_centralizer_iff, mul_inv_eq_iff_eq_mul]
   simp [eq_comm]
 
-#eval Nat.minFac 1
-
 def MulAut.congr {G H : Type*} [Group G] [Group H] (ϕ : G ≃* H) :
     MulAut G ≃* MulAut H where
   toFun := fun f ↦ ϕ.symm.trans (f.trans ϕ)
@@ -123,22 +121,34 @@ def MulAut.congr {G H : Type*} [Group G] [Group H] (ϕ : G ≃* H) :
   right_inv _ := by simp [DFunLike.ext_iff]
   map_mul' := by simp [DFunLike.ext_iff]
 
-def MulAut.ofMultiplicative (A : Type*) [AddGroup A] : MulAut (Multiplicative A) ≃* AddAut A where
-  toFun := sorry
-  invFun := sorry
-  left_inv := sorry
-  right_inv := sorry
-  map_mul' := sorry
-
-def ringequiv (n : ℕ) : AddAut (ZMod n) ≃* (ZMod n)ˣ := sorry
+def ringequiv (n : ℕ) : AddAut (ZMod n) ≃* (ZMod n)ˣ :=
+  have key : ∀ (f : AddAut (ZMod n)) (x : ZMod n), f 1 * x = f x := by
+    intro f x
+    rw [mul_comm]
+    have h2 := (zsmul_eq_mul (f 1) x.cast).symm
+    rwa [← map_zsmul, zsmul_one, ZMod.intCast_zmod_cast] at h2
+  { toFun := fun f ↦ Units.mkOfMulEqOne (f 1) (f⁻¹ 1) (by
+      rw [key, f.inv_apply_self])
+    invFun := AddAut.mulLeft
+    left_inv := by
+      intro f
+      ext x
+      simp [Units.smul_def, key]
+    right_inv := by
+      intro x
+      ext
+      simp [Units.smul_def]
+    map_mul' := by
+      intro f g
+      ext
+      simp [key] }
 
 theorem IsCyclic.card_mulAut {G : Type*} [Group G] [Finite G] [h : IsCyclic G] :
     Nat.card (MulAut G) = Nat.totient (Nat.card G) := by
   have : NeZero (Nat.card G) := ⟨Nat.card_pos.ne'⟩
   rw [← ZMod.card_units_eq_totient, ← Nat.card_eq_fintype_card]
   have key := MulAut.congr (zmodCyclicMulEquiv h)
-  have key2 := MulAut.ofMultiplicative (ZMod (Nat.card G))
-  have key3 := key.symm.trans (key2.trans (ringequiv (Nat.card G)))
+  have key3 := key.toEquiv.symm.trans (MulEquiv.toAdditive.trans (ringequiv (Nat.card G)).toEquiv)
   exact Nat.card_congr key3
 
 theorem thm1 {G : Type*} [Group G] [Finite G] {P : Sylow (Nat.card G).minFac G} (hP : IsCyclic P) :
