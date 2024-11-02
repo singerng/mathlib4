@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Thomas Browning
 -/
 import Mathlib.Algebra.Ring.AddAut
+import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.SchurZassenhaus
 import Mathlib.GroupTheory.Transfer
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
@@ -220,7 +221,7 @@ theorem IsZGroup_iff : IsZGroup G ↔ ∀ p : ℕ, p.Prime → ∀ P : Sylow p G
 
 namespace IsZGroup
 
-theorem of_injective (hG' : IsZGroup G') (hf : Function.Injective f) : IsZGroup G := by
+theorem of_injective [hG' : IsZGroup G'] (hf : Function.Injective f) : IsZGroup G := by
   rw [IsZGroup_iff] at hG' ⊢
   intro p hp P
   obtain ⟨Q, hQ⟩ := P.exists_comap_eq_of_injective hf
@@ -229,7 +230,7 @@ theorem of_injective (hG' : IsZGroup G') (hf : Function.Injective f) : IsZGroup 
   have := isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe h).surjective
   exact isCyclic_of_surjective _ (Subgroup.equivMapOfInjective P f hf).symm.surjective
 
-theorem of_surjective [Finite G] (hG' : IsZGroup G) (hf : Function.Surjective f) : IsZGroup G' := by
+theorem of_surjective [Finite G] [hG' : IsZGroup G] (hf : Function.Surjective f) : IsZGroup G' := by
   rw [IsZGroup_iff] at hG' ⊢
   intro p hp P
   have := Fact.mk hp
@@ -237,13 +238,24 @@ theorem of_surjective [Finite G] (hG' : IsZGroup G) (hf : Function.Surjective f)
   specialize hG' p hp Q
   exact isCyclic_of_surjective _ (f.subgroupMap_surjective Q)
 
+instance [IsZGroup G] (H : Subgroup G) : IsZGroup H := of_injective H.subtype_injective
 
+instance [IsZGroup G] [Finite G] (H : Subgroup G) [H.Normal] : IsZGroup (G ⧸ H) :=
+  of_surjective (QuotientGroup.mk'_surjective H)
 
--- If smallest prime divisor is cyclic, then G has normal p-complement
+instance [IsZGroup G] [Finite G] : IsZGroup (Abelianization G) :=
+  of_surjective (QuotientGroup.mk'_surjective (commutator G))
+
+instance [Group.IsNilpotent G] [IsZGroup G] : IsCyclic G := sorry
+
+-- this is now automatic!
+instance [IsZGroup G] [Finite G] : IsCyclic (Abelianization G) := inferInstance
+
+-- If smallest prime divisor is cyclic, then G has normal p-complement (done)
 -- ZGroup implies solvable: Induct
 -- If p is cyclic, then p cannot divide both |G'| and |G:G'|
 -- ZGroup implies coprime |G'| and |G:G'|
--- G/G' is cyclic (abelian ZGroup is cyclic)
+-- G/G' is cyclic (abelian (or nilpotent) ZGroup is cyclic, directProductOfNormal)
 -- G' is cyclic: Theorem 5.16
 
 end IsZGroup
