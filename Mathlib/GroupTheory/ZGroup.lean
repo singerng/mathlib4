@@ -25,28 +25,12 @@ def IsPGroup.toSylow {G : Type*} [Group G] {P : Subgroup G} {p : ℕ} [Fact p.Pr
     isPGroup' := hP1
     is_maximal' := by
       intro Q hQ hPQ
-      have hP : P.index ≠ 0 := by
-        intro h
-        rw [h] at hP2
-        exact hP2 (dvd_zero p)
-      have : P.FiniteIndex := ⟨hP⟩
-      let N := P.normalCore
-      have : N.FiniteIndex := inferInstance
-      have : Q.FiniteIndex := Subgroup.finiteIndex_of_le hPQ
-      refine le_antisymm (Subgroup.relindex_eq_one.mp ?_) hPQ
-      have key : IsPGroup p (Q ⧸ (N.subgroupOf Q)) := hQ.to_quotient (N.subgroupOf Q)
-      obtain ⟨k, hk⟩ := key.exists_card_eq
-      rw [← Subgroup.index, ← Subgroup.relindex] at hk
-      have h1 : P.relindex Q ∣ N.relindex Q := Subgroup.relindex_dvd_of_le_left Q P.normalCore_le
-      have h2 : P.relindex Q ∣ P.index := by exact Subgroup.relindex_dvd_index_of_le hPQ
-      rw [hk] at h1
-      obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow Fact.out).mp h1
-      rw [hj] at h2 ⊢
-      cases j
-      · rfl
-      · rw [pow_succ] at h2
-        have key := dvd_of_mul_left_dvd h2
-        exact (hP2 key).elim }
+      have : P.FiniteIndex := ⟨fun h ↦ hP2 (h ▸ (dvd_zero p))⟩
+      obtain ⟨k, hk⟩ := (hQ.to_quotient (P.normalCore.subgroupOf Q)).exists_card_eq
+      have h := hk ▸ Nat.Prime.coprime_pow_of_not_dvd (m := k) Fact.out hP2
+      exact le_antisymm (Subgroup.relindex_eq_one.mp
+        (Nat.eq_one_of_dvd_coprimes h (Subgroup.relindex_dvd_index_of_le hPQ)
+        (Subgroup.relindex_dvd_of_le_left Q P.normalCore_le))) hPQ }
 
 theorem IsPGroup.toSylow_coe {G : Type*} [Group G] {P : Subgroup G} {p : ℕ} [Fact p.Prime]
     (hP1 : IsPGroup p P) (hP2 : ¬ p ∣ P.index) : (hP1.toSylow hP2) = P :=
@@ -72,29 +56,35 @@ theorem Sylow.coe_mapSurjective {G G' : Type*} [Group G] [Finite G] [Group G']
     (P.mapSurjective hf : Subgroup G') = P.map f :=
   rfl
 
+theorem Subgroup.index_map_of_injective {G G' : Type*} [Group G] [Group G'] (H : Subgroup G)
+    {f : G →* G'} (hf : Function.Injective f) :
+    (H.map f).index = H.index * f.range.index := by
+  rw [H.index_map, f.ker_eq_bot_iff.mpr hf, sup_bot_eq]
+
+theorem Subgroup.index_map_subtype {G : Type*} [Group G] {H : Subgroup G} (K : Subgroup H) :
+    (K.map H.subtype).index = K.index * H.index := by
+  rw [K.index_map_of_injective H.subtype_injective, H.subtype_range]
+
+theorem Sylow.not_dvd_index
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime] (P : Sylow p G) :
+    ¬ p ∣ P.index :=
+  not_dvd_index_sylow P Subgroup.index_ne_zero_of_finite
+
 theorem Sylow.mapSurjective_surjective {G G' : Type*} [Group G] [Finite G] [Group G']
     {f : G →* G'} (hf : Function.Surjective f) (p : ℕ) [Fact p.Prime] :
     Function.Surjective (Sylow.mapSurjective hf : Sylow p G → Sylow p G') := by
   have : Finite G' := Finite.of_surjective f hf
   intro P
-  let Q : Sylow p (P.comap f) := Sylow.nonempty.some
-  let Q' : Subgroup G := Q.map (P.comap f).subtype
-  have hQ' : IsPGroup p Q' := Q.2.map (P.comap f).subtype
-  have hQ'' : ¬ p ∣ Q'.index := by
-    rw [← Subgroup.relindex_mul_index (Subgroup.map_subtype_le Q.1),
-      P.index_comap_of_surjective hf,
-      Subgroup.relindex, Subgroup.subgroupOf,
-      Q.comap_map_eq_self_of_injective (P.comap f).subtype_injective]
-    exact Nat.Prime.not_dvd_mul Fact.out (not_dvd_index_sylow Q (Subgroup.index_ne_zero_of_finite))
-      (not_dvd_index_sylow P (Subgroup.index_ne_zero_of_finite))
-  refine ⟨hQ'.toSylow hQ'', Sylow.ext ?_⟩
-  rw [coe_mapSurjective, IsPGroup.toSylow_coe]
-  have hQ''' : ¬ p ∣ (Q'.map f).index :=
-    fun h ↦ hQ'' (h.trans (Q'.index_map_dvd hf))
-  symm
-  apply ((hQ'.map f).toSylow hQ''').3 P.2
-  rw [IsPGroup.toSylow_coe, Subgroup.map_le_iff_le_comap]
-  exact Subgroup.map_subtype_le Q.1
+  let Q₀ : Sylow p (P.comap f) := Sylow.nonempty.some
+  let Q : Subgroup G := Q₀.map (P.comap f).subtype
+  have hPQ : Q.map f ≤ P := Subgroup.map_le_iff_le_comap.mpr (Subgroup.map_subtype_le Q₀.1)
+  have hpQ : IsPGroup p Q := Q₀.2.map (P.comap f).subtype
+  have hQ : ¬ p ∣ Q.index := by
+    rw [Subgroup.index_map_subtype Q₀.1, P.index_comap_of_surjective hf]
+    exact Nat.Prime.not_dvd_mul Fact.out Q₀.not_dvd_index P.not_dvd_index
+  use hpQ.toSylow hQ
+  rw [Sylow.ext_iff, Sylow.coe_mapSurjective, eq_comm]
+  exact ((hpQ.map f).toSylow (fun h ↦ hQ (h.trans (Q.index_map_dvd hf)))).3 P.2 hPQ
 
 section Burnside
 
