@@ -22,7 +22,7 @@ import Mathlib.RingTheory.Multiplicity
 
 ## Main results
 * `Ideal.setOf_isPrincipal_wellFoundedOn_gt`, `WfDvdMonoid.of_setOf_isPrincipal_wellFoundedOn_gt`
-  in a domain, well-foundedness of the strict verison of ∣ is equivalent to the ascending
+  in a domain, well-foundedness of the strict version of ∣ is equivalent to the ascending
   chain condition on principal ideals.
 
 ## TODO
@@ -1473,11 +1473,11 @@ theorem prod_le [Nontrivial α] {a b : FactorSet α} : a.prod ≤ b.prod ↔ a �
   rwa [prod_factors, prod_factors] at this
 
 open Classical in
-noncomputable instance : Sup (Associates α) :=
+noncomputable instance : Max (Associates α) :=
   ⟨fun a b => (a.factors ⊔ b.factors).prod⟩
 
 open Classical in
-noncomputable instance : Inf (Associates α) :=
+noncomputable instance : Min (Associates α) :=
   ⟨fun a b => (a.factors ⊓ b.factors).prod⟩
 
 open Classical in
