@@ -21,9 +21,26 @@ open Filter Ideal NumberField.InfinitePlace NumberField.Units Topology NumberThe
 
 open scoped Real
 
+lemma LSeries_eq_tsum (f : ℕ → ℂ) {s : ℂ} (hs : s ≠ 0) :
+     LSeries f s = ∑' n, (f n) / (n : ℂ) ^ s := by
+   refine tsum_congr fun n ↦ ?_
+   cases n with
+   | zero => simp [hs]
+   | succ n => simp
+
 /-- Docstring. -/
 def dedekindZeta (s : ℂ) :=
   LSeries (fun n ↦ Nat.card {I : Ideal (𝓞 K) // absNorm I = n}) s
+
+#exit
+
+example (s : ℂ) :
+    dedekindZeta K s = ∑' I : Ideal (𝓞 K), 1 / (absNorm I : ℂ) ^ s := by
+  rw [dedekindZeta, LSeries_eq_tsum]
+  have : Summable (fun I : Ideal (𝓞 K) ↦  1 / (absNorm I : ℂ) ^ s) := sorry
+  convert (HasSum.tsum_fiberwise this.hasSum (fun I : Ideal (𝓞 K) ↦ absNorm I)).tsum_eq with n
+
+  sorry
 
 /-- Docstring. -/
 def residue : ℝ :=
@@ -68,3 +85,5 @@ theorem dedekindZeta_residue :
     exact Finset.mem_range_succ_iff.mpr hx
 
 end NumberField
+
+#exit
