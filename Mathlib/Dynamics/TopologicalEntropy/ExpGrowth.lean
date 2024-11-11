@@ -255,45 +255,45 @@ lemma expGrowthSup_inv {u : ℕ → ℝ≥0∞} :
 
 /-! ### Comparison -/
 
-lemma expGrowthInf_le_of_bigO {u v : ℕ → ℝ≥0∞} (h : ∃ C ≠ ∞, ∀ᶠ n in atTop, u n ≤ C * v n) :
+lemma expGrowthInf_le_of_bigO {u v : ℕ → ℝ≥0∞} {C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ᶠ n in atTop, u n ≤ C * v n) :
     expGrowthInf u ≤ expGrowthInf v := by
-  obtain ⟨C, C_top, u_v⟩ := h
-  apply (expGrowthInf_eventually_monotone u_v).trans
+  apply (expGrowthInf_eventually_monotone h).trans
   rcases eq_zero_or_pos C with rfl | C_pos
   · simp only [zero_mul]
     exact expGrowthInf_zero ▸ bot_le
-  · apply (expGrowthInf_mul_le _ _).trans_eq <;> rw [expGrowthSup_const C_pos.ne' C_top]
+  · apply (expGrowthInf_mul_le _ _).trans_eq <;> rw [expGrowthSup_const C_pos.ne' hC]
     · exact zero_add (expGrowthInf v)
-    · exact Or.inl EReal.zero_ne_bot
-    · exact Or.inl EReal.zero_ne_top
+    · exact .inl zero_ne_bot
+    · exact .inl zero_ne_top
 
-lemma expGrowthSup_le_of_bigO {u v : ℕ → ℝ≥0∞} (h : ∃ C ≠ ∞, ∀ᶠ n in atTop, u n ≤ C * v n) :
+lemma expGrowthSup_le_of_bigO {u v : ℕ → ℝ≥0∞} {C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ᶠ n in atTop, u n ≤ C * v n) :
     expGrowthSup u ≤ expGrowthSup v := by
-  obtain ⟨C, C_top, u_v⟩ := h
-  apply (expGrowthSup_eventually_monotone u_v).trans
+  apply (expGrowthSup_eventually_monotone h).trans
   rcases eq_zero_or_pos C with rfl | C_pos
   · simp only [zero_mul]
     exact expGrowthSup_zero ▸ bot_le
-  · apply (expGrowthSup_mul_le _ _).trans_eq <;> rw [expGrowthSup_const C_pos.ne' C_top]
+  · apply (expGrowthSup_mul_le _ _).trans_eq <;> rw [expGrowthSup_const C_pos.ne' hC]
     · exact zero_add (expGrowthSup v)
-    · exact Or.inl EReal.zero_ne_bot
-    · exact Or.inl EReal.zero_ne_top
+    · exact .inl zero_ne_bot
+    · exact .inl zero_ne_top
 
-lemma expGrowthInf_of_bigO {u v : ℕ → ℝ≥0∞} (h : ∃ c ≠ 0, ∀ᶠ n in atTop, c * u n ≤ v n) :
+lemma expGrowthInf_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
+    (h : ∀ᶠ n in atTop, c * u n ≤ v n) :
     expGrowthInf u ≤ expGrowthInf v := by
-  obtain ⟨c, c_pos, u_v⟩ := h
-  apply (expGrowthInf_eventually_monotone u_v).trans' (le_expGrowthInf_mul.trans' _)
+  apply (expGrowthInf_eventually_monotone h).trans' (le_expGrowthInf_mul.trans' _)
   rcases eq_top_or_lt_top c with rfl | c_top
   · exact expGrowthInf_top ▸ le_add_of_nonneg_left le_top
-  · rw [expGrowthInf_const c_pos c_top.ne, zero_add]
+  · rw [expGrowthInf_const hc c_top.ne, zero_add]
 
-lemma expGrowthSup_of_bigO {u v : ℕ → ℝ≥0∞} (h : ∃ c ≠ 0, ∀ᶠ n in atTop, c * u n ≤ v n) :
+lemma expGrowthSup_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
+    (h : ∀ᶠ n in atTop, c * u n ≤ v n) :
     expGrowthSup u ≤ expGrowthSup v := by
-  obtain ⟨c, c_pos, u_v⟩ := h
-  apply (expGrowthSup_eventually_monotone u_v).trans' (le_expGrowthSup_mul'.trans' _)
+  apply (expGrowthSup_eventually_monotone h).trans' (le_expGrowthSup_mul'.trans' _)
   rcases eq_top_or_lt_top c with rfl | c_top
   · exact expGrowthInf_top ▸ le_add_of_nonneg_left le_top
-  · rw [expGrowthInf_const c_pos c_top.ne, zero_add]
+  · rw [expGrowthInf_const hc c_top.ne, zero_add]
 
 /-! ### Infimum and supremum -/
 
@@ -349,7 +349,7 @@ lemma expGrowthSup_add {u v : ℕ → ℝ≥0∞} :
     expGrowthSup (u + v) = (expGrowthSup u) ⊔ expGrowthSup v := by
   rw [← expGrowthSup_sup]
   apply le_antisymm
-  · refine expGrowthSup_le_of_bigO ⟨2, by norm_num, Eventually.of_forall fun n ↦ ?_⟩
+  · refine expGrowthSup_le_of_bigO (C := 2) (by norm_num) (Eventually.of_forall fun n ↦ ?_)
     rw [Pi.sup_apply u v n, Pi.add_apply u v n, two_mul]
     exact add_le_add (le_max_left (u n) (v n)) (le_max_right (u n) (v n))
   · refine expGrowthSup_monotone fun n ↦ ?_
