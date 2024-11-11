@@ -699,6 +699,14 @@ lemma graphOn_prod_prodMap (s : Set α) (t : Set β) (f : α → γ) (g : β →
     (s ×ˢ t).graphOn (Prod.map f g) = Equiv.prodProdProdComm .. ⁻¹' s.graphOn f ×ˢ t.graphOn g := by
   aesop
 
+lemma forall_mem_graphOn {α β : Type*} {f : α → β} {s : Set α} {p : α × β → Prop} :
+    (∀ y ∈ s.graphOn f, p y) ↔ ∀ ⦃x : α⦄, x ∈ s → p (x, f x) := by
+  rw [graphOn_eq_image, forall_mem_image]
+
+lemma exists_mem_graphOn {α β : Type*} {f : α → β} {s : Set α} {p : α × β → Prop} :
+    (∃ y ∈ s.graphOn f, p y) ↔ ∃ x ∈ s, p (x, f x) := by
+  rw [graphOn_eq_image, exists_mem_image]
+
 end graphOn
 
 /-! ### Surjectivity on a set -/
