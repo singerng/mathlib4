@@ -25,90 +25,102 @@ function `n ↦ Nat.card {x | F x = n}`.
   `n ↦ Nat.card {x | F x = n}` has abscissa of absolute convergence `1`.
 -/
 
-open Filter Topology Complex Metric LSeries
+open Filter Topology Complex Metric LSeries Finset
 
 namespace NumberTheory.LSeries.card
 
-variable {α : Type*} {F : α → ℕ} {l : ℝ}
-  (hF : Tendsto (fun n ↦ (Nat.card {x | F x ≤ n} : ℝ) / n) atTop (𝓝 l)) (hl : 0 < l)
+variable {a : ℕ → ℕ} {l : ℝ}
+  (hF : Tendsto (fun n ↦ (∑ i in range n, a i : ℝ) / n) atTop (𝓝 l)) (hl : 0 < l)
 
-section card_le
+-- section card_le
 
-include hF hl
+-- include hF hl
 
-theorem finite_card_le (n : ℕ) :
-    {x | F x ≤ n}.Finite := by
-  contrapose! hl
-  have h_card : ∀ ⦃m⦄, n ≤ m → Nat.card {x | F x ≤ m} = 0 :=
-    fun _ h ↦ Set.Nat.card_coe_set_eq _ ▸ (Set.Infinite.mono (fun _ h' ↦ h'.trans h) hl).ncard
-  suffices Tendsto (fun n ↦ (Nat.card {x | F x ≤ n} : ℝ) / n) atTop (𝓝 0) by
-    rw [tendsto_nhds_unique hF this]
-  exact tendsto_atTop_of_eventually_const fun _ h ↦ by rw [h_card h, Nat.cast_zero, zero_div]
+-- theorem finite_card_le (n : ℕ) :
+--     {x | F x ≤ n}.Finite := by
+--   contrapose! hl
+--   have h_card : ∀ ⦃m⦄, n ≤ m → Nat.card {x | F x ≤ m} = 0 :=
+--     fun _ h ↦ Set.Nat.card_coe_set_eq _ ▸ (Set.Infinite.mono (fun _ h' ↦ h'.trans h) hl).ncard
+--   suffices Tendsto (fun n ↦ (Nat.card {x | F x ≤ n} : ℝ) / n) atTop (𝓝 0) by
+--     rw [tendsto_nhds_unique hF this]
+--   exact tendsto_atTop_of_eventually_const fun _ h ↦ by rw [h_card h, Nat.cast_zero, zero_div]
 
-theorem finite_card_eq (n : ℕ) :
-    {x | F x = n}.Finite :=
-  (finite_card_le hF hl n).subset fun _ h ↦ h.le
+-- theorem finite_card_eq (n : ℕ) :
+--     {x | F x = n}.Finite :=
+--   (finite_card_le hF hl n).subset fun _ h ↦ h.le
 
-theorem card_eq_succ_add_card_le (n : ℕ) :
-    Nat.card {x | F x = n + 1} + Nat.card {x | F x ≤ n} = Nat.card {x | F x ≤ n + 1} := by
-  classical
-  have : ∀ n, Fintype {x | F x ≤ n} := fun _ ↦ (finite_card_le hF hl _).fintype
-  have : ∀ n, Fintype {x | F x = n} := fun _ ↦ (finite_card_eq hF hl _).fintype
-  rw [Nat.card_eq_card_toFinset, Nat.card_eq_card_toFinset, Nat.card_eq_card_toFinset,
-    ← Finset.card_union_of_disjoint]
-  · congr with x
-    simpa [← Nat.lt_add_one_iff (n := n)] using le_iff_eq_or_lt.symm
-  · exact Finset.disjoint_left.mpr fun _ h ↦ by simp_all
+-- theorem card_eq_succ_add_card_le (n : ℕ) :
+--     Nat.card {x | F x = n + 1} + Nat.card {x | F x ≤ n} = Nat.card {x | F x ≤ n + 1} := by
+--   classical
+--   have : ∀ n, Fintype {x | F x ≤ n} := fun _ ↦ (finite_card_le hF hl _).fintype
+--   have : ∀ n, Fintype {x | F x = n} := fun _ ↦ (finite_card_eq hF hl _).fintype
+--   rw [Nat.card_eq_card_toFinset, Nat.card_eq_card_toFinset, Nat.card_eq_card_toFinset,
+--     ← Finset.card_union_of_disjoint]
+--   · congr with x
+--     simpa [← Nat.lt_add_one_iff (n := n)] using le_iff_eq_or_lt.symm
+--   · exact Finset.disjoint_left.mpr fun _ h ↦ by simp_all
 
-theorem card_le_not_bounded (N : ℕ) :
-    ∃ n, N ≤ Nat.card {x | F x ≤ n} := by
-  contrapose! hl
-  refine tendsto_le_of_eventuallyLE hF (tendsto_const_div_atTop_nhds_zero_nat (N : ℝ)) ?_
-  filter_upwards with n using div_le_div_of_nonneg_right (Nat.cast_le.mpr (hl n).le) n.cast_nonneg
+-- theorem card_le_not_bounded (N : ℕ) :
+--     ∃ n, N ≤ Nat.card {x | F x ≤ n} := by
+--   contrapose! hl
+--   refine tendsto_le_of_eventuallyLE hF (tendsto_const_div_atTop_nhds_zero_nat (N : ℝ)) ?_
+--   filter_upwards with n using div_le_div_of_nonneg_right (Nat.cast_le.mpr (hl n).le) n.cast_nonneg
 
-theorem mono_card_le :
-    Monotone (Nat.card {x | F x ≤ ·}) :=
-  fun _ _ h₁ ↦ Nat.card_mono (finite_card_le hF hl _) fun _ h₂ ↦ h₂.trans h₁
+-- theorem mono_card_le :
+--     Monotone (Nat.card {x | F x ≤ ·}) :=
+--   fun _ _ h₁ ↦ Nat.card_mono (finite_card_le hF hl _) fun _ h₂ ↦ h₂.trans h₁
 
-end card_le
+-- end card_le
 
 noncomputable section val
 
-variable (F) in
-/-- The sequence of values taken by `F` sorted by increasing order, see `card_val_eq_succ` and
-`monotone_val`. -/
-def val (k : ℕ) : ℕ := sInf {n : ℕ | k ≤ Nat.card {x | F x ≤ n}}
+variable (a) in
+-- /-- The sequence of values taken by `a` sorted by increasing order, see `card_val_eq_succ` and
+-- `monotone_val`. -/
+def r : ℕ ≃ ℕ := sorry -- (k : ℕ) : ℕ := sInf {n : ℕ | k ≤ ∑ i in range n, a i}
 
 include hl hF
 
-theorem val_eq_succ_iff {k n : ℕ} :
-    val F k = n + 1 ↔ Nat.card {x | F x ≤ n} < k ∧ k ≤ Nat.card {x | F x ≤ n + 1} := by
-  rw [val, Nat.sInf_upward_closed_eq_succ_iff, Set.mem_setOf_eq, Set.mem_setOf_eq, not_le, and_comm]
-  exact fun _ _ h₁ h₂ ↦ h₂.trans (mono_card_le hF hl h₁)
+theorem T1 : Monotone (a ∘ r) := sorry
 
-/-- For `0 < n`, there are as many `k : ℕ` such that `val k = n` than elements `x : α` such
-that `F x = n`.-/
-theorem card_val_eq_succ (n : ℕ) : Nat.card {k | val F k = n + 1} = Nat.card {x | F x = n + 1} := by
-  simp_rw [val_eq_succ_iff hF hl, ← Finset.mem_Ioc, Finset.setOf_mem, Nat.card_eq_card_toFinset,
-    Finset.toFinset_coe, Nat.card_Ioc, (Nat.eq_sub_of_add_eq (card_eq_succ_add_card_le hF hl n))]
 
-theorem val_not_bounded (n : ℕ) :
-    ∃ k, n ≤ val F k :=
-  ⟨Nat.card {x | F x ≤ n} + 1,
-    le_csInf (card_le_not_bounded hF hl _) fun _ h ↦  ((mono_card_le hF hl).reflect_lt h).le⟩
+-- theorem val_eq_succ_iff {k n : ℕ} :
+--     val F k = n + 1 ↔ Nat.card {x | F x ≤ n} < k ∧ k ≤ Nat.card {x | F x ≤ n + 1} := by
+--   rw [val, Nat.sInf_upward_closed_eq_succ_iff, Set.mem_setOf_eq, Set.mem_setOf_eq, not_le, and_comm]
+--   exact fun _ _ h₁ h₂ ↦ h₂.trans (mono_card_le hF hl h₁)
 
-theorem mono_val : Monotone (val F) :=
-  fun _ _ h ↦ le_csInf (card_le_not_bounded hF hl _)
-    fun _ h' ↦ csInf_le (OrderBot.bddBelow _) (h.trans h')
+-- /-- For `0 < n`, there are as many `k : ℕ` such that `val k = n` than elements `x : α` such
+-- that `F x = n`.-/
+-- theorem card_val_eq_succ (n : ℕ) : Nat.card {k | val F k = n + 1} = Nat.card {x | F x = n + 1} := by
+--   simp_rw [val_eq_succ_iff hF hl, ← Finset.mem_Ioc, Finset.setOf_mem, Nat.card_eq_card_toFinset,
+--     Finset.toFinset_coe, Nat.card_Ioc, (Nat.eq_sub_of_add_eq (card_eq_succ_add_card_le hF hl n))]
 
-theorem tendsto_atTop_val : Tendsto (val F) atTop atTop :=
-  Monotone.tendsto_atTop_atTop (mono_val hF hl) (val_not_bounded hF hl)
+-- theorem val_not_bounded (n : ℕ) :
+--     ∃ k, n ≤ val F k :=
+--   ⟨Nat.card {x | F x ≤ n} + 1,
+--     le_csInf (card_le_not_bounded hF hl _) fun _ h ↦  ((mono_card_le hF hl).reflect_lt h).le⟩
 
-theorem finite_val_eq (n : ℕ) :
-    {k | val F k = n}.Finite := by
-  rw [← compl_mem_cofinite, show {k | val F k = n} = val F ⁻¹' {n} by rfl, ← Set.preimage_compl]
-  exact (Nat.cofinite_eq_atTop ▸ tendsto_atTop_val hF hl) (by simp)
+theorem card_a_eq_card_M (n : ℕ) :
+  Nat.card {k | a k = n} = Nat.card {k | M a k = n} := sorry
 
+theorem mono_val : Monotone (M a) := by
+  sorry
+--  fun _ _ h ↦ le_csInf (card_le_not_bounded hF hl _)
+--    fun _ h' ↦ csInf_le (OrderBot.bddBelow _) (h.trans h')
+
+theorem tendsto_atTop_val : Tendsto (M a) atTop atTop := by
+  sorry
+--  Monotone.tendsto_atTop_atTop (mono_val hF hl) (val_not_bounded hF hl)
+
+-- theorem finite_val_eq (n : ℕ) :
+--     {k | val F k = n}.Finite := by
+--   rw [← compl_mem_cofinite, show {k | val F k = n} = val F ⁻¹' {n} by rfl, ← Set.preimage_compl]
+--   exact (Nat.cofinite_eq_atTop ▸ tendsto_atTop_val hF hl) (by simp)
+
+example (n : ℕ) {s : ℝ} (hs : s ≠ 0) :
+    (a n) / (n : ℝ) ^ s = ∑' (k : ↑((M a) ⁻¹' {n})), 1 / (M a k : ℝ) ^ s := by
+
+  sorry
 /-- A consequence of `card_val_eq_succ` that is useful later on. -/
 theorem card_eq_div_pow_eq_tsum_fiber (n : ℕ) {s : ℝ} (hs : s ≠ 0) :
     (Nat.card {x | F x = n}) / (n : ℝ) ^ s = ∑' (k : ↑(val F ⁻¹' {n})), 1 / (val F k : ℝ) ^ s := by
