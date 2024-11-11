@@ -87,6 +87,24 @@ lemma div_right_distrib_by_nonneg {a b c : EReal} (h : 0 ≤ c) :
     (a + b) / c = a / c + b / c := by
   apply right_distrib_mul_by_nonneg (inv_nonneg_of_nonneg h) (inv_lt_top c).ne
 
+lemma NNReal.rpow_right_mono {x : NNReal} (h : 1 ≤ x) : Monotone fun (y : ℝ) => x ^ y :=
+  Real.monotone_rpow_of_base_ge_one h
+
+lemma ENNReal.rpow_right_mono {x : ℝ≥0∞} (h : 1 ≤ x) : Monotone fun (y : ℝ) => x ^ y := by
+  induction x with
+  | top =>
+    intro y z y_z
+    rcases lt_trichotomy y 0 with y_neg | rfl | y_pos <;> simp [*]
+    · rcases eq_or_lt_of_le y_z with rfl | z_pos <;> simp [*]
+    · exact y_pos.trans_le y_z
+  | coe x =>
+    rw [← ENNReal.coe_one, coe_le_coe] at h
+    have : x ≠ 0 := (h.trans_lt' zero_lt_one).ne.symm
+    intro y z y_z
+    simp only
+    rw [← ENNReal.coe_rpow_of_ne_zero this, ← ENNReal.coe_rpow_of_ne_zero this, coe_le_coe]
+    exact NNReal.rpow_right_mono h y_z
+
 /-! ### ExpGrowth -/
 
 noncomputable def expGrowthInf (u : ℕ → ℝ≥0∞) : EReal := atTop.liminf fun n ↦ log (u n) / n
@@ -279,7 +297,7 @@ lemma expGrowthSup_le_of_bigO {u v : ℕ → ℝ≥0∞} {C : ℝ≥0∞} (hC : 
     · exact .inl zero_ne_bot
     · exact .inl zero_ne_top
 
-lemma expGrowthInf_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
+lemma le_expGrowthInf_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
     (h : ∀ᶠ n in atTop, c * u n ≤ v n) :
     expGrowthInf u ≤ expGrowthInf v := by
   apply (expGrowthInf_eventually_monotone h).trans' (le_expGrowthInf_mul.trans' _)
@@ -287,7 +305,7 @@ lemma expGrowthInf_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c �
   · exact expGrowthInf_top ▸ le_add_of_nonneg_left le_top
   · rw [expGrowthInf_const hc c_top.ne, zero_add]
 
-lemma expGrowthSup_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
+lemma le_expGrowthSup_of_bigO {u v : ℕ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ 0)
     (h : ∀ᶠ n in atTop, c * u n ≤ v n) :
     expGrowthSup u ≤ expGrowthSup v := by
   apply (expGrowthSup_eventually_monotone h).trans' (le_expGrowthSup_mul'.trans' _)
