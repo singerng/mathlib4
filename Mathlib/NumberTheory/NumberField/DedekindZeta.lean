@@ -21,25 +21,17 @@ open Filter Ideal NumberField.InfinitePlace NumberField.Units Topology NumberThe
 
 open scoped Real
 
-lemma LSeries_eq_tsum (f : ℕ → ℂ) {s : ℂ} (hs : s ≠ 0) :
-     LSeries f s = ∑' n, (f n) / (n : ℂ) ^ s := by
-   refine tsum_congr fun n ↦ ?_
-   cases n with
-   | zero => simp [hs]
-   | succ n => simp
+
 
 /-- Docstring. -/
 def dedekindZeta (s : ℂ) :=
   LSeries (fun n ↦ Nat.card {I : Ideal (𝓞 K) // absNorm I = n}) s
 
-#exit
-
-example (s : ℂ) :
+theorem dedekindZeta_eq_tsum {s : ℂ} (hs₀ : s ≠ 0)
+    (hs₁ : Summable (fun I : Ideal (𝓞 K) ↦  1 / (absNorm I : ℂ) ^ s)) :
     dedekindZeta K s = ∑' I : Ideal (𝓞 K), 1 / (absNorm I : ℂ) ^ s := by
-  rw [dedekindZeta, LSeries_eq_tsum]
-  have : Summable (fun I : Ideal (𝓞 K) ↦  1 / (absNorm I : ℂ) ^ s) := sorry
-  convert (HasSum.tsum_fiberwise this.hasSum (fun I : Ideal (𝓞 K) ↦ absNorm I)).tsum_eq with n
-
+  rw [dedekindZeta, LSeries_eq_tsum _ hs₀]
+  convert (HasSum.tsum_fiberwise hs₁.hasSum (fun I : Ideal (𝓞 K) ↦ absNorm I)).tsum_eq with n
   sorry
 
 /-- Docstring. -/
@@ -59,6 +51,7 @@ theorem residue_ne_zero : residue K ≠ 0 := (residue_pos K).ne'
 
 theorem dedekindZeta_residue :
     Tendsto (fun s  : ℝ ↦ (s - 1) * dedekindZeta K s) (𝓝[>] 1) (𝓝 (residue K)) := by
+  
   refine tendsto_mul_of_sum_div_tendsto (residue_pos K) ?_
   convert (ideal.tendsto_norm_le_div_atop K).comp tendsto_natCast_atTop_atTop with n
   simp_rw [Function.comp_apply, Nat.cast_le]
