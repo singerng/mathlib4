@@ -12,7 +12,95 @@ import Mathlib.NumberTheory.Harmonic.ZetaAsymp
 
 noncomputable section
 
-open Filter Topology Finset Asymptotics Metric MeasureTheory
+section abelpartialsummation
+
+open Finset intervalIntegral MeasureTheory
+
+variable (c : ℕ → ℂ) (f : ℝ → ℂ)
+
+abbrev S : ℝ → ℂ := fun t ↦ ∑ n ∈ range (⌊t + 1⌋₊), c n
+
+theorem S_succ (k : ℕ) :
+    S c (k + 1) = c (k + 1) + S c k := by
+  rw [S, S,  Nat.floor_add_one (by positivity), sum_range_succ_comm, Nat.floor_add_one
+    k.cast_nonneg, Nat.floor_natCast]
+
+theorem S_eq_zero_of_le (r : ℝ) (hr : r ≤ -1) : S c r = 0 := by
+  convert sum_range_zero c
+  refine Nat.floor_of_nonpos (by linarith)
+
+theorem S_sub_S (n : ℕ) :
+    S c n - S c (n - 1) = c n := by
+  cases n with
+  | zero => simp [S]
+  | succ n =>
+    rw [Nat.cast_add, Nat.cast_one, S_succ, add_sub_cancel_right, add_sub_cancel_right]
+
+theorem sum_mul_eq_add_sum_mul_sub (n : ℕ) :
+    ∑ k ∈ range (n + 1), (c k) * (f k) =
+      S c n * f n - ∑ k ∈ range n, S c k * (f (k + 1) - f k) := by
+  simp_rw [← S_sub_S, sub_mul, sum_sub_distrib]
+  conv_lhs =>
+    enter [1]
+    rw [sum_range_succ_comm]
+  conv_lhs =>
+    enter [2]
+    rw [sum_range_succ']
+  simp_rw [Nat.cast_add, Nat.cast_one, Nat.cast_zero, zero_sub, S_eq_zero_of_le c (-1 : ℝ) le_rfl,
+    zero_mul, add_zero, add_sub_cancel_right]
+  rw [add_sub_assoc, ← sum_sub_distrib]
+  simp_rw [← mul_sub]
+  sorry
+
+theorem toto (k : ℕ)
+    (h_diff : ∀ x ∈ Set.Icc (k : ℝ) (k + 1), DifferentiableAt ℝ f x)
+    (h_integ : IntervalIntegrable (deriv f) volume k (k + 1)) :
+    f (k + 1) - f k = ∫ t in (k : ℝ)..(k + 1), deriv f t := by
+  rw [integral_deriv_eq_sub ?_ h_integ]
+  rwa [Set.uIcc_of_le (by linarith)]
+
+example (n : ℕ) {f' : ℝ → ℂ}
+    (h_diff : ∀ x ∈ Set.Icc (0 : ℝ) (n + 1), DifferentiableAt ℝ f x)
+    (h_integ : IntervalIntegrable (deriv f) volume 0 (n + 1)) :
+    ∑ k ∈ range n, S c k * (f (k + 1) - f k) = ∫ t in (0 : ℝ)..n, S c t * deriv f t := by
+  induction n with
+  | zero => simp [S]
+  | succ n hn =>
+      rw [sum_range_succ, hn, toto, ← integral_const_mul]
+      · conv_lhs =>
+          enter [2, 1, x]
+          rw [show S c n = S c x by sorry]
+        rw [integral_add_adjacent_intervals, Nat.cast_add, Nat.cast_one]
+        · sorry
+        · sorry
+      · exact fun x hx ↦ h_diff x ⟨le_trans n.cast_nonneg hx.1, le_trans hx.2 (by simp)⟩
+      · refine h_integ.mono_set ?_
+        rw [Set.uIcc_of_le (by linarith), Set.uIcc_of_le (by positivity)]
+        exact Set.Icc_subset_Icc n.cast_nonneg (by simp)
+      · exact fun x hx ↦ h_diff x ⟨hx.1, hx.2.trans (by simp)⟩
+      · refine h_integ.mono_set ?_
+        rw [Set.uIcc_of_le (by linarith), Set.uIcc_of_le (by positivity)]
+        exact Set.Icc_subset_Icc_right (by simp)
+
+
+
+#exit
+  simp_rw [toto f _ h_deriv sorry sorry, ← integral_const_mul]
+  conv_lhs =>
+    enter [2, k, 1, x]
+    rw [show S c k = S c x by sorry]
+  have := sum_integral_adjacent_intervals (f := fun t ↦ S c t * f' t) (a := fun k ↦ k)
+    (μ := volume) (n := n)
+  sorry
+
+
+
+end abelpartialsummation
+
+#exit
+
+
+open Filter Topology Finset Asymptotics Metric MeasureTheory intervalIntegral
 
 variable (f : ℕ → ℂ) {l : ℝ}
 
@@ -42,6 +130,9 @@ theorem S_in_Ico {n : ℕ} {x : ℝ} (hx : x ∈ Set.Ico (n : ℝ) (n + 1)) :
   rw [S, S, Nat.floor_add_one (n.cast_nonneg.trans hx.1), Nat.floor_add_one n.cast_nonneg,
     Nat.floor_natCast, Nat.floor_eq_on_Ico n x hx]
 
+theorem S_ae (n : ℕ) :
+    ∀ᵐ x, x ∈ Set.uIoc (n : ℝ) (n + 1) → S f n = S f x := sorry
+
 -- theorem S_bdd_Ioc (a b : ℝ) :
 theorem step1 (n : ℕ) :
     f n = S f n - S f (n - 1) := by
@@ -67,7 +158,13 @@ theorem step2 (n : ℕ) (b : ℕ → ℂ) :
 
 theorem step3_1 (n : ℕ) (s : ℂ) (hn : 0 < n) (hs : s ≠ 0) :
     S f n / (n : ℂ) ^ s - S f n / (n + 1) ^ s =
-      s * ∫ t in Set.Ioc (n : ℝ) (n + 1), S f t / t ^ (s + 1) := by
+      s * ∫ t in (n : ℝ)..(n + 1), S f t / t ^ (s + 1) := by
+  have : ∫ t in (n : ℝ)..(n + 1), S f t / t ^ (s + 1) =
+      ∫ t in (n : ℝ)..(n + 1), S f n / t ^ (s + 1) := by
+    refine integral_congr_ae ?_
+
+    have := S_ae f n
+
   rw [setIntegral_congr_set Ico_ae_eq_Ioc.symm]
   rw [setIntegral_congr_fun measurableSet_Ico (by
     intro t ht
@@ -119,6 +216,7 @@ theorem step3_3 (s : ℂ) (hs : 0 < s.re) (n m : ℕ) (ha : 0 < n) :
         exact h₃
   · exact lt_of_lt_of_le ha (mem_Ico.mp hk).1
 
+-- MeasureTheory.intervalIntegral_tendsto_integral_Ioi
 theorem step3 (hf₀ : f 0 = 0) (n : ℕ) (s : ℂ) (hs : 0 < s.re) :
     ∑ k ∈ range (n + 1), (f k) / (k : ℂ) ^ s = S f n / (n : ℂ) ^ s +
       s * ∫ t in Set.Ioc (1 : ℝ) n, (S f t) / t ^ (s + 1) := by
