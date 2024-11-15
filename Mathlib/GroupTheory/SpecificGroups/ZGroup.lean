@@ -213,8 +213,9 @@ instance [hG : Group.IsNilpotent G] [IsZGroup G] [Finite G] : IsCyclic G := by
   obtain ⟨ϕ⟩ := ((isNilpotent_of_finite_tfae (G := G)).out 0 4).mp hG
   let _ : CommGroup G :=
     ⟨fun g h ↦ by rw [← ϕ.symm.injective.eq_iff, map_mul, mul_comm, ← map_mul]⟩
-  rw [isCyclic_iff_exists_ofOrder_eq_natCard, ← exponent_eq_card]
-  exact Monoid.exists_orderOf_eq_exponent Monoid.ExponentExists.of_finite
+  rcases nonempty_fintype (α := G) -- can be removed after merge
+  apply IsCyclic.of_exponent_eq_card
+  rw [exponent_eq_card, Nat.card_eq_fintype_card]
 
 example [IsZGroup G] [Finite G] : IsCyclic (Abelianization G) := inferInstance
 
