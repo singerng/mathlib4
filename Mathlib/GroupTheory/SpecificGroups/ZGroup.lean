@@ -188,8 +188,23 @@ instance [IsZGroup G] : IsSolvable G := by
   -- induction on G, requires Burnside
   sorry
 
+open Monoid in
+theorem _root_.IsCyclic.exponent_eq_card' {α : Type*} [Group α] [IsCyclic α] :
+    Monoid.exponent α = Nat.card α := by
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := α)
+  apply Nat.dvd_antisymm Group.exponent_dvd_nat_card
+  rw [← orderOf_generator_eq_natCard hg]
+  exact order_dvd_exponent _
+
 theorem exponent_eq_card [IsZGroup G] [Finite G] : Monoid.exponent G = Nat.card G := by
-  sorry
+  refine dvd_antisymm Group.exponent_dvd_nat_card ?_
+  rw [← Nat.factorization_prime_le_iff_dvd Nat.card_pos.ne' Monoid.exponent_ne_zero_of_finite]
+  intro p hp
+  have := Fact.mk hp
+  let P : Sylow p G := default
+  rw [← hp.pow_dvd_iff_le_factorization Monoid.exponent_ne_zero_of_finite,
+      ← P.card_eq_multiplicity, ← (isZGroup p hp P).exponent_eq_card']
+  exact Monoid.exponent_dvd_of_monoidHom P.1.subtype P.1.subtype_injective
 
 instance [hG : Group.IsNilpotent G] [IsZGroup G] [Finite G] : IsCyclic G := by
   let h (p : { x // x ∈ (Nat.card G).primeFactors }) (P : Sylow p G) : CommGroup P :=
@@ -201,8 +216,7 @@ instance [hG : Group.IsNilpotent G] [IsZGroup G] [Finite G] : IsCyclic G := by
   rw [isCyclic_iff_exists_ofOrder_eq_natCard, ← exponent_eq_card]
   exact Monoid.exists_orderOf_eq_exponent Monoid.ExponentExists.of_finite
 
--- this is now automatic!
-instance [IsZGroup G] [Finite G] : IsCyclic (Abelianization G) := inferInstance
+example [IsZGroup G] [Finite G] : IsCyclic (Abelianization G) := inferInstance
 
 -- If smallest prime divisor is cyclic, then G has normal p-complement (done)
 -- ZGroup implies solvable: Induct
