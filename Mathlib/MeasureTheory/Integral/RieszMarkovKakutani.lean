@@ -26,8 +26,8 @@ compact subsets of the space X, rather than the usual construction of open sets 
 
 noncomputable section
 
-open scoped Classical BoundedContinuousFunction NNReal ENNReal
-open Set Function TopologicalSpace CompactlySupported MeasureTheory
+open scoped Classical BoundedContinuousFunction ENNReal
+open Set Function TopologicalSpace CompactlySupported MeasureTheory NNReal
 
 variable {X : Type*} [TopologicalSpace X]
 variable (Λ : C_c(X, ℝ≥0) →ₗ[ℝ≥0] ℝ≥0)
@@ -320,76 +320,92 @@ lemma rieszContentRegular : (rieszContent Λ).ContentRegular := by
     refine ⟨Eq.symm (ENNReal.coe_toNNReal (ne_of_lt this)), ?_⟩
     apply NNReal.coe_le_coe.mp
     simp only [NNReal.coe_le_coe]
-    sorry
-    -- apply le_iff_forall_pos_le_add.mpr
-    -- intro ε hε
-    -- obtain ⟨f, hf⟩ := exists_lt_rieszContentAux_add_pos Λ K hε
-    -- apply le_of_lt (lt_of_le_of_lt _ hf.2.2.2)
-    -- have : 0 ≤ f.1 := by
-    --   intro x
-    --   simp only [ContinuousMap.toFun_eq_coe, ContinuousMap.zero_apply,
-    --     CompactlySupportedContinuousMap.coe_toContinuousMap]
-    --   exact hf.2.1 x
-    -- apply Real.le_of_forall_lt_one_lt_mul
-    -- · exact hΛ f this
-    -- · intro α hα
-    --   have : Λ f * α = Λ (α • f) := by
-    --     simp only [map_smul, smul_eq_mul]
-    --     exact mul_comm _ _
-    --   rw [this]
-    --   set K' := f ⁻¹' (Ici α⁻¹) with hK'
-    --   have hKK' : K.carrier ⊆ interior K' := by
-    --     rw [subset_interior_iff]
-    --     use f ⁻¹' (Ioi α⁻¹)
-    --     constructor
-    --     · apply IsOpen.preimage f.1.2
-    --       exact isOpen_Ioi
-    --     constructor
-    --     · intro x hx
-    --       rw [Set.mem_preimage, Set.mem_Ioi]
-    --       exact lt_of_lt_of_le (inv_lt_one hα) (hf.2.2.1 x hx)
-    --     · rw [hK']
-    --       intro x hx
-    --       simp only [mem_preimage, mem_Ioi] at hx
-    --       simp only [mem_preimage, mem_Ici]
-    --       exact le_of_lt hx
-    --   have hK'cp : IsCompact K' := by
-    --     apply IsCompact.of_isClosed_subset hf.1
-    --     · simp only [smul_eq_mul] at hK'
-    --       exact IsClosed.preimage f.1.2 isClosed_Ici
-    --     · rw [hK']
-    --       apply Set.Subset.trans _ subset_closure
-    --       intro x hx
-    --       simp only [mem_preimage, mem_Ici] at hx
-    --       simp only [mem_support]
-    --       apply ne_of_gt
-    --       exact (lt_of_lt_of_le (inv_pos_of_pos (lt_trans zero_lt_one hα)) hx)
-    --   set hb' := hb ⟨K', hK'cp⟩
-    --   simp only [Compacts.coe_mk, le_iInf_iff] at hb'
-    --   have hbK' : b ≤ rieszContentNonneg Λ hΛ ⟨K', hK'cp⟩ := hb' hKK'
-    --   rw [ENNReal.le_coe_iff] at hbK'
-    --   obtain ⟨p, hp⟩ := hbK'
-    --   rw [hp.1]
-    --   simp only [toNNReal_coe]
-    --   rw [← rieszContentAux_eq_rieszContentNonneg] at hp
-    --   apply le_trans (NNReal.GCongr.toReal_le_toReal hp.2)
-    --   simp only [coe_mk]
-    --   rw [rieszContentAux]
-    --   apply csInf_le (rieszContentAux_image_BddBelow Λ hΛ _)
-    --   simp only [mem_image, mem_setOf_eq]
-    --   use α • f
-    --   constructor
-    --   constructor
-    --   · simp only [CompactlySupportedContinuousMap.coe_smul]
-    --     apply IsCompact.of_isClosed_subset hf.1 (isClosed_tsupport _)
-    --       (closure_mono (Function.support_const_smul_subset _ _))
-    --   constructor
-    --   · intro x
-    --     simp only [CompactlySupportedContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
-    --     exact mul_nonneg (le_of_lt (lt_trans zero_lt_one hα)) (hf.2.1 x)
-    --   · intro x hx
-    --     simp only [CompactlySupportedContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
-    --     apply (inv_pos_le_iff_one_le_mul' (lt_trans zero_lt_one hα)).mp
-    --     rw [← Set.mem_Ici, ← Set.mem_preimage]
-    --     exact hx
-    --   · exact rfl
+    rw [← NNReal.coe_le_coe]
+    apply le_iff_forall_pos_le_add.mpr
+    intro ε hε
+    set εnn : ℝ≥0 := ⟨ε, le_of_lt hε⟩ with hεnn
+    have εnneq : ε.toNNReal = εnn := Real.toNNReal_of_nonneg (le_of_lt hε)
+    rw [← coe_mk ε (le_of_lt hε), ← NNReal.coe_add, coe_le_coe]
+    obtain ⟨f, hfleoneonK, hfle⟩ := exists_lt_rieszContentAux_add_pos Λ K (Real.toNNReal_pos.mpr hε)
+    rw [rieszContentAux, εnneq] at hfle
+    rw [← Real.toNNReal_pos] at hε
+    apply le_of_lt (lt_of_le_of_lt _ hfle)
+    have : 0 ≤ f.1 := by
+      intro x
+      simp only [ContinuousMap.toFun_eq_coe, ContinuousMap.zero_apply,
+        CompactlySupportedContinuousMap.coe_toContinuousMap]
+      exact zero_le (f x)
+    apply Real.le_of_forall_lt_one_lt_mul
+    · simp only [val_eq_coe, zero_le_coe]
+    · intro α hα
+      simp only
+      have : (Λ f).val * α = Λ (α.toNNReal • f) := by
+        simp only [val_eq_coe, map_smul, smul_eq_mul, NNReal.coe_mul, Real.coe_toNNReal']
+        rw [max_eq_left <| le_of_lt (lt_of_le_of_lt zero_le_one hα)]
+        exact mul_comm _ _
+      rw [this]
+      set K' := f ⁻¹' (Ici α⁻¹.toNNReal) with hK'
+      have hKK' : K.carrier ⊆ interior K' := by
+        rw [subset_interior_iff]
+        use f ⁻¹' (Ioi α⁻¹.toNNReal)
+        refine ⟨?_, ?_, ?_⟩
+        · apply IsOpen.preimage f.1.2
+          exact isOpen_Ioi
+        · intro x hx
+          rw [Set.mem_preimage, Set.mem_Ioi]
+          exact lt_of_lt_of_le (Real.toNNReal_lt_one.mpr (inv_lt_one_of_one_lt₀ hα))
+            (hfleoneonK x hx)
+        · rw [hK']
+          intro x hx
+          simp only [mem_preimage, mem_Ioi] at hx
+          simp only [mem_preimage, mem_Ici]
+          exact le_of_lt hx
+      have hK'cp : IsCompact K' := by
+        apply IsCompact.of_isClosed_subset f.2
+        · simp only [smul_eq_mul] at hK'
+          exact IsClosed.preimage f.1.2 isClosed_Ici
+        · rw [hK']
+          apply Set.Subset.trans _ subset_closure
+          intro x hx
+          simp only [mem_preimage, mem_Ici] at hx
+          simp only [mem_support]
+          apply ne_of_gt
+          rw [Real.toNNReal_inv] at hx
+          exact (lt_of_lt_of_le
+            (inv_pos_of_pos (lt_trans zero_lt_one (Real.one_lt_toNNReal.mpr hα))) hx)
+      set hb' := hb ⟨K', hK'cp⟩
+      simp only [Compacts.coe_mk, le_iInf_iff] at hb'
+      have hbK' : b ≤ rieszContent Λ ⟨K', hK'cp⟩ := hb' hKK'
+      rw [ENNReal.le_coe_iff] at hbK'
+      obtain ⟨p, hp⟩ := hbK'
+      rw [hp.1]
+      simp only [ENNReal.toNNReal_coe, val_eq_coe, map_smul, smul_eq_mul, NNReal.coe_mul,
+        Real.coe_toNNReal', ge_iff_le]
+      apply le_trans (NNReal.GCongr.toReal_le_toReal hp.2)
+      rw [rieszContent]
+      simp only
+      rw [rieszContentAux, ← Real.coe_toNNReal (α ⊔ 0) (le_max_right α 0), ← NNReal.coe_mul,
+        NNReal.coe_le_coe]
+      apply csInf_le
+      · simp only [OrderBot.bddBelow]
+      · rw [mem_image]
+        simp only [mem_setOf_eq]
+        use α.toNNReal • f
+        refine ⟨?_, ?_⟩
+        · intro x hx
+          simp only [CompactlySupportedContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
+          rw [← NNReal.coe_le_coe]
+          simp only [coe_one, NNReal.coe_mul, Real.coe_toNNReal']
+          rw [← (left_eq_sup.mpr <| le_of_lt (lt_of_le_of_lt zero_le_one hα)), mul_comm]
+          apply (inv_le_iff_one_le_mul₀ (lt_trans zero_lt_one hα)).mp
+          rw [← Set.mem_Ici]
+          have hxK' : x ∈ K' := by exact hx
+          rw [hK'] at hxK'
+          simp only [mem_preimage, mem_Ici] at hxK'
+          simp only [mem_Ici, ge_iff_le]
+          exact Real.toNNReal_le_iff_le_coe.mp hx
+        · simp only [map_smul, smul_eq_mul, mul_eq_mul_right_iff]
+          left
+          rw [Real.toNNReal_eq_toNNReal_iff (le_of_lt (lt_of_le_of_lt zero_le_one hα))
+            (le_max_right α 0), left_eq_sup]
+          exact le_of_lt (lt_of_le_of_lt zero_le_one hα)
