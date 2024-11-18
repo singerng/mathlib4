@@ -6,6 +6,11 @@ Authors: Jesse Reimann, Kalle Kytölä
 import Mathlib.MeasureTheory.Measure.Content
 import Mathlib.Topology.ContinuousMap.CompactlySupported
 import Mathlib.Topology.PartitionOfUnity
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+import Mathlib.MeasureTheory.Integral.Bochner
+import Mathlib.MeasureTheory.Integral.SetIntegral
+import Mathlib.MeasureTheory.Function.LocallyIntegrable
+
 
 /-!
 #  Riesz–Markov–Kakutani representation theorem
@@ -409,3 +414,59 @@ lemma rieszContentRegular : (rieszContent Λ).ContentRegular := by
           rw [Real.toNNReal_eq_toNNReal_iff (le_of_lt (lt_of_le_of_lt zero_le_one hα))
             (le_max_right α 0), left_eq_sup]
           exact le_of_lt (lt_of_le_of_lt zero_le_one hα)
+
+variable [MeasurableSpace X] [BorelSpace X]
+
+theorem MeasureTheory.integral_tsupport {M : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    {F : X → M} {ν : MeasureTheory.Measure X} :
+    ∫ (x : X), F x ∂ν = ∫ (x : X) in tsupport F, F x ∂ν := by
+  rw [← MeasureTheory.setIntegral_univ]
+  apply MeasureTheory.setIntegral_eq_of_subset_of_forall_diff_eq_zero MeasurableSet.univ
+    (subset_univ _)
+  intro x hx
+  apply image_eq_zero_of_nmem_tsupport
+  exact not_mem_of_mem_diff hx
+
+@[to_additive]
+theorem le_iff_forall_one_lt_le_mul' {α : Type*} [LinearOrder α] [DenselyOrdered α] [Monoid α]
+    [ExistsMulOfLE α] [MulLeftReflectLT α] {a b : α} [MulLeftStrictMono α] :
+    a ≤ b ↔ ∀ ε, 1 < ε → a ≤ b * ε :=
+  ⟨fun h _ hε ↦ lt_mul_of_le_of_one_lt h hε |>.le, le_of_forall_one_lt_le_mul⟩
+
+open NNReal
+
+example {a b : ℝ≥0} : a ≤ b ↔ ∀ (ε : ℝ≥0), 0 < ε → a ≤ b + ε :=
+  le_iff_forall_pos_le_add'
+
+/-- `rieszContent` is promoted to a measure. -/
+def μ := (MeasureTheory.Content.measure (rieszContent Λ))
+
+lemma leRieszMeasure_isCompact {f : C_c(X, ℝ≥0)} (hf : ∀ (x : X), f x ≤ 1) {K : Compacts X}
+    (h : tsupport f ⊆ K) : ENNReal.ofReal (Λ f) ≤ (μ Λ) K := by
+  rw [μ]
+  rw [MeasureTheory.Content.measure_eq_content_of_regular (rieszContent Λ)
+    (rieszContentRegular Λ)]
+  simp only
+  rw [rieszContent]
+  simp only [ENNReal.ofReal_coe_nnreal, ENNReal.coe_le_coe]
+  apply le_iff_forall_pos_le_add'.mpr
+  intro ε hε
+  obtain ⟨g, hg⟩ := exists_lt_rieszContentAux_add_pos Λ K hε
+  apply le_of_lt (lt_of_le_of_lt _ hg.2)
+  sorry
+  -- apply Λ_mono Λ
+  -- intro x
+  -- simp only [ContinuousMap.toFun_eq_coe, CompactlySupportedContinuousMap.coe_toContinuousMap]
+  -- by_cases hx : x ∈ tsupport f
+  -- · exact le_trans (hf x).2 (hg.2.2.1 x (Set.mem_of_subset_of_mem h hx))
+  -- · rw [image_eq_zero_of_nmem_tsupport hx]
+  --   exact hg.2.1 x
+
+lemma leRieszMeasure_isOpen {f : C_c(X, ℝ≥0)} (hf : ∀ (x : X), f x ≤ 1) {V : Opens X}
+    (h : tsupport f ⊆ V) :
+    ENNReal.ofReal (Λ f) ≤ (μ Λ) V := by
+  apply le_trans _ (MeasureTheory.measure_mono h)
+  rw [← TopologicalSpace.Compacts.coe_mk (tsupport f) f.2]
+  apply leRieszMeasure_isCompact Λ hf
+  simp only [Compacts.coe_mk]
+  exact subset_rfl
