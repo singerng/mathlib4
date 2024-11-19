@@ -491,14 +491,13 @@ lemma leRieszMeasure_isCompact {f : C_c(X, ℝ≥0)} (hf : ∀ (x : X), f x ≤ 
   intro ε hε
   obtain ⟨g, hg⟩ := exists_lt_rieszContentAux_add_pos Λ K hε
   apply le_of_lt (lt_of_le_of_lt _ hg.2)
-  sorry
-  -- apply Λ_mono Λ
-  -- intro x
-  -- simp only [ContinuousMap.toFun_eq_coe, CompactlySupportedContinuousMap.coe_toContinuousMap]
-  -- by_cases hx : x ∈ tsupport f
-  -- · exact le_trans (hf x).2 (hg.2.2.1 x (Set.mem_of_subset_of_mem h hx))
-  -- · rw [image_eq_zero_of_nmem_tsupport hx]
-  --   exact hg.2.1 x
+  apply Λ_mono Λ
+  intro x
+  simp only [ContinuousMap.toFun_eq_coe, CompactlySupportedContinuousMap.coe_toContinuousMap]
+  by_cases hx : x ∈ tsupport f
+  · exact le_trans (hf x) (hg.1 x (Set.mem_of_subset_of_mem h hx))
+  · rw [image_eq_zero_of_nmem_tsupport hx]
+    exact zero_le (g x)
 
 lemma leRieszMeasure_isOpen {f : C_c(X, ℝ≥0)} (hf : ∀ (x : X), f x ≤ 1) {V : Opens X}
     (h : tsupport f ⊆ V) :
