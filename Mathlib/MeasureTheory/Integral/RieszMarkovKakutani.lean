@@ -45,6 +45,44 @@ content, and will be shown to agree with the Riesz measure on the compact subset
 def rieszContentAux : Compacts X → ℝ≥0 := fun K =>
   sInf (Λ '' { f : C_c(X, ℝ≥0) | ∀ x ∈ K, (1 : ℝ≥0) ≤ f x })
 
+section Λ_mono
+
+variable [T2Space X] [LocallyCompactSpace X]
+
+
+-- I tried to generalize `Function.support_sub`. It turns out that `Sub` in general does not have
+-- `sub_self`. so I decided to prove directly this.
+lemma Λ_mono (f₁ f₂ : C_c(X, ℝ≥0)) (h : f₁.1 ≤ f₂.1) : Λ f₁ ≤ Λ f₂ := by
+  have ex_diff : ∃ (g : C_c(X, ℝ≥0)), f₁ + g = f₂ := by
+    set g_cf := f₂.1 - f₁.1 with hg_cf
+    have g_cp : HasCompactSupport g_cf := by
+      apply IsCompact.of_isClosed_subset
+        (IsCompact.union f₁.hasCompactSupport' f₂.hasCompactSupport') isClosed_closure
+      rw [tsupport, tsupport, ← closure_union]
+      apply closure_mono
+      intro x
+      simp only [mem_support, ne_eq, ContinuousMap.toFun_eq_coe,
+        CompactlySupportedContinuousMap.coe_toContinuousMap, mem_union]
+      rw [hg_cf]
+      simp only [ContinuousMap.sub_apply, CompactlySupportedContinuousMap.coe_toContinuousMap]
+      by_contra!
+      rw [this.2.1, this.2.2] at this
+      simp only [tsub_self, ne_eq, not_true_eq_false, and_self, and_true] at this
+    use ⟨g_cf, g_cp⟩
+    ext x
+    simp only [CompactlySupportedContinuousMap.coe_add, CompactlySupportedContinuousMap.coe_mk,
+      Pi.add_apply]
+    rw [NNReal.coe_inj, hg_cf]
+    simp only [ContinuousMap.sub_apply, CompactlySupportedContinuousMap.coe_toContinuousMap]
+    exact add_tsub_cancel_of_le (h x)
+  obtain ⟨g, hg⟩ := ex_diff
+  rw [← hg]
+  simp only [map_add, le_add_iff_nonneg_right, zero_le]
+
+
+
+end Λ_mono
+
 section RieszMonotone
 
 variable [T2Space X] [LocallyCompactSpace X]
