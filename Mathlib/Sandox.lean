@@ -3,7 +3,8 @@ Copyright (c) 2024 Xavier Roblot. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Xavier Roblot
 -/
-import Mathlib.NumberTheory.Harmonic.ZetaAsymp
+import Mathlib.MeasureTheory.Integral.FundThmCalculus
+import Mathlib.NumberTheory.LSeries.Basic
 
 /-!
 # Docstring
@@ -26,7 +27,7 @@ noncomputable section
 
 open Finset intervalIntegral MeasureTheory IntervalIntegrable
 
-theorem AbelSummation (c : ℕ → ℂ) (f : ℝ → ℂ) {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤ b)
+theorem AbelSummation (c : ℕ → ℂ) {f : ℝ → ℂ} {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤ b)
     (hf_diff : ∀ t ∈ Set.Icc a b, DifferentiableAt ℝ f t)
     (hf_int : IntervalIntegrable (deriv f) volume a b) :
     ∑ k ∈ Ioc ⌊a⌋₊ ⌊b⌋₊, f k * c k =
@@ -138,17 +139,41 @@ theorem AbelSummation₀ (c : ℕ → ℂ) (f : ℝ → ℂ) {b : ℝ} (hb : 0 �
     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
       f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in (0 : ℝ)..b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
   nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (Nat.zero_le _)]
-  rw [sum_cons, ← Nat.floor_zero (α := ℝ), AbelSummation c f le_rfl hb hf_diff hf_int,
+  rw [sum_cons, ← Nat.floor_zero (α := ℝ), AbelSummation c le_rfl hb hf_diff hf_int,
     Nat.floor_zero, Nat.cast_zero, Icc_self, sum_singleton]
   ring
 
-#exit
+theorem AbelSummation₁ (c : ℕ → ℂ) (hc : c 0 = 0) {f : ℝ → ℂ} {b : ℝ} (hb : 0 ≤ b)
+    (hf_diff : ∀ t ∈ Set.Icc 1 b, DifferentiableAt ℝ f t)
+    (hf_int : IntervalIntegrable (deriv f) volume 1 b) :
+    ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
+      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in (1: ℝ)..b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+  obtain hb' | hb' := le_or_gt 1 b
+  · have : 1 ≤ ⌊b⌋₊ := (Nat.one_le_floor_iff _).mpr hb'
+    nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (by linarith), sum_cons, ← Nat.Icc_succ_left,
+      Finset.Icc_eq_cons_Ioc (by linarith), sum_cons]
+    rw [Nat.succ_eq_add_one, zero_add, ← Nat.floor_one (α := ℝ), AbelSummation c zero_le_one hb'
+      hf_diff hf_int, Nat.floor_one, Nat.cast_one, Finset.Icc_eq_cons_Ioc zero_le_one, sum_cons,
+      show 1 = 0 + 1 by rfl, Nat.Ioc_succ_singleton, zero_add, sum_singleton, hc, mul_zero,
+      zero_add]
+    ring
+  · rw [Nat.floor_eq_zero.mpr hb', Icc_self, sum_singleton, sum_singleton]
+    
+    sorry
 
-theorem integral_repr (s : ℂ) (hs : LSeriesSummable f s):
-    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (S f t) / t ^ (s + 1)) := by
+open Filter Topology
+
+theorem integral_repr (f : ℕ → ℂ) (s : ℂ) (hs : LSeriesSummable f s):
+    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) := by
+  have := fun N : ℕ ↦ AbelSummation₁ (fun k ↦ if k = 0 then 0 else f k)
+    (f := fun x ↦ x ^ (- s)) (b := N + 1) ?_ ?_ ?_ ?_
+
   have : Tendsto (fun n ↦ ∑ k in range n, LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
     hs.hasSum.tendsto_sum_nat
+
   sorry
+
+#exit
 
 theorem assume1 {ε : ℝ} (hε : 0 < ε) :
     ∃ t : ℝ, ‖S f t - l * t‖ ≤ ε := sorry
