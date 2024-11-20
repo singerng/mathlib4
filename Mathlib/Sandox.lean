@@ -32,8 +32,9 @@ theorem AbelSummation (c : ℕ → ℂ) {f : ℝ → ℂ} {a b : ℝ} (ha : 0 �
     (hf_int : IntervalIntegrable (deriv f) volume a b) :
     ∑ k ∈ Ioc ⌊a⌋₊ ⌊b⌋₊, f k * c k =
       f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - f a * (∑ k ∈ Icc 0 ⌊a⌋₊, c k) -
-        ∫ t in a..b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
-   -- We prove some inequalities to be used later on by linarith / positivity
+        ∫ t in Set.Ioc a b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+  rw [← integral_of_le hab]
+  -- We prove some inequalities to be used later on by linarith / positivity
   have : ⌊a⌋₊ ≤ a := Nat.floor_le ha
   have : a < ⌊a⌋₊ + 1 := Nat.lt_floor_add_one _
   have : b < ⌊b⌋₊ + 1 := Nat.lt_floor_add_one _
@@ -63,7 +64,7 @@ theorem AbelSummation (c : ℕ → ℂ) {f : ℝ → ℂ} {a b : ℝ} (ha : 0 �
   have : ⌊b⌋₊ ≤ b := Nat.floor_le (by positivity)
   have : ⌊a⌋₊ + 1 ≤ b := by rwa [← Nat.cast_add_one,  ← Nat.le_floor_iff (by positivity)]
   have : a < ⌊b⌋₊ := by rwa [← Nat.floor_lt ha]
-  -- And some additional properties
+  -- And then some additional properties
   have h_Icck : ∀ ⦃k⦄, k ∈ Set.Ico (⌊a⌋₊ + 1) ⌊b⌋₊ → Set.Icc (k : ℝ) (k + 1) ⊆ Set.Icc a b := by
     refine fun k hk ↦ Set.Icc_subset_Icc ?_ ?_
     · have := (Nat.succ_eq_add_one _) ▸ (Set.mem_Ico.mp hk).1
@@ -128,49 +129,56 @@ theorem AbelSummation (c : ℕ → ℂ) {f : ℝ → ℂ} {a b : ℝ} (ha : 0 �
   · refine h_int.mono_set ?_
     rw [Set.uIcc_of_le (by linarith), Set.uIcc_of_le (by linarith)]
     exact Set.Icc_subset_Icc_right (by linarith)
-  · intro k hk
-    refine h_int.mono_set ?_
+  · refine fun k hk ↦ h_int.mono_set ?_
     rw [Set.uIcc_of_le (by simp), Set.uIcc_of_le (by linarith), Nat.cast_add_one]
     exact h_Icck hk
 
-theorem AbelSummation₀ (c : ℕ → ℂ) (f : ℝ → ℂ) {b : ℝ} (hb : 0 ≤ b)
+theorem AbelSummation₀ (c : ℕ → ℂ) {f : ℝ → ℂ} {b : ℝ} (hb : 0 ≤ b)
     (hf_diff : ∀ t ∈ Set.Icc 0 b, DifferentiableAt ℝ f t)
     (hf_int : IntervalIntegrable (deriv f) volume 0 b) :
     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
-      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in (0 : ℝ)..b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 0 b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
   nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (Nat.zero_le _)]
   rw [sum_cons, ← Nat.floor_zero (α := ℝ), AbelSummation c le_rfl hb hf_diff hf_int,
     Nat.floor_zero, Nat.cast_zero, Icc_self, sum_singleton]
   ring
 
-theorem AbelSummation₁ (c : ℕ → ℂ) (hc : c 0 = 0) {f : ℝ → ℂ} {b : ℝ} (hb : 0 ≤ b)
+theorem AbelSummation₁ (c : ℕ → ℂ) (hc : c 0 = 0) {f : ℝ → ℂ} {b : ℝ}
     (hf_diff : ∀ t ∈ Set.Icc 1 b, DifferentiableAt ℝ f t)
     (hf_int : IntervalIntegrable (deriv f) volume 1 b) :
     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
-      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in (1: ℝ)..b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
-  obtain hb' | hb' := le_or_gt 1 b
-  · have : 1 ≤ ⌊b⌋₊ := (Nat.one_le_floor_iff _).mpr hb'
+      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 1 b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+  obtain hb | hb := le_or_gt 1 b
+  · have : 1 ≤ ⌊b⌋₊ := (Nat.one_le_floor_iff _).mpr hb
     nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (by linarith), sum_cons, ← Nat.Icc_succ_left,
       Finset.Icc_eq_cons_Ioc (by linarith), sum_cons]
-    rw [Nat.succ_eq_add_one, zero_add, ← Nat.floor_one (α := ℝ), AbelSummation c zero_le_one hb'
+    rw [Nat.succ_eq_add_one, zero_add, ← Nat.floor_one (α := ℝ), AbelSummation c zero_le_one hb
       hf_diff hf_int, Nat.floor_one, Nat.cast_one, Finset.Icc_eq_cons_Ioc zero_le_one, sum_cons,
       show 1 = 0 + 1 by rfl, Nat.Ioc_succ_singleton, zero_add, sum_singleton, hc, mul_zero,
       zero_add]
     ring
-  · rw [Nat.floor_eq_zero.mpr hb', Icc_self, sum_singleton, sum_singleton]
-    
-    sorry
+  · simp_rw [Nat.floor_eq_zero.mpr hb, Icc_self, sum_singleton, Nat.cast_zero, hc, mul_zero,
+    Set.Ioc_eq_empty_of_le hb.le, Measure.restrict_empty, integral_zero_measure, sub_self]
 
 open Filter Topology
 
 theorem integral_repr (f : ℕ → ℂ) (s : ℂ) (hs : LSeriesSummable f s):
     LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) := by
-  have := fun N : ℕ ↦ AbelSummation₁ (fun k ↦ if k = 0 then 0 else f k)
-    (f := fun x ↦ x ^ (- s)) (b := N + 1) ?_ ?_ ?_ ?_
-
-  have : Tendsto (fun n ↦ ∑ k in range n, LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
+  have t₁ := fun n: ℕ ↦ AbelSummation₁ (fun k ↦ if k = 0 then 0 else f k)
+    (f := fun x ↦ x ^ (- s)) (b := n) (by simp) sorry sorry
+  have t₂ : (fun n ↦ ∑ k ∈ range n, LSeries.term f s k) =ᶠ[atTop]
+     fun n ↦ (∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, (k : ℝ) ^ (-s) * if k = 0 then 0 else f k) := sorry
+  have t₃ : Tendsto (fun n ↦ ∑ k in range n, LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
     hs.hasSum.tendsto_sum_nat
-
+  have t₄ := t₃.congr' t₂
+  simp_rw [t₁] at t₄
+  have t₅ : Tendsto (fun n : ℕ ↦ s * ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ),
+    (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) atTop
+    (𝓝 (s * ∫ (t : ℝ) in Set.Ioi 1, (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1))) := sorry
+  refine tendsto_nhds_unique_of_eventuallyEq t₄ t₅ ?_
+  filter_upwards [eventually_ne_atTop 0] with k hk
+  simp_rw [if_neg sorry]
+  
   sorry
 
 #exit
