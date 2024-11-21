@@ -61,8 +61,14 @@ class TheoremEntry(NamedTuple):
     formalisations: List[Tuple[ProofAssistant, FormalisationEntry]]
 
 
-def _write_entry():
+def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
+    # TODO: this is a complete placeholder!
+    return TheoremEntry("TODO", None, "TODO", "TODO", [])
+
+
+def _write_entry(entry: TheoremEntry) -> str:
     return "TODO!"
+
 
 def main():
     dir = "../1000-plus.github.io/_thm"
@@ -71,7 +77,14 @@ def main():
         for entry in entries:
             if entry.is_file():
                 files.append(entry.name)
-    entries
-    pass
+    # Parse each entry file into a theorem entry.
+    entries: List[TheoremEntry] = []
+    for file in files:
+        with open(os.path.join(dir, file), "r") as f:
+            entries.append(_parse_theorem_entry(f.read()))
+    # Write out a new yaml file for this, again.
+    with open("1000-new.yaml", "w") as f:
+        f.write('\n'.join([_write_entry(e) for e in entries]))
+
 
 main()
