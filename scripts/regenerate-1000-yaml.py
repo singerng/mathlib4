@@ -57,13 +57,52 @@ class TheoremEntry(NamedTuple):
     msc_classification: str
     # The exact link to a wikipedia page (or several??)
     wikipedia_links: str
-    # Zero or more entries for any formalisation, in any of the proof assistants supported.
-    formalisations: List[Tuple[ProofAssistant, FormalisationEntry]]
+    # Entries about formalizations in any of the supported proof assistants.
+    # Several formalization entries for assistant are allowed.
+    formalisations: dict[ProofAssistant, List[FormalisationEntry]]
+
+
+def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
+    form = {
+        "formalized": FormalizationStatus.FullProof,
+        "statement": FormalizationStatus.Statement,
+    }
+    status = form[entry["status"]]
+    lib = {
+      "S": Library.StandardLibrary,
+      "L": Library.MainLibrary,
+      "X": Library.External,
+    }
+    library = lib[entry["library"]]
+    return FormalisationEntry(
+        status, library, entry["url"], entry.get("authors"), entry.get("date"), entry.get("comment")
+    )
 
 
 def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
-    # TODO: this is a complete placeholder!
-    return TheoremEntry("TODO", None, "TODO", "TODO", [])
+    assert contents[0].rstrip() == "---"
+    assert contents[-1].rstrip() == "---"
+    data = yaml.safe_load("".join(contents[1:-1]))
+    provers: dict[str, ProofAssistant] = {
+      'isabelle': ProofAssistant.Isabelle,
+      'hol_light': ProofAssistant.HolLight,
+      'coq': ProofAssistant.Coq,
+      'lean': ProofAssistant.Lean,
+      'metamath': ProofAssistant.Metamath,
+      'mizar': ProofAssistant.Mizar,
+    }
+    formalisations = dict()
+    for (pname, variant) in provers.items():
+        if pname in data:
+            entries = [_parse_formalization_entry(entry) for entry in data[pname]]
+            formalisations[variant] = entries
+        else:
+            formalisations[variant] = []
+    res = TheoremEntry(
+        data["wikidata"], data.get("id_suffix"), data["msc_classification"],
+        data["wikipedia_links"], formalisations
+    )
+    return res
 
 
 def _write_entry(entry: TheoremEntry) -> str:
@@ -71,17 +110,19 @@ def _write_entry(entry: TheoremEntry) -> str:
 
 
 def main():
+    # FIXME: this script assumes that the _thm data files are present locally in this directory.
+    # A proper fix would be to ensure (in a workflow step) the repository is checked out
+    # in the right place, and perhaps pass that location into this script.
     dir = "../1000-plus.github.io/_thm"
-    files = []
+    # Determine the list of theorme entry files.
+    theorem_entry_files = []
     with os.scandir(dir) as entries:
-        for entry in entries:
-            if entry.is_file():
-                files.append(entry.name)
+        theorem_entry_files = [entry.name for entry in entries if entry.is_file()]
     # Parse each entry file into a theorem entry.
     entries: List[TheoremEntry] = []
-    for file in files:
+    for file in theorem_entry_files:
         with open(os.path.join(dir, file), "r") as f:
-            entries.append(_parse_theorem_entry(f.read()))
+            entries.append(_parse_theorem_entry(f.readlines()))
     # Write out a new yaml file for this, again.
     with open("1000-new.yaml", "w") as f:
         f.write('\n'.join([_write_entry(e) for e in entries]))
