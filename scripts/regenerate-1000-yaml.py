@@ -130,7 +130,8 @@ def _write_entry(entry: TheoremEntry) -> str:
             inner['author'] = ' and '.join(form.authors)
         # if form.date:
         #     inner['date'] = form.date
-    res = { entry.wikidata: inner }
+    key = entry.wikidata + (entry.id_suffix or '')
+    res = { key: inner }
     return yaml.dump(res, sort_keys=False)
 
 
