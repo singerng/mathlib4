@@ -652,5 +652,77 @@ instance instStarRing : StarRing ℍ[R,c₁,c₂,c₃] where
   star_mul a b := by ext <;> simp <;> ring
 
 
+theorem self_add_star' : a + star a = ↑(2 * a.re + c₂ * a.imI) := by ext <;> simp [two_mul]; ring
+
+theorem self_add_star : a + star a = 2 * a.re + c₂ * a.imI := by
+  simp [self_add_star', two_mul]
+
+theorem star_add_self' : star a + a = ↑(2 * a.re + c₂ * a.imI) := by rw [add_comm, self_add_star']
+
+theorem star_add_self : star a + a = 2 * a.re + c₂ * a.imI := by rw [add_comm, self_add_star]
+
+theorem star_eq_two_re_sub : star a = ↑(2 * a.re + c₂ * a.imI) - a :=
+  eq_sub_iff_add_eq.2 a.star_add_self'
+
+instance : IsStarNormal a :=
+  ⟨by
+    delta Commute; delta SemiconjBy
+    rw [a.star_eq_two_re_sub]
+    ext <;> simp <;> ring⟩
+
+
+@[simp, norm_cast]
+theorem star_coe : star (x : ℍ[R,c₁,c₂,c₃]) = x := by ext <;> simp
+
+@[simp] theorem star_im : star a.im = -a.im + c₂ * a.imI := by
+  rw [← im_star a]
+  ext <;> simp
+
+@[simp]
+theorem star_smul [CommRing S] [Algebra S R] (s : S) (a : ℍ[R,c₁,c₂,c₃]) :
+    star (s • a) = s • star a :=
+  QuaternionAlgebra.ext (by aesop) (smul_neg _ _).symm (smul_neg _ _).symm (smul_neg _ _).symm
+
+theorem eq_re_of_eq_coe {a : ℍ[R,c₁,c₂,c₃]} {x : R} (h : a = x) : a = a.re := by rw [h, coe_re]
+
+theorem eq_re_iff_mem_range_coe {a : ℍ[R,c₁,c₂,c₃]} :
+    a = a.re ↔ a ∈ Set.range (coe : R → ℍ[R,c₁,c₂,c₃]) :=
+  ⟨fun h => ⟨a.re, h.symm⟩, fun ⟨_, h⟩ => eq_re_of_eq_coe h.symm⟩
+
+
+section CharZero
+
+variable [NoZeroDivisors R] [CharZero R]
+
+@[simp]
+theorem star_eq_self {c₁ c₂ c₃: R} {a : ℍ[R,c₁,c₂,c₃]} : star a = a ↔ a = a.re := by
+  simp [QuaternionAlgebra.ext_iff, neg_eq_iff_add_eq_zero, add_self_eq_zero]
+  tauto
+
+-- theorem star_eq_neg {c₁ c₂ c₃: R} {a : ℍ[R,c₁,c₂,c₃]} : star a = -a ↔ a.re = 0 := by
+--   simp [QuaternionAlgebra.ext_iff, eq_neg_iff_add_eq_zero]
+
+end CharZero
+
+-- Can't use `rw ← star_eq_self` in the proof without additional assumptions
+theorem star_mul_eq_coe : star a * a = (star a * a).re := by ext <;> simp <;> ring
+
+theorem mul_star_eq_coe : a * star a = (a * star a).re := by
+  rw [← star_comm_self']
+  exact a.star_mul_eq_coe
+
+open MulOpposite
+
+/-- Quaternion conjugate as an `AlgEquiv` to the opposite ring. -/
+def starAe : ℍ[R,c₁,c₂,c₃] ≃ₐ[R] ℍ[R,c₁,c₂,c₃]ᵐᵒᵖ :=
+  { starAddEquiv.trans opAddEquiv with
+    toFun := op ∘ star
+    invFun := star ∘ unop
+    map_mul' := fun x y => by simp
+    commutes' := fun r => by simp }
+
+@[simp]
+theorem coe_starAe : ⇑(starAe : ℍ[R,c₁,c₂,c₃] ≃ₐ[R] _) = op ∘ star :=
+  rfl
 
 end QuaternionAlgebra
