@@ -36,6 +36,8 @@ class FormalisationEntry(NamedTuple):
     # A URL pointing to the formalization
     # (or a list collecting a list of theorems for a particular proof assistant).
     url: str
+    # XXX: this is missing from the README -> clarify if this should replace the URL field for 'std/main library' formalisations!
+    identifiers: str | None
     authors: str | None
     # Format YYYY-MM-DD
     date: str | None
@@ -75,7 +77,7 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     }
     library = lib[entry["library"]]
     return FormalisationEntry(
-        status, library, entry["url"], entry.get("authors"), entry.get("date"), entry.get("comment")
+        status, library, entry["url"], entry.get("identifiers"), entry.get("authors"), entry.get("date"), entry.get("comment")
     )
 
 
