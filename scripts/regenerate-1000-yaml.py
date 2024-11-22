@@ -81,9 +81,13 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     )
 
 
-def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
+# Return a human-ready theorem title, as well as a `TheoremEntry` with the underlying data.
+# FUTURE: parse the wikipedia link instead, and split it (that's what the webpage does)
+def _parse_theorem_entry(contents: List[str]) -> Tuple[str, TheoremEntry]:
     assert contents[0].rstrip() == "---"
     assert contents[-1].rstrip() == "---"
+    assert contents[1].startswith("# ") or contents[1].startswith("## ")
+    title = contents[1].rstrip().removeprefix("## ").removeprefix("# ")
     data = yaml.safe_load("".join(contents[1:-1]))
     provers: dict[str, ProofAssistant] = {
       'isabelle': ProofAssistant.Isabelle,
@@ -105,12 +109,12 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
         data["wikidata"], data.get("id_suffix"), data["msc_classification"],
         data["wikipedia_links"], formalisations
     )
-    return res
+    return (title, res)
 
 
-def _write_entry(entry: TheoremEntry) -> str:
+def _write_entry(title: str, entry: TheoremEntry) -> str:
     inner = {
-        'title': 'TODO extract and populate',
+        'title': title
     }
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
@@ -145,13 +149,13 @@ def main():
     with os.scandir(dir) as entries:
         theorem_entry_files = [entry.name for entry in entries if entry.is_file()]
     # Parse each entry file into a theorem entry.
-    entries: List[TheoremEntry] = []
+    entries: List[Tuple[str, TheoremEntry]] = []
     for file in theorem_entry_files:
         with open(os.path.join(dir, file), "r") as f:
             entries.append(_parse_theorem_entry(f.readlines()))
     # Write out a new yaml file for this, again.
     with open(os.path.join("docs", "1000.yaml"), "w") as f:
-        f.write('\n'.join([_write_entry(e) for e in entries]))
+        f.write('\n'.join([_write_entry(title, entry) for (title, entry) in entries]))
 
 
 main()
