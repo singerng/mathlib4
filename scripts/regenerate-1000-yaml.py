@@ -100,6 +100,7 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
             formalisations[variant] = entries
         else:
             formalisations[variant] = []
+
     res = TheoremEntry(
         data["wikidata"], data.get("id_suffix"), data["msc_classification"],
         data["wikipedia_links"], formalisations
@@ -108,7 +109,25 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
 
 
 def _write_entry(entry: TheoremEntry) -> str:
-    return "TODO!"
+    inner = {
+        'title': 'TODO extract and populate',
+    }
+    form = entry.formalisations[ProofAssistant.Lean]
+    if form:
+        form = form[0]  # TODO: support multiple formalisations!
+        if form.library == Library.MainLibrary:
+            if len(form.identifiers) == 1:
+                inner['decl'] = form.identifiers[0]
+            else:
+                inner['decls'] = form.identifiers
+        elif form.library == Library.External:
+            inner['url'] = form.url
+        if form.authors:
+            inner['author'] = ' and '.join(form.authors)
+        # if form.date:
+        #     inner['date'] = form.date
+    res = { entry.wikidata: inner }
+    return yaml.dump(res, sort_keys=False)
 
 
 def main():
@@ -126,7 +145,7 @@ def main():
         with open(os.path.join(dir, file), "r") as f:
             entries.append(_parse_theorem_entry(f.readlines()))
     # Write out a new yaml file for this, again.
-    with open("1000-new.yaml", "w") as f:
+    with open(os.path.join("docs", "1000.yaml"), "w") as f:
         f.write('\n'.join([_write_entry(e) for e in entries]))
 
 
