@@ -57,7 +57,7 @@ class TheoremEntry(NamedTuple):
     id_suffix: str | None
     # Our best guess of the MSC-classification. (Should be a two-digit string; not validated.)
     msc_classification: str
-    # The exact link to a wikipedia page (or several??)
+    # The exact link to a wikipedia page: format [[Page name]] or [[Wiki-link|Displayed name]].
     wikipedia_links: str
     # Entries about formalizations in any of the supported proof assistants.
     # Several formalization entries for assistant are allowed.
@@ -82,12 +82,13 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
 
 
 # Return a human-ready theorem title, as well as a `TheoremEntry` with the underlying data.
-# FUTURE: parse the wikipedia link instead, and split it (that's what the webpage does)
-def _parse_theorem_entry(contents: List[str]) -> Tuple[str, TheoremEntry]:
+def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
     assert contents[0].rstrip() == "---"
     assert contents[-1].rstrip() == "---"
+    # For optics, we check that all entry files start with the theorem name as comment.
+    # We parse the actual title from the wikipedia data below: this yields virtually the same results.
     assert contents[1].startswith("# ") or contents[1].startswith("## ")
-    title = contents[1].rstrip().removeprefix("## ").removeprefix("# ")
+    # title = contents[1].rstrip().removeprefix("## ").removeprefix("# ")
     data = yaml.safe_load("".join(contents[1:-1]))
     provers: dict[str, ProofAssistant] = {
       'isabelle': ProofAssistant.Isabelle,
@@ -109,12 +110,25 @@ def _parse_theorem_entry(contents: List[str]) -> Tuple[str, TheoremEntry]:
         data["wikidata"], data.get("id_suffix"), data["msc_classification"],
         data["wikipedia_links"], formalisations
     )
-    return (title, res)
+    return res
+
+def _parse_title(entry: TheoremEntry) -> str:
+    # FIXME: what's the best way to deal with multiple links here?
+    # For now, let's match the webpage and just show the first link's target.
+    # if len(entry.wikipedia_links) > 1:
+    #     print(f"attention: found several wikipedia links for a theorem: {entry.wikipedia_links}")
+    # Handle wikipedia links [[Big theorem]]s also.
+    (title, _, suf) = entry.wikipedia_links[0].removeprefix("[[").partition("]]")
+    if suf == "s":
+        title += "s"
+    if "|" in title:
+        title = title.partition("|")[2]
+    return title
 
 
-def _write_entry(title: str, entry: TheoremEntry) -> str:
+def _write_entry(entry: TheoremEntry) -> str:
     inner = {
-        'title': title
+        'title': _parse_title(entry)
     }
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
@@ -155,7 +169,7 @@ def main():
             entries.append(_parse_theorem_entry(f.readlines()))
     # Write out a new yaml file for this, again.
     with open(os.path.join("docs", "1000.yaml"), "w") as f:
-        f.write('\n'.join([_write_entry(title, entry) for (title, entry) in entries]))
+        f.write('\n'.join([_write_entry(entry) for entry in entries]))
 
 
 main()
