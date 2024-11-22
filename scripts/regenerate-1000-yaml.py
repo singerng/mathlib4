@@ -114,7 +114,9 @@ def _write_entry(entry: TheoremEntry) -> str:
     }
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
-        form = form[0]  # TODO: support multiple formalisations!
+        # TODO: currently, we only write out data for the first formalisation.
+        # Decide how to present several of them, and implement this!
+        form = form[0]
         if form.library == Library.MainLibrary:
             if len(form.identifiers) == 1:
                 inner['decl'] = form.identifiers[0]
@@ -122,6 +124,8 @@ def _write_entry(entry: TheoremEntry) -> str:
                 inner['decls'] = form.identifiers
         elif form.library == Library.External:
             inner['url'] = form.url
+            # One *could* also write out the identifier(s) of the relevant theorems:
+            # since this cannot easily be checked, we don't do so.
         if form.authors:
             inner['author'] = ' and '.join(form.authors)
         # if form.date:
