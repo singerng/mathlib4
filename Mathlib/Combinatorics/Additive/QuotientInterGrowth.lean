@@ -42,7 +42,6 @@ lemma card_pow_quotient_mul_pow_inter_subgroup_le :
         exists_exists_and_eq_and, Set.mem_setOf_eq, and_imp, forall_exists_index, Prod.forall,
         Prod.mk.injEq]
       rintro _ a₁ b₁ hb₁ rfl - ha₁ _ a₂ b₂ hb₂ rfl - ha₂ hab
-      have := hπφ <| Set.mem_image_of_mem _ hb₁
       have hπa₁ : π a₁ = 1 := (QuotientGroup.eq_one_iff _).2 ha₁
       have hπa₂ : π a₂ = 1 := (QuotientGroup.eq_one_iff _).2 ha₂
       have hπb : π b₁ = π b₂ := by
