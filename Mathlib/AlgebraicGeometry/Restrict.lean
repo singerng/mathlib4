@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Andrew Yang
 -/
 import Mathlib.AlgebraicGeometry.Cover.Open
+import Mathlib.AlgebraicGeometry.Over
 
 /-!
 # Restriction of Schemes and Morphisms
@@ -17,7 +18,7 @@ import Mathlib.AlgebraicGeometry.Cover.Open
 
 -/
 
--- Explicit universe annotations were used in this file to improve performance #12737
+-- Explicit universe annotations were used in this file to improve performance https://github.com/leanprover-community/mathlib4/issues/12737
 
 
 noncomputable section
@@ -50,6 +51,11 @@ instance : CoeOut X.Opens Scheme := ⟨toScheme⟩
 def ι : ↑U ⟶ X := X.ofRestrict _
 
 instance : IsOpenImmersion U.ι := inferInstanceAs (IsOpenImmersion (X.ofRestrict _))
+
+@[simps! over] instance : U.toScheme.CanonicallyOver X where
+  hom := U.ι
+
+instance (U : X.Opens) : U.ι.IsOver X where
 
 lemma toScheme_carrier : (U : Type u) = (U : Set X) := rfl
 
@@ -197,6 +203,8 @@ def Scheme.homOfLE (X : Scheme.{u}) {U V : X.Opens} (e : U ≤ V) : (U : Scheme.
 lemma Scheme.homOfLE_ι (X : Scheme.{u}) {U V : X.Opens} (e : U ≤ V) :
     X.homOfLE e ≫ V.ι = U.ι :=
   IsOpenImmersion.lift_fac _ _ _
+
+instance {U V : X.Opens} (h : U ≤ V) : (X.homOfLE h).IsOver X where
 
 @[simp]
 lemma Scheme.homOfLE_rfl (X : Scheme.{u}) (U : X.Opens) : X.homOfLE (refl U) = 𝟙 _ := by
@@ -440,6 +448,21 @@ theorem isPullback_morphismRestrict {X Y : Scheme.{u}} (f : X ⟶ Y) (U : Y.Open
   -- Porting note: changed `rw` to `erw`
   erw [pullbackRestrictIsoRestrict_inv_fst]; rw [Category.comp_id]
 
+lemma isPullback_opens_inf_le {X : Scheme} {U V W : X.Opens} (hU : U ≤ W) (hV : V ≤ W) :
+    IsPullback (X.homOfLE inf_le_left) (X.homOfLE inf_le_right) (X.homOfLE hU) (X.homOfLE hV) := by
+  refine (isPullback_morphismRestrict (X.homOfLE hV) (W.ι ⁻¹ᵁ U)).of_iso (V.ι.isoImage _ ≪≫
+    X.isoOfEq ?_) (W.ι.isoImage _ ≪≫ X.isoOfEq ?_) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_ ?_
+  · rw [← TopologicalSpace.Opens.map_comp_obj, ← Scheme.comp_base, Scheme.homOfLE_ι]
+    exact V.functor_map_eq_inf U
+  · exact (W.functor_map_eq_inf U).trans (by simpa)
+  all_goals { simp [← cancel_mono (Scheme.Opens.ι _)] }
+
+lemma isPullback_opens_inf {X : Scheme} (U V : X.Opens) :
+    IsPullback (X.homOfLE inf_le_left) (X.homOfLE inf_le_right) U.ι V.ι :=
+  (isPullback_morphismRestrict V.ι U).of_iso (V.ι.isoImage _ ≪≫ X.isoOfEq
+    (V.functor_map_eq_inf U)) (Iso.refl _) (Iso.refl _) (Iso.refl _) (by simp [← cancel_mono U.ι])
+    (by simp [← cancel_mono V.ι]) (by simp) (by simp)
+
 @[simp]
 lemma morphismRestrict_id {X : Scheme.{u}} (U : X.Opens) : 𝟙 X ∣_ U = 𝟙 _ := by
   rw [← cancel_mono U.ι, morphismRestrict_ι, Category.comp_id, Category.id_comp]
@@ -480,13 +503,13 @@ theorem image_morphismRestrict_preimage {X Y : Scheme.{u}} (f : X ⟶ Y) (U : Y.
     -- Porting note: this rewrite was not necessary
     rw [SetLike.mem_coe]
     convert hx'
-    -- Porting note (#11041): `ext1` is not compiling
+    -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11041): `ext1` is not compiling
     refine Subtype.ext ?_
     exact (morphismRestrict_base_coe f U ⟨x, hx⟩).symm
   · rintro ⟨⟨x, hx⟩, hx' : _ ∈ V.1, rfl : x = _⟩
     refine ⟨⟨_, hx⟩, (?_ : (f ∣_ U).base ⟨x, hx⟩ ∈ V.1), rfl⟩
     convert hx'
-    -- Porting note (#11041): `ext1` is compiling
+    -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11041): `ext1` is compiling
     refine Subtype.ext ?_
     exact morphismRestrict_base_coe f U ⟨x, hx⟩
 
@@ -684,15 +707,15 @@ end MorphismRestrict
 noncomputable
 def Scheme.OpenCover.restrict {X : Scheme.{u}} (𝒰 : X.OpenCover) (U : Opens X) :
     U.toScheme.OpenCover := by
-  refine copy (𝒰.pullbackCover U.ι) 𝒰.J _ (𝒰.map · ∣_ U) (Equiv.refl _)
+  refine Cover.copy (𝒰.pullbackCover U.ι) 𝒰.J _ (𝒰.map · ∣_ U) (Equiv.refl _)
     (fun i ↦ IsOpenImmersion.isoOfRangeEq (Opens.ι _) (pullback.snd _ _) ?_) ?_
   · erw [IsOpenImmersion.range_pullback_snd_of_left U.ι (𝒰.map i)]
     rw [Opens.opensRange_ι]
     exact Subtype.range_val
   · intro i
     rw [← cancel_mono U.ι]
-    simp only [morphismRestrict_ι, pullbackCover_J, Equiv.refl_apply, pullbackCover_obj,
-      pullbackCover_map, Category.assoc, pullback.condition]
+    simp only [morphismRestrict_ι, Cover.pullbackCover_J, Equiv.refl_apply, Cover.pullbackCover_obj,
+      Cover.pullbackCover_map, Category.assoc, pullback.condition]
     rw [IsOpenImmersion.isoOfRangeEq_hom_fac_assoc]
 
 end AlgebraicGeometry
