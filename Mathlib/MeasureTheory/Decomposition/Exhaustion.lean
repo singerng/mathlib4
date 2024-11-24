@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Rémy Degenne
 -/
 import Mathlib.MeasureTheory.Measure.Typeclasses
+import Mathlib.MeasureTheory.Decomposition.ExhaustionFun
 
 /-!
 # Method of exhaustion
@@ -49,80 +50,28 @@ variable {α : Type*} {mα : MeasurableSpace α} {μ : Measure α} [IsFiniteMeas
 all measurable sets `s` with property `p s`. `C` is finite since `μ` is a finite measure.
 Then there exists a measurable set `t` with `p t` such that `μ t ≥ C - 1/n`. -/
 lemma exists_set_measure_ge (μ : Measure α) [IsFiniteMeasure μ]
-    (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) :
-    ∃ t, MeasurableSet t ∧ p t
-      ∧ (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s) - 1/n ≤ μ t := by
-  by_cases hC_lt : 1/n < ⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s
-  · have h_lt_top : ⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s < ∞ := by
-      refine (?_ : ⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s ≤ μ Set.univ).trans_lt
-        (measure_lt_top _ _)
-      refine iSup_le (fun s ↦ ?_)
-      exact iSup_le (fun _ ↦ iSup_le (fun _ ↦ measure_mono (Set.subset_univ s)))
-    obtain ⟨t, ht⟩ := exists_lt_of_lt_ciSup
-      (ENNReal.sub_lt_self h_lt_top.ne (ne_zero_of_lt hC_lt) (by simp) :
-          (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s) - 1/n
-        < ⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s)
-    have ht_meas : MeasurableSet t := by
-      by_contra h_not_mem
-      simp [h_not_mem] at ht
-    have ht_mem : p t := by
-      by_contra h_not_mem
-      simp [h_not_mem] at ht
-    refine ⟨t, ht_meas, ht_mem, ?_⟩
-    simp only [ht_meas, ht_mem, iSup_true] at ht
-    exact ht.le
-  · obtain ⟨s, hs, hps⟩ := hp_exists
-    refine ⟨s, hs, hps, ?_⟩
-    rw [tsub_eq_zero_of_le (not_lt.mp hC_lt)]
-    exact zero_le'
-
-/-- A measurable set such that `p (μ.pSetGE μ n)` and for `C` the supremum of `μ s` over
-all measurable sets `s` with `p s`, `μ (μ.pSetGE μ n) ≥ C - 1/n`. -/
-def Measure.pSetGE (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → Prop)
-    (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) : Set α :=
-  (exists_set_measure_ge μ p hp_exists n).choose
-
-lemma measurableSet_pSetGE (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) :
-    MeasurableSet (μ.pSetGE p hp_exists n) :=
-  (exists_set_measure_ge μ p hp_exists n).choose_spec.1
-
-lemma prop_pSetGE (μ : Measure α) [IsFiniteMeasure μ]
-    (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) :
-    p (μ.pSetGE p hp_exists n) :=
-  (exists_set_measure_ge μ p hp_exists n).choose_spec.2.1
-
-lemma measure_pSetGE_le (μ : Measure α) [IsFiniteMeasure μ]
-    (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) :
-    μ (μ.pSetGE p hp_exists n) ≤ ⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s := by
-  refine (le_iSup (f := fun s ↦ _) (prop_pSetGE μ p hp_exists n)).trans ?_
-  exact le_iSup₂ (f := fun s _ ↦ ⨆ (_ : p s), μ s) (μ.pSetGE p hp_exists n)
-    (measurableSet_pSetGE p hp_exists n)
-
-lemma measure_pSetGE_ge (μ : Measure α) [IsFiniteMeasure μ]
-    (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) (n : ℕ) :
-    (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s) - 1/n ≤ μ (μ.pSetGE p hp_exists n) :=
-  (exists_set_measure_ge μ p hp_exists n).choose_spec.2.2
-
-lemma tendsto_measure_pSetGE (μ : Measure α) [IsFiniteMeasure μ]
     (p : Set α → Prop) (hp_exists : ∃ s, MeasurableSet s ∧ p s) :
-    Tendsto (fun n ↦ μ (μ.pSetGE p hp_exists n)) atTop
-      (𝓝 (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s)) := by
-  refine tendsto_of_tendsto_of_tendsto_of_le_of_le ?_
-    tendsto_const_nhds (measure_pSetGE_ge μ p hp_exists) (measure_pSetGE_le μ p hp_exists)
-  nth_rewrite 2 [← tsub_zero (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s)]
-  refine ENNReal.Tendsto.sub tendsto_const_nhds ?_ (Or.inr ENNReal.zero_ne_top)
-  simp only [one_div]
-  exact ENNReal.tendsto_inv_nat_nhds_zero
+    ∃ (f : ℕ → Set α), (∀ n, MeasurableSet (f n)) ∧ (∀ n, p (f n))
+      ∧ Monotone (fun n ↦ μ (f n))
+      ∧ Tendsto (fun n ↦ μ (f n)) atTop (𝓝 (⨆ (s) (_ : MeasurableSet s) (_ : p s), μ s)) := by
+  obtain ⟨f, hf_mono, hf_tendsto, hf⟩ :=
+    exists_seq_tendsto_iSup hp_exists (OrderTop.bddAbove _) (F := μ)
+  choose hf_meas hfp using hf
+  change Tendsto (fun n ↦ μ (f n)) atTop (𝓝 (⨆ a ∈ {x | MeasurableSet x ∧ p x}, μ a))
+    at hf_tendsto
+  simp only [Set.mem_setOf_eq, iSup_and] at hf_tendsto
+  exact ⟨f, hf_meas, hfp, hf_mono, hf_tendsto⟩
 
 open Classical in
 /-- A measurable set such that `p (μ.maximalSet p hp_empty)` and the measure
 `μ (μ.maximalSet p hp_empty)` is maximal among such sets. -/
 def Measure.maximalSet (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → Prop) :
     Set α :=
-  if hp_exists : ∃ s, MeasurableSet s ∧ p s then ⋃ n, μ.pSetGE p hp_exists n else ∅
+  if hp_exists : ∃ s, MeasurableSet s ∧ p s
+    then ⋃ n, (exists_set_measure_ge μ p hp_exists).choose n else ∅
 
 lemma maximalSet_of_exists (hp_exists : ∃ s, MeasurableSet s ∧ p s) :
-    μ.maximalSet p = ⋃ n, μ.pSetGE p hp_exists n :=
+    μ.maximalSet p = ⋃ n, (exists_set_measure_ge μ p hp_exists).choose n :=
   dif_pos hp_exists
 
 lemma maximalSet_of_not_exists (hp_empty : ¬ ∃ s, MeasurableSet s ∧ p s) :
@@ -132,7 +81,7 @@ lemma measurableSet_maximalSet (p : Set α → Prop) :
     MeasurableSet (μ.maximalSet p) := by
   by_cases hp_exists : ∃ s, MeasurableSet s ∧ p s
   · rw [maximalSet_of_exists hp_exists]
-    exact MeasurableSet.iUnion (measurableSet_pSetGE p hp_exists)
+    exact MeasurableSet.iUnion (exists_set_measure_ge μ p hp_exists).choose_spec.1
   · rw [maximalSet_of_not_exists hp_exists]
     exact .empty
 
@@ -142,7 +91,8 @@ lemma prop_maximalSet (μ : Measure α) [IsFiniteMeasure μ]
       p (⋃ n, t n)) :
     p (μ.maximalSet p) := by
   rw [maximalSet_of_exists hp_exists]
-  exact hp_iUnion _ (measurableSet_pSetGE p hp_exists) (prop_pSetGE μ p hp_exists)
+  exact hp_iUnion _ (exists_set_measure_ge μ p hp_exists).choose_spec.1
+    (exists_set_measure_ge μ p hp_exists).choose_spec.2.1
 
 /-- `μ.maximalSet p hp_empty` has maximal `μ`-measure among all measurable sets `s` with `p s`. -/
 lemma measure_maximalSet (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → Prop)
@@ -163,23 +113,20 @@ lemma measure_maximalSet (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → 
     convert le_iSup₂ (f := fun s _ ↦ ⨆ (_ : p s), μ s) (μ.maximalSet p)
       (measurableSet_maximalSet p)
     rw [maximalSet_of_exists hp_exists]
-  · exact le_of_tendsto' (tendsto_measure_pSetGE μ p hp_exists)
+  · exact le_of_tendsto' (exists_set_measure_ge μ p hp_exists).choose_spec.2.2.2
       (fun _ ↦ measure_mono (Set.subset_iUnion _ _))
 
-lemma not_prop_of_subset_compl_maximalSet (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → Prop)
+lemma not_prop_of_disjoint_maximalSet (μ : Measure α) [IsFiniteMeasure μ] (p : Set α → Prop)
     (hp_iUnion : ∀ (t : ℕ → Set α) (_ : ∀ n, MeasurableSet (t n)) (_ : ∀ n, p (t n)),
       p (⋃ n, t n))
-    (hs : MeasurableSet s) (hs_subset : s ⊆ (μ.maximalSet p)ᶜ) (hμs : μ s ≠ 0) :
+    (hs : MeasurableSet s) (hs_disj : Disjoint (μ.maximalSet p) s) (hμs : μ s ≠ 0) :
     ¬ p s := by
   by_cases hp_exists : ∃ s, MeasurableSet s ∧ p s
-  swap
-  · push_neg at hp_exists
-    exact hp_exists s hs
+  swap; · push_neg at hp_exists; exact hp_exists s hs
   intro hsp
   have h_lt : μ (μ.maximalSet p) < μ (μ.maximalSet p ∪ s) := by
-    rw [measure_union _ hs]
-    · exact ENNReal.lt_add_right (measure_ne_top _ _) hμs
-    · exact disjoint_compl_right.mono_right hs_subset
+    rw [measure_union hs_disj hs]
+    exact ENNReal.lt_add_right (measure_ne_top _ _) hμs
   have hp_union {s t} (hs : MeasurableSet s) (ht : MeasurableSet t) (hps : p s) (hpt : p t) :
       p (s ∪ t) := by
     let ts : ℕ → Set α := fun n ↦ if n = 0 then s else t

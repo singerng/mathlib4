@@ -3,7 +3,7 @@ Copyright (c) 2024 Rémy Degenne. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Rémy Degenne
 -/
-import Mathlib.MeasureTheory.Integral.Lebesgue
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 
 /-!
 # Method of exhaustion
@@ -50,120 +50,75 @@ open Filter
 
 namespace MeasureTheory
 
-variable {α : Type*} {mα : MeasurableSpace α} {μ : Measure α} {C : ℝ≥0} {g : α → ℝ≥0∞}
+variable {α : Type*} {mα : MeasurableSpace α} {g : α → ℝ≥0∞}
 
-/-! We prove that the condition in the definition of `sigmaFiniteSetWRT` is true for finite
-measures. Since every s-finite measure is absolutely continuous with respect to a finite measure,
-the condition will then also be true for s-finite measures. -/
+lemma exists_seq_tendsto_iSup {α β : Type*} [CompleteLinearOrder β] [TopologicalSpace β]
+    [OrderTopology β] [FirstCountableTopology β]
+    {S : Set α} (hS : S.Nonempty) {F : α → β} (hS' : BddAbove (F '' S)) :
+    ∃ u : ℕ → α, Monotone (fun n ↦ F (u n)) ∧ Tendsto (fun n ↦ F (u n)) atTop (𝓝 (⨆ a ∈ S, F a))
+      ∧ ∀ n, u n ∈ S := by
+  have h_seq := exists_seq_tendsto_sSup (S := F '' S)
+    (by simp only [Set.image_nonempty]; exact hS) hS'
+  choose g hg_mono hg₂ f hpf hFf_eq using h_seq
+  have : sSup (F '' S) = ⨆ a ∈ S, F a := sSup_image
+  rw [this] at hg₂
+  refine ⟨f, ?_, ?_, hpf⟩
+  · simp_rw [hFf_eq]
+    exact hg_mono
+  · simp_rw [hFf_eq]
+    exact hg₂
 
 /-- Let `p : Set α → Prop` be a predicate on sets and let `C` be the supremum of `μ s` over
 all measurable sets `s` with property `p s`. `C` is finite since `μ` is a finite measure.
 Then there exists a measurable set `t` with `p t` such that `μ t ≥ C - 1/n`. -/
-lemma exists_fun_lintegral_ge (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C)
-    (n : ℕ) :
-    ∃ f, Measurable f ∧ p f
-      ∧ (⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ) - 1/n ≤ ∫⁻ x, f x ∂μ := by
-  by_cases hC_lt : 1/n < ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ
-  · have h_lt_top : ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ < ∞ := by
-      refine (?_ : ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C).trans_lt
-        ENNReal.coe_lt_top
-      refine iSup_le (fun g ↦ ?_)
-      exact iSup_le (fun hg ↦ iSup_le (fun hgp ↦ hC _ hg hgp))
-    obtain ⟨t, ht⟩ := exists_lt_of_lt_ciSup
-      (ENNReal.sub_lt_self h_lt_top.ne (ne_zero_of_lt hC_lt) (by simp) :
-          (⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ) - 1/n
-        < ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ)
-    have ht_meas : Measurable t := by
-      by_contra h_not_mem
-      simp only [h_not_mem] at ht
-      simp at ht
-    have ht_mem : p t := by
-      by_contra h_not_mem
-      simp only [h_not_mem] at ht
-      simp at ht
-    refine ⟨t, ht_meas, ht_mem, ?_⟩
-    simp only [ht_meas, ht_mem, iSup_true] at ht
-    exact ht.le
-  · refine ⟨0, measurable_const, hp_zero, ?_⟩
-    rw [tsub_eq_zero_of_le (not_lt.mp hC_lt)]
-    exact zero_le'
-
-/-- A measurable set such that `p (μ.funGE μ n)` and for `C` the supremum of `μ s` over
-all measurable sets `s` with `p s`, `μ (μ.funGE μ n) ≥ C - 1/n`. -/
-noncomputable
-def Measure.funGE (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C)
-    (n : ℕ) :
-    α → ℝ≥0∞ :=
-  (exists_fun_lintegral_ge μ p hp_zero hC n).choose
-
-lemma measurable_funGE (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) (n : ℕ) :
-    Measurable (μ.funGE p hp_zero hC n) :=
-  (exists_fun_lintegral_ge μ p hp_zero hC n).choose_spec.1
-
-lemma prop_funGE (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) (n : ℕ) :
-    p (μ.funGE p hp_zero hC n) :=
-  (exists_fun_lintegral_ge μ p hp_zero hC n).choose_spec.2.1
-
-lemma lintegral_funGE_le (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) (n : ℕ) :
-    ∫⁻ x, μ.funGE p hp_zero hC n x ∂μ ≤ ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ := by
-  refine (le_iSup (f := fun s ↦ _) (prop_funGE μ p hp_zero hC n)).trans ?_
-  exact le_iSup₂ (f := fun g _ ↦ ⨆ (_ : p g), ∫⁻ x, g x ∂μ) (μ.funGE p hp_zero hC n)
-    (measurable_funGE p hp_zero hC n)
-
-lemma lintegral_funGE_ge (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) (n : ℕ) :
-    (⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ) - 1/n ≤ ∫⁻ x, μ.funGE p hp_zero hC n x ∂μ :=
-  (exists_fun_lintegral_ge μ p hp_zero hC n).choose_spec.2.2
-
-lemma tendsto_lintegral_funGE (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) :
-    Tendsto (fun n ↦ ∫⁻ x, μ.funGE p hp_zero hC n x ∂μ) atTop
-      (𝓝 (⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ)) := by
-  refine tendsto_of_tendsto_of_tendsto_of_le_of_le ?_
-    tendsto_const_nhds (lintegral_funGE_ge μ p hp_zero hC) (lintegral_funGE_le μ p hp_zero hC)
-  nth_rewrite 2 [← tsub_zero (⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ)]
-  refine ENNReal.Tendsto.sub tendsto_const_nhds ?_ (Or.inr ENNReal.zero_ne_top)
-  simp only [one_div]
-  exact ENNReal.tendsto_inv_nat_nhds_zero
+lemma exists_fun_lintegral_ge (p : (α → ℝ≥0∞) → Prop) (hp_exists : ∃ f, Measurable f ∧ p f)
+    (F : (α → ℝ≥0∞) → ℝ≥0∞) :
+    ∃ f : ℕ → α → ℝ≥0∞, (∀ n, Measurable (f n)) ∧ (∀ n, p (f n))
+      ∧ Monotone (fun n ↦ F (f n))
+      ∧ Tendsto (fun n ↦ F (f n)) atTop (𝓝 (⨆ (g) (_ : Measurable g) (_ : p g), F g)) := by
+  obtain ⟨f, hf_mono, hf_tendsto, hf⟩ :=
+    exists_seq_tendsto_iSup hp_exists (OrderTop.bddAbove _) (F := F)
+  choose hf_meas hfp using hf
+  change Tendsto (fun n ↦ F (f n)) atTop (𝓝 (⨆ a ∈ {x | Measurable x ∧ p x}, F a))
+    at hf_tendsto
+  simp only [Set.mem_setOf_eq, iSup_and] at hf_tendsto
+  exact ⟨f, hf_meas, hfp, hf_mono, hf_tendsto⟩
 
 /-- A measurable function such that `p (μ.maximalFun p hp_zero hC)` and the integral of that
 function is maximal (see `lintegral_maximalFun`). -/
 noncomputable
-def Measure.maximalFun (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) :
+def maximalFun (p : (α → ℝ≥0∞) → Prop) (hp_exists : ∃ f, Measurable f ∧ p f)
+    (F : (α → ℝ≥0∞) → ℝ≥0∞) :
     α → ℝ≥0∞ :=
-  fun a ↦ ⨆ n, μ.funGE p hp_zero hC n a
+  fun a ↦ ⨆ n, (exists_fun_lintegral_ge p hp_exists F).choose n a
 
-lemma measurable_maximalFun (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C) :
-    Measurable (μ.maximalFun p hp_zero hC) :=
-  Measurable.iSup (measurable_funGE p hp_zero hC)
+lemma measurable_maximalFun (p : (α → ℝ≥0∞) → Prop) (hp_exists : ∃ f, Measurable f ∧ p f)
+    (F : (α → ℝ≥0∞) → ℝ≥0∞) :
+    Measurable (maximalFun p hp_exists F) :=
+  Measurable.iSup (exists_fun_lintegral_ge p hp_exists F).choose_spec.1
 
-lemma prop_maximalFun (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C)
+lemma prop_maximalFun (p : (α → ℝ≥0∞) → Prop) (hp_exists : ∃ f, Measurable f ∧ p f)
+    (F : (α → ℝ≥0∞) → ℝ≥0∞)
     (hp_iUnion : ∀ (g : ℕ → α → ℝ≥0∞) (_ : ∀ n, Measurable (g n)) (_ : ∀ n, p (g n)),
       p (fun a ↦ ⨆ n, g n a)) :
-    p (μ.maximalFun p hp_zero hC) :=
-  hp_iUnion _ (measurable_funGE p hp_zero hC) (prop_funGE μ p hp_zero hC)
+    p (maximalFun p hp_exists F) :=
+  hp_iUnion _ (exists_fun_lintegral_ge p hp_exists F).choose_spec.1
+    (exists_fun_lintegral_ge p hp_exists F).choose_spec.2.1
 
 /-- `μ.maximalFun p p hp_zero hC` has maximal integral among all measurable functions with
 property `p`. -/
-lemma lintegral_maximalFun (μ : Measure α) (p : (α → ℝ≥0∞) → Prop) (hp_zero : p 0)
-    (hC : ∀ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ ≤ C)
+lemma lintegral_maximalFun (p : (α → ℝ≥0∞) → Prop) (hp_exists : ∃ f, Measurable f ∧ p f)
+    (F : (α → ℝ≥0∞) → ℝ≥0∞)
     (hp_iUnion : ∀ (g : ℕ → α → ℝ≥0∞) (_ : ∀ n, Measurable (g n)) (_ : ∀ n, p (g n)),
-      p (fun a ↦ ⨆ n, g n a)) :
-    ∫⁻ x, μ.maximalFun p hp_zero hC x ∂μ = ⨆ (g) (_ : Measurable g) (_ : p g), ∫⁻ x, g x ∂μ := by
+      p (fun a ↦ ⨆ n, g n a))
+    (hF_mono : Monotone F) :
+    F (maximalFun p hp_exists F) = ⨆ (g) (_ : Measurable g) (_ : p g), F g := by
   apply le_antisymm
-  · refine (le_iSup (f := fun _ ↦ _) (prop_maximalFun μ p hp_zero hC hp_iUnion)).trans ?_
-    exact le_iSup₂ (f := fun g _ ↦ ⨆ (_ : p g), ∫⁻ x, g x ∂μ) (μ.maximalFun p hp_zero hC)
-      (measurable_maximalFun p hp_zero hC)
-  · refine le_of_tendsto' (tendsto_lintegral_funGE μ p hp_zero hC) fun n ↦ ?_
-    refine lintegral_mono fun a ↦ ?_
-    exact le_iSup (fun n ↦ μ.funGE p hp_zero hC n a) n
+  · refine (le_iSup (f := fun _ ↦ _) (prop_maximalFun p hp_exists F hp_iUnion)).trans ?_
+    exact le_iSup₂ (f := fun g _ ↦ ⨆ (_ : p g), F g) (maximalFun p hp_exists F)
+      (measurable_maximalFun p hp_exists F)
+  · refine le_of_tendsto' (exists_fun_lintegral_ge p hp_exists F).choose_spec.2.2.2 fun n ↦ ?_
+    refine hF_mono fun a ↦ ?_
+    exact le_iSup (fun n ↦ (exists_fun_lintegral_ge p hp_exists F).choose n a) n
 
 end MeasureTheory

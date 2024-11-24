@@ -111,8 +111,8 @@ lemma measure_eq_top_of_subset_compl_sigmaFiniteSetWRT'_of_measurableSet [IsFini
     (hs : MeasurableSet s) (hs_subset : s ⊆ (μ.sigmaFiniteSetWRT' ν)ᶜ) (hνs : ν s ≠ 0) :
     μ s = ∞ := by
   have : ¬ SigmaFinite (μ.restrict s) := by
-    refine not_prop_of_subset_compl_maximalSet ν (fun s ↦ SigmaFinite (μ.restrict s))
-      ?_ hs hs_subset hνs
+    refine not_prop_of_disjoint_maximalSet ν (fun s ↦ SigmaFinite (μ.restrict s))
+      ?_ hs (disjoint_compl_right.mono_right hs_subset) hνs
     simp only
     exact fun t ht _ ↦ sigmaFinite_iUnion μ (MeasurableSet.iUnion ht)
   by_contra h
