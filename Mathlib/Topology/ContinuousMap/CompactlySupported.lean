@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yoh Tanimoto
 -/
 import Mathlib.Topology.ContinuousMap.CocompactMap
+import Mathlib.Topology.ContinuousMap.Ordered
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.Support
 
@@ -527,8 +528,8 @@ section NonnegativePart
 
 open NNReal
 
-/-- The nonnegative part of a bounded continuous `ℝ`-valued function as a bounded
-continuous `ℝ≥0`-valued function. -/
+/-- The nonnegative part of a compactly supported continuous `ℝ≥0`-valued function as a compactly
+supported continuous `ℝ≥0`-valued function. -/
 noncomputable def nnrealPartCompactlySupported (f : C_c(α, ℝ)) : C_c(α, ℝ≥0) where
   toFun := Real.toNNReal.comp f.toFun
   continuous_toFun := Continuous.comp continuous_real_toNNReal f.continuous
@@ -539,9 +540,22 @@ noncomputable def nnrealPartCompactlySupported (f : C_c(α, ℝ)) : C_c(α, ℝ�
 lemma nnrealPartCompactlySupported_apply (f : C_c(α, ℝ)) (x : α) :
     (nnrealPartCompactlySupported f) x = Real.toNNReal (f x) := rfl
 
+/-- The compactly supported continuous `ℝ≥0`-valued function as a compactly supported `ℝ`-valued
+function. -/
+noncomputable def toRealCompactlySupported (f : C_c(α, ℝ≥0)) : C_c(α, ℝ) where
+  toFun := ContinuousMap.coeNNRealReal.comp f.1
+  hasCompactSupport' := by
+    simp only [ContinuousMap.coe_comp, ContinuousMap.coeNNRealReal_apply,
+      CompactlySupportedContinuousMap.coe_toContinuousMap]
+    exact HasCompactSupport.comp_left f.hasCompactSupport' (by rfl)
 
--- copy Mathlib.Topology.ContinuousMap.Ordered for `CompactlySupported`
+-- define this as linear map
+-- need `toNNReal` as a linear map
 
--- def toNNRealLinear {Λ : C_c(α, ℝ) →ₗ[ℝ] ℝ} (hΛ : ∀ f, 0 ≤ f → 0 ≤ Λ f)
+noncomputable def toNNRealLinear {Λ : C_c(α, ℝ) →ₗ[ℝ] ℝ} (hΛ : ∀ f, 0 ≤ f.1 → 0 ≤ Λ f) :
+    C_c(α, ℝ≥0) →ₗ[ℝ≥0] ℝ≥0 where
+  toFun := fun f => Real.toNNReal (Λ (toRealCompactlySupported f))
+  map_add' := sorry
+  map_smul' := sorry
 
 end NonnegativePart
