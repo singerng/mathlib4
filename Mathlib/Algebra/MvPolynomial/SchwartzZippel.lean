@@ -5,8 +5,10 @@ Authors: Bolton Bailey, Yaël Dillies, Andrew Yang
 -/
 import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.Algebra.MvPolynomial.Variables
+import Mathlib.Algebra.Order.Group.Finset
+import Mathlib.Algebra.Order.GroupWithZero.Finset
+import Mathlib.Algebra.Order.Ring.Finset
 import Mathlib.Algebra.Polynomial.Roots
-import Mathlib.Data.NNRat.Floor
 import Mathlib.Data.Fin.Tuple.Finset
 import Mathlib.Tactic.Positivity.Finset
 
@@ -156,10 +158,10 @@ lemma schwartz_zippel_sup_sum :
                 ← Polynomial.leadingCoeff, ← hpₖ, ← leadingCoeff_toLex,
                 AddMonoidAlgebra.leadingCoeff_ne_zero toLex.injective]
             simpa using monomial_le_degreeOf 0 this
-    · rw [sup_add _ (support_nonempty.mpr hpₖ₀)]
+    · rw [Finset.sup_add (support_nonempty.mpr hpₖ₀)]
       apply Finset.sup_le
       rintro i hi
-      refine le_sup_of_le (cons_mem_support_finSuccEquiv.mp hi) ?_
+      refine le_sup_of_le (mem_support_coeff_finSuccEquiv.mp hi) ?_
       rw [Fin.sum_univ_succ, add_comm]
       dsimp
       gcongr
