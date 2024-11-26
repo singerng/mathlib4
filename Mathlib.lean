@@ -599,6 +599,7 @@ import Mathlib.Algebra.MvPolynomial.Monad
 import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.Algebra.MvPolynomial.Polynomial
 import Mathlib.Algebra.MvPolynomial.Rename
+import Mathlib.Algebra.MvPolynomial.SchwartzZippel
 import Mathlib.Algebra.MvPolynomial.Supported
 import Mathlib.Algebra.MvPolynomial.Variables
 import Mathlib.Algebra.NeZero
@@ -741,6 +742,7 @@ import Mathlib.Algebra.Order.Ring.Canonical
 import Mathlib.Algebra.Order.Ring.Cast
 import Mathlib.Algebra.Order.Ring.Cone
 import Mathlib.Algebra.Order.Ring.Defs
+import Mathlib.Algebra.Order.Ring.Finset
 import Mathlib.Algebra.Order.Ring.InjSurj
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Algebra.Order.Ring.Nat
