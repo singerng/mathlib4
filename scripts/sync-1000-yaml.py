@@ -164,6 +164,7 @@ def _write_entry(entry: TheoremEntry) -> str:
             # since this cannot easily be checked, we don't do so.
         if form.authors:
             inner['author'] = ' and '.join(form.authors)
+        # TODO: should I add further metadata, to make the file more useful? to be decided?
         # if form.date:
         #     inner['date'] = form.date
     key = f'Q{entry.wikidata}' + (entry.id_suffix or '')
