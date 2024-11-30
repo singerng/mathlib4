@@ -67,7 +67,7 @@ class TheoremEntry(NamedTuple):
     # Our best guess of the MSC-classification. (Should be a two-digit string; not validated.)
     msc_classification: str
     # The exact link to a wikipedia page: format [[Page name]] or [[Wiki-link|Displayed name]].
-    wikipedia_links: str
+    wikipedia_links: List[str]
     # Entries about formalizations in any of the supported proof assistants.
     # Several formalization entries for assistant are allowed.
     formalisations: dict[ProofAssistant, List[FormalisationEntry]]
@@ -136,18 +136,21 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry | None:
     return res
 
 
-def _parse_title(entry: TheoremEntry) -> str:
+def _parse_title_inner(wiki_links: List[str]) -> str:
     # FIXME: what's the best way to deal with multiple links here?
     # For now, let's match the webpage and just show the first link's target.
     # if len(entry.wikipedia_links) > 1:
     #     print(f"attention: found several wikipedia links for a theorem: {entry.wikipedia_links}")
     # Handle wikipedia links [[Big theorem]]s also.
-    (title, _, suf) = entry.wikipedia_links[0].removeprefix("[[").partition("]]")
+    (title, _, suf) = wiki_links[0].removeprefix("[[").partition("]]")
     if suf == "s":
         title += "s"
     if "|" in title:
         title = title.partition("|")[2]
     return title
+
+def _parse_title(entry: TheoremEntry) -> str:
+    return _parse_title_inner(entry.wikipedia_links)
 
 
 def _write_entry(entry: TheoremEntry) -> str:
@@ -209,14 +212,65 @@ def regenerate_from_upstream(_args) -> None:
             thms.append(_parse_theorem_entry(f.readlines()))
     # Sort alphabetically according to wikidata ID.
     # FUTURE: also use MSC classification?
-    filtered = filter(lambda t: t is not None, thms)
+    filtered: List[TheoremEntry] = filter(lambda t: t is not None, thms)
 
     # Write out a new yaml file for this, again.
     with open(os.path.join("docs", "1000.yaml"), "w") as f:
         f.write("\n".join([_write_entry(thm) for thm in sorted(filtered, key=lambda t: t.wikidata)]))
 
 
+def regenerate_upstream_from_yaml(dest_dir: str) -> None:
+    with open(os.path.join("docs", "1000.yaml"), "r") as f:
+        data_1000_yaml = yaml.safe_load(f)
+    for id_with_suffix, entry in data_1000_yaml.items():
+        has_formalisation = "decl" in entry or "decls" in entry or "url" in entry
+        # For each downstream declaration, read in the "upstream" yaml file and compare with the
+        # downstream result.
+        with open(os.path.join(dest_dir, f"{id_with_suffix}.md"), 'r') as f:
+            contents = f.readlines()
+            upstream_data = yaml.safe_load("".join(contents[1:-1]))
+            upstream_lean_entry = _parse_theorem_entry(contents)
+        original_lean = []
+        if upstream_lean_entry:
+            original_lean = upstream_lean_entry.formalisations[ProofAssistant.Lean]
+
+        if original_lean and not has_formalisation:
+            print(f"update: Lean formalisation of {id_with_suffix} is noted upstream, but not downstream!")
+        elif original_lean and has_formalisation:
+            # FUTURE: compare the formalisation entries; not done right now
+            pass
+        elif has_formalisation and not original_lean:
+            print(f"update: found a new formalisation of {id_with_suffix} in 1000.yaml, "
+              "trying to update upstream file now")
+            # Augment the original file with information about the Lean formalisation.
+            decl = entry.get("decl") or entry.get("decls")
+            inner = {"status": "formalized"}
+            if decl:
+                inner["library"] = "M"  # FIXME: cannot determine if anything was from the std lib!
+                # inner["url"] = # TODO, omitted from the yaml file!
+                inner["identifiers"] = decl
+            else:
+                inner["library"] = "X"
+                inner["url"] = entry["url"]
+                # TODO: the yaml file omits this for now, so cannot reconstruct it here...
+                # inner["identifiers"] = "TODO",
+            if "author" in entry:
+                inner["authors"] = entry["author"].split(" and ")
+            if "date" in entry:
+                inner["date"] = entry["date"]
+            upstream_data["lean"] = [inner]
+            # Human-readable theorem title from the upstream file.
+            # We're not preserving (for now) if this was a section or sub-section.
+            # XXX: the generated formatting is not exactly the same, because yaml.dump...
+            # `ruamel` seems to be better here... for now, we decide to not care
+            title = _parse_title_inner(upstream_data["wikipedia_links"])
+            with open(os.path.join(dest_dir, f"{id_with_suffix}.md"), 'w') as f:
+                yamls = yaml.dump(upstream_data, indent=2, sort_keys=False)
+                f.write(f"---\n# {title}\n\n{yamls}\n---")
+
+
 if __name__ == "__main__":
     import sys
 
-    regenerate_from_upstream(sys.argv)
+    # regenerate_from_upstream(sys.argv)
+    regenerate_upstream_from_yaml("../1000-plus.github.io/_thm")
