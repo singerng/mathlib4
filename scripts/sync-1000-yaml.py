@@ -3,6 +3,12 @@ import os
 from enum import Enum, auto
 from typing import List, NamedTuple, Tuple
 
+'''
+This script contains tools for bi-directional synchronisation/regeneration of 1000.yaml.
+Mainly, this consists of an internal typed representation of all theorem entries.
+The "upstream -> downstream" direction was only used to generate an initial version of 1000.yaml.
+The other direction is not implemented yet, but should be useful in the future.
+'''
 
 class ProofAssistant(Enum):
     Isabelle = auto()
@@ -49,8 +55,8 @@ class FormalisationEntry(NamedTuple):
 class TheoremEntry(NamedTuple):
     # Wikidata identifier for this theorem (or concept related to the theorem).
     # This is usually the Wikipedia page containing the theorem.
-    # FIXME: more typed format? or is this fine?
-    wikidata: str # really?
+    # TODO: validate the format: a letter Q followed by a number
+    wikidata: str
     # disambiguates an entry when two theorems have the same wikidata identifier.
     # X means an extra theorem on a Wikipedia page (e.g. a generalization or special case),
     # A/B/... means different theorems on one Wikipedia page that doesn't have a "main" theorem.
@@ -153,12 +159,12 @@ def _write_entry(entry: TheoremEntry) -> str:
     return yaml.dump(res, sort_keys=False)
 
 
-def main():
-    # FIXME: this script assumes that the _thm data files are present locally in this directory.
-    # A proper fix would be to ensure (in a workflow step) the repository is checked out
-    # in the right place, and perhaps pass that location into this script.
+def regenerate_from_upstream(args):
+    # FIXME: download the upstream files to a local directory; or
+    # if the --local option and a location are passed, look in that location instead.
+    # For now, the latter is used, with a hard-coded directory...
     dir = "../1000-plus.github.io/_thm"
-    # Determine the list of theorme entry files.
+    # Determine the list of theorem entry files.
     theorem_entry_files = []
     with os.scandir(dir) as entries:
         theorem_entry_files = [entry.name for entry in entries if entry.is_file()]
@@ -172,4 +178,6 @@ def main():
         f.write('\n'.join([_write_entry(entry) for entry in entries]))
 
 
-main()
+if __name__ == '__main__':
+    import sys
+    regenerate_from_upstream(sys.argv)
