@@ -344,15 +344,18 @@ Q467756:
 
 Q468391:
   title: "Bolzano\u2013Weierstrass theorem"
+  # TODO: this exists in mathlib, add decl!
 
 Q470877:
   title: Stirling's theorem
+  # TODO: this exists in mathlib, add decl!
 
 Q472883:
   title: Quadratic reciprocity theorem
 
 Q474881:
   title: Cantor's theorem
+  # a.k.a. Cantor's diagonal argument. TODO, add decl!
 
 Q476776:
   title: Solutions of a general quartic equation
@@ -412,6 +415,7 @@ Q544369:
 
 Q550402:
   title: Dirichlet's theorem on arithmetic progressions
+  # TODO: add decl!
 
 Q552367:
   title: Berge's theorem
@@ -421,6 +425,7 @@ Q567843:
 
 Q570779:
   title: Vieta's formulas
+  # TODO: this exists in mathlib, right? add decl!
 
 Q574902:
   title: Tarski's indefinability theorem
@@ -440,6 +445,7 @@ Q579515:
 
 Q583147:
   title: Sard's theorem
+  # exists a statement in Lean, WIP proof
 
 Q586051:
   title: "Haag\u2013\u0141opusza\u0144ski\u2013Sohnius theorem"
@@ -473,18 +479,22 @@ Q617417:
 
 Q619985:
   title: Multinomial theorem
+  # TODO: this exists in mathlib, right? add decl
 
 Q620602:
   title: Virial theorem
 
 Q631561:
   title: Closed range theorem
+  # TODO: this exists in mathlib, right? add decl
 
 Q632546X:
   title: Sylvester's theorem
+  # XXX: does this exist in mathlib already?
 
 Q632546:
   title: Bertrand's postulate
+  # XXX. does somebody work on this already? say, the book project?
 
 Q637418:
   title: Napoleon's theorem
@@ -503,6 +513,7 @@ Q646523:
 
 Q649469:
   title: Modularity theorem
+  # WIP: FLT is working on parts of it
 
 Q649977:
   title: "Shirshov\u2013Cohn theorem"
@@ -518,12 +529,16 @@ Q656176:
 
 Q656198:
   title: Maschke's theorem
+  # TODO: this exists in mathlib, right? add decl!
 
 Q656645:
   title: Hilbert's basis theorem
+  # TODO: this exists in mathlib, right? add decl!
 
 Q656772:
   title: "Cayley\u2013Hamilton theorem"
+  - decl: Matrix.aeval_self_charpoly
+  - url: https://leanprover-community.github.io/mathlib4_docs/Mathlib/LinearAlgebra/Matrix/Charpoly/Basic.html#Matrix.aeval_self_charpoly
 
 Q657469:
   title: Lefschetz fixed-point theorem
@@ -544,6 +559,7 @@ Q660799:
 
 Q670235:
   title: Fundamental theorem of arithmetic
+  # TODO: surely exists in mathlib, TODO add decl
 
 Q671663:
   title: "Coleman\u2013Mandula theorem"
@@ -616,6 +632,7 @@ Q751120:
 
 Q752375:
   title: Extreme value theorem
+  # TODO: exists in mathlib already
 
 Q755986:
   title: "Atiyah\u2013Bott fixed-point theorem"
@@ -728,6 +745,7 @@ Q852973:
 
 Q853067:
   title: Solutions to Pell's equation
+  # TODO: exists, add to mathlib
 
 Q856032:
   title: CAP theorem
