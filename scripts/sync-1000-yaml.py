@@ -180,6 +180,8 @@ def _write_entry(entry: TheoremEntry) -> str:
             # One *could* also write out the identifier(s) of the relevant theorems:
             # since this cannot easily be checked, we don't do so.
         if first.authors:
+            # XXX: this is inconsistent between 100.yaml
+            # the former uses 'author' always; the 1000+ theorems project always uses 'authors'
             inner["author"] = " and ".join(first.authors)
         # Add additional metadata, so no information is lost in the generated yaml file.
         if first.date:
