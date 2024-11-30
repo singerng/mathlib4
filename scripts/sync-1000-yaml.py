@@ -44,10 +44,10 @@ class FormalisationEntry(NamedTuple):
     status: FormalizationStatus
     library: Library
     # A URL pointing to the formalization
-    # (or a list collecting a list of theorems for a particular proof assistant).
     url: str
-    # XXX: this is missing from the README -> clarify if this should replace the URL field for 'std/main library' formalisations!
-    identifiers: str | None
+    # list collecting a list of theorems for a particular proof assistant
+    # is optional: if missing, there should be a URL. recommended for main or standard library formalizations
+    identifiers: List[str] | None
     authors: str | None
     # Format YYYY-MM-DD
     date: str | None
@@ -64,12 +64,13 @@ class TheoremEntry(NamedTuple):
     # X means an extra theorem on a Wikipedia page (e.g. a generalization or special case),
     # A/B/... means different theorems on one Wikipedia page that doesn't have a "main" theorem.
     id_suffix: str | None
-    # Our best guess of the MSC-classification. (Should be a two-digit string; not validated.)
+    # Our best guess of the MSC-classification of this theorem. (Should be a two-digit string; not validated.)
     msc_classification: str
-    # The exact link to a wikipedia page: format [[Page name]] or [[Wiki-link|Displayed name]].
+    # The exact link to the relevant wikipedia pages:
+    # each entry has the format [[Page name]] or [[Wiki-link|Displayed name]].
     wikipedia_links: List[str]
     # Entries about formalizations in any of the supported proof assistants.
-    # Several formalization entries for assistant are allowed.
+    # Several formalization entries for one proof assistant are allowed.
     formalisations: dict[ProofAssistant, List[FormalisationEntry]]
 
 
