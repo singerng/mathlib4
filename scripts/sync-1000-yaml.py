@@ -4,12 +4,13 @@ from typing import List, NamedTuple
 
 import yaml
 
-'''
+"""
 This script contains tools for bi-directional synchronisation/regeneration of 1000.yaml.
 Mainly, this consists of an internal typed representation of all theorem entries.
 The "upstream -> downstream" direction was only used to generate an initial version of 1000.yaml.
 The other direction is not implemented yet, but should be useful in the future.
-'''
+"""
+
 
 class ProofAssistant(Enum):
     Isabelle = auto()
@@ -19,12 +20,14 @@ class ProofAssistant(Enum):
     Metamath = auto()
     Mizar = auto()
 
+
 # The different formalisation statusses: just the statement or also the proof.
 class FormalizationStatus(Enum):
     # The statement of a result was formalized (but not its proof yet).
     Statement = auto()
     # The full proof of a result was formalized.
     FullProof = auto()
+
 
 # In what library does the formalization appear?
 class Library(Enum):
@@ -77,9 +80,9 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     }
     status = form[entry["status"]]
     lib = {
-      "S": Library.StandardLibrary,
-      "L": Library.MainLibrary,
-      "X": Library.External,
+        "S": Library.StandardLibrary,
+        "L": Library.MainLibrary,
+        "X": Library.External,
     }
     library = lib[entry["library"]]
     return FormalisationEntry(
@@ -87,7 +90,7 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     )
 
 
-def _parse_wikidata(input: str) -> int|None:
+def _parse_wikidata(input: str) -> int | None:
     if not input.startswith("Q"):
         print(f"error: invalid wikidata identifier {input}; must start with a letter 'Q'")
         return None
@@ -96,6 +99,7 @@ def _parse_wikidata(input: str) -> int|None:
     except ValueError:
         print("invalid input: {input} must be the letter 'Q', followed by a number")
         return None
+
 
 # Return a human-ready theorem title, as well as a `TheoremEntry` with the underlying data.
 # Return `None` if `contents` does not describe a valid theorem entry.
@@ -111,15 +115,15 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry | None:
     if wikidata is None:
         return None
     provers: dict[str, ProofAssistant] = {
-      'isabelle': ProofAssistant.Isabelle,
-      'hol_light': ProofAssistant.HolLight,
-      'coq': ProofAssistant.Coq,
-      'lean': ProofAssistant.Lean,
-      'metamath': ProofAssistant.Metamath,
-      'mizar': ProofAssistant.Mizar,
+        "isabelle": ProofAssistant.Isabelle,
+        "hol_light": ProofAssistant.HolLight,
+        "coq": ProofAssistant.Coq,
+        "lean": ProofAssistant.Lean,
+        "metamath": ProofAssistant.Metamath,
+        "mizar": ProofAssistant.Mizar,
     }
     formalisations = dict()
-    for (pname, variant) in provers.items():
+    for pname, variant in provers.items():
         if pname in data:
             entries = [_parse_formalization_entry(entry) for entry in data[pname]]
             formalisations[variant] = entries
@@ -147,9 +151,7 @@ def _parse_title(entry: TheoremEntry) -> str:
 
 
 def _write_entry(entry: TheoremEntry) -> str:
-    inner = {
-        'title': _parse_title(entry)
-    }
+    inner = {"title": _parse_title(entry)}
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
         # TODO: currently, we only write out data for the first formalisation.
@@ -159,20 +161,20 @@ def _write_entry(entry: TheoremEntry) -> str:
         if first.library == Library.MainLibrary:
             if first.identifiers is not None:
                 if len(first.identifiers) == 1:
-                    inner['decl'] = first.identifiers[0]
+                    inner["decl"] = first.identifiers[0]
                 else:
-                    inner['decls'] = first.identifiers
+                    inner["decls"] = first.identifiers
         elif first.library == Library.External:
-            inner['url'] = first.url
+            inner["url"] = first.url
             # One *could* also write out the identifier(s) of the relevant theorems:
             # since this cannot easily be checked, we don't do so.
         if first.authors:
-            inner['author'] = ' and '.join(first.authors)
+            inner["author"] = " and ".join(first.authors)
         # TODO: should I add further metadata, to make the file more useful? to be decided?
         # if first.date:
         #     inner['date'] = first.date
-    key = f'Q{entry.wikidata}' + (entry.id_suffix or '')
-    res = { key: inner }
+    key = f"Q{entry.wikidata}" + (entry.id_suffix or "")
+    res = {key: inner}
     return yaml.dump(res, sort_keys=False)
 
 
@@ -194,9 +196,10 @@ def regenerate_from_upstream(args) -> None:
                 thms.append(res)
     # Write out a new yaml file for this, again.
     with open(os.path.join("docs", "1000.yaml"), "w") as f:
-        f.write('\n'.join([_write_entry(thm) for thm in thms]))
+        f.write("\n".join([_write_entry(thm) for thm in thms]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     regenerate_from_upstream(sys.argv)
