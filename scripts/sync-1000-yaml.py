@@ -54,9 +54,8 @@ class FormalisationEntry(NamedTuple):
 # https://github.com/1000-plus/1000-plus.github.io/blob/main/README.md#file-format.
 class TheoremEntry(NamedTuple):
     # Wikidata identifier for this theorem (or concept related to the theorem).
-    # This is usually the Wikipedia page containing the theorem.
-    # TODO: validate the format: a letter Q followed by a number
-    wikidata: str
+    # Valid identifiers start with the latter Q followed by a number; we only save this number.
+    wikidata: int
     # disambiguates an entry when two theorems have the same wikidata identifier.
     # X means an extra theorem on a Wikipedia page (e.g. a generalization or special case),
     # A/B/... means different theorems on one Wikipedia page that doesn't have a "main" theorem.
@@ -87,6 +86,16 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     )
 
 
+def _parse_wikidata(input: str) -> int|None:
+    if not input.startswith("Q"):
+        print(f"error: invalid wikidata identifier {input}; must start with a letter 'Q'")
+        return None
+    try:
+        return int(input.removeprefix("Q"))
+    except ValueError:
+        print("invalid input: {input} must be the letter 'Q', followed by a number")
+        return None
+
 # Return a human-ready theorem title, as well as a `TheoremEntry` with the underlying data.
 def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
     assert contents[0].rstrip() == "---"
@@ -96,6 +105,9 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
     assert contents[1].startswith("# ") or contents[1].startswith("## ")
     # title = contents[1].rstrip().removeprefix("## ").removeprefix("# ")
     data = yaml.safe_load("".join(contents[1:-1]))
+    wikidata = _parse_wikidata(data["wikidata"])
+    if wikidata is None:
+        return None
     provers: dict[str, ProofAssistant] = {
       'isabelle': ProofAssistant.Isabelle,
       'hol_light': ProofAssistant.HolLight,
@@ -113,7 +125,7 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
             formalisations[variant] = []
 
     res = TheoremEntry(
-        data["wikidata"], data.get("id_suffix"), data["msc_classification"],
+        wikidata, data.get("id_suffix"), data["msc_classification"],
         data["wikipedia_links"], formalisations
     )
     return res
@@ -154,7 +166,7 @@ def _write_entry(entry: TheoremEntry) -> str:
             inner['author'] = ' and '.join(form.authors)
         # if form.date:
         #     inner['date'] = form.date
-    key = entry.wikidata + (entry.id_suffix or '')
+    key = f'Q{entry.wikidata}' + (entry.id_suffix or '')
     res = { key: inner }
     return yaml.dump(res, sort_keys=False)
 
