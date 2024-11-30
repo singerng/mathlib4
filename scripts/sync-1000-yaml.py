@@ -109,7 +109,6 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry | None:
     # For optics, we check that all entry files start with the theorem name as comment.
     # We parse the actual title from the wikipedia data below: this yields virtually the same results.
     assert contents[1].startswith("# ") or contents[1].startswith("## ")
-    # title = contents[1].rstrip().removeprefix("## ").removeprefix("# ")
     data = yaml.safe_load("".join(contents[1:-1]))
     wikidata = _parse_wikidata(data["wikidata"])
     if wikidata is None:
@@ -136,6 +135,7 @@ def _parse_theorem_entry(contents: List[str]) -> TheoremEntry | None:
     )
     return res
 
+
 def _parse_title(entry: TheoremEntry) -> str:
     # FIXME: what's the best way to deal with multiple links here?
     # For now, let's match the webpage and just show the first link's target.
@@ -154,17 +154,28 @@ def _write_entry(entry: TheoremEntry) -> str:
     inner = {"title": _parse_title(entry)}
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
-        # TODO: currently, we only write out data for the first formalisation.
-        # Instead, prioritise library over external formalisations;
-        # if there are still several, pick the first!
-        first = form[0]
-        if first.library == Library.MainLibrary:
+        # If there are several formalisations, we prioritise mathlib and stdlib
+        # formalisations over external projects.
+        # If there are still several, we pick the first in the theorem file.
+        stdlib_formalisations = [f for f in form if f.library == Library.StandardLibrary]
+        mathlib_formalisations = [f for f in form if f.library == Library.MainLibrary]
+        if stdlib_formalisations:
+            first = stdlib_formalisations[0]
             if first.identifiers is not None:
                 if len(first.identifiers) == 1:
                     inner["decl"] = first.identifiers[0]
                 else:
                     inner["decls"] = first.identifiers
-        elif first.library == Library.External:
+        elif mathlib_formalisations:
+            first = mathlib_formalisations[0]
+            if first.identifiers is not None:
+                if len(first.identifiers) == 1:
+                    inner["decl"] = first.identifiers[0]
+                else:
+                    inner["decls"] = first.identifiers
+        else:
+            first = form[0]
+            assert first.library == Library.External  # internal consistency check
             inner["url"] = first.url
             # One *could* also write out the identifier(s) of the relevant theorems:
             # since this cannot easily be checked, we don't do so.
@@ -178,7 +189,7 @@ def _write_entry(entry: TheoremEntry) -> str:
     return yaml.dump(res, sort_keys=False)
 
 
-def regenerate_from_upstream(args) -> None:
+def regenerate_from_upstream(_args) -> None:
     # FIXME: download the upstream files to a local directory; or
     # if the --local option and a location are passed, look in that location instead.
     # For now, the latter is used, with a hard-coded directory...
