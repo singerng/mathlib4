@@ -1,7 +1,8 @@
-import yaml
 import os
 from enum import Enum, auto
-from typing import List, NamedTuple, Tuple
+from typing import List, NamedTuple
+
+import yaml
 
 '''
 This script contains tools for bi-directional synchronisation/regeneration of 1000.yaml.
@@ -97,7 +98,8 @@ def _parse_wikidata(input: str) -> int|None:
         return None
 
 # Return a human-ready theorem title, as well as a `TheoremEntry` with the underlying data.
-def _parse_theorem_entry(contents: List[str]) -> TheoremEntry:
+# Return `None` if `contents` does not describe a valid theorem entry.
+def _parse_theorem_entry(contents: List[str]) -> TheoremEntry | None:
     assert contents[0].rstrip() == "---"
     assert contents[-1].rstrip() == "---"
     # For optics, we check that all entry files start with the theorem name as comment.
@@ -151,28 +153,30 @@ def _write_entry(entry: TheoremEntry) -> str:
     form = entry.formalisations[ProofAssistant.Lean]
     if form:
         # TODO: currently, we only write out data for the first formalisation.
-        # Decide how to present several of them, and implement this!
-        form = form[0]
-        if form.library == Library.MainLibrary:
-            if len(form.identifiers) == 1:
-                inner['decl'] = form.identifiers[0]
-            else:
-                inner['decls'] = form.identifiers
-        elif form.library == Library.External:
-            inner['url'] = form.url
+        # Instead, prioritise library over external formalisations;
+        # if there are still several, pick the first!
+        first = form[0]
+        if first.library == Library.MainLibrary:
+            if first.identifiers is not None:
+                if len(first.identifiers) == 1:
+                    inner['decl'] = first.identifiers[0]
+                else:
+                    inner['decls'] = first.identifiers
+        elif first.library == Library.External:
+            inner['url'] = first.url
             # One *could* also write out the identifier(s) of the relevant theorems:
             # since this cannot easily be checked, we don't do so.
-        if form.authors:
-            inner['author'] = ' and '.join(form.authors)
+        if first.authors:
+            inner['author'] = ' and '.join(first.authors)
         # TODO: should I add further metadata, to make the file more useful? to be decided?
-        # if form.date:
-        #     inner['date'] = form.date
+        # if first.date:
+        #     inner['date'] = first.date
     key = f'Q{entry.wikidata}' + (entry.id_suffix or '')
     res = { key: inner }
     return yaml.dump(res, sort_keys=False)
 
 
-def regenerate_from_upstream(args):
+def regenerate_from_upstream(args) -> None:
     # FIXME: download the upstream files to a local directory; or
     # if the --local option and a location are passed, look in that location instead.
     # For now, the latter is used, with a hard-coded directory...
@@ -182,13 +186,15 @@ def regenerate_from_upstream(args):
     with os.scandir(dir) as entries:
         theorem_entry_files = [entry.name for entry in entries if entry.is_file()]
     # Parse each entry file into a theorem entry.
-    entries: List[Tuple[str, TheoremEntry]] = []
+    thms: List[TheoremEntry] = []
     for file in theorem_entry_files:
         with open(os.path.join(dir, file), "r") as f:
-            entries.append(_parse_theorem_entry(f.readlines()))
+            res = _parse_theorem_entry(f.readlines())
+            if res:
+                thms.append(res)
     # Write out a new yaml file for this, again.
     with open(os.path.join("docs", "1000.yaml"), "w") as f:
-        f.write('\n'.join([_write_entry(entry) for entry in entries]))
+        f.write('\n'.join([_write_entry(thm) for thm in thms]))
 
 
 if __name__ == '__main__':
