@@ -8,9 +8,9 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Polynomial.Basic
 
 /-!
-# Lucas's theorem
+# Lucas' theorem
 
-This file contains a proof of [Lucas's theorem](https://en.wikipedia.org/wiki/Lucas's_theorem) about
+This file contains a proof of [Lucas' theorem](https://en.wikipedia.org/wiki/Lucas's_theorem) about
 binomial coefficients, which says that for primes `p`, `n` choose `k` is congruent to product of
 `n_i` choose `k_i` modulo `p`, where `n_i` and `k_i` are the base-`p` digits of `n` and `k`,
 respectively.
