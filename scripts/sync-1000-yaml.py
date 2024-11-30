@@ -181,9 +181,11 @@ def _write_entry(entry: TheoremEntry) -> str:
             # since this cannot easily be checked, we don't do so.
         if first.authors:
             inner["author"] = " and ".join(first.authors)
-        # TODO: should I add further metadata, to make the file more useful? to be decided?
-        # if first.date:
-        #     inner['date'] = first.date
+        # Add additional metadata, so no information is lost in the generated yaml file.
+        if first.date:
+            inner['date'] = first.date
+        if first.comment:
+            inner['comment'] = first.comment
     key = f"Q{entry.wikidata}" + (entry.id_suffix or "")
     res = {key: inner}
     return yaml.dump(res, sort_keys=False)

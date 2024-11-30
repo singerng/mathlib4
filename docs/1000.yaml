@@ -131,6 +131,7 @@ Q208416:
   title: Independence of the continuum hypothesis
   url: https://github.com/flypitch/flypitch
   author: Floris van Doorn and Jesse Michael Han
+  date: 2019-09-17
 
 Q208756:
   title: Castelnuovo theorem
@@ -805,6 +806,7 @@ Q939927:
   title: "Stone\u2013Weierstrass theorem"
   decl: ContinuousMap.subalgebra_topologicalClosure_eq_top_of_separatesPoints
   author: Scott Morrison and Heather Macbeth
+  date: 2021-05-01
 
 Q942046:
   title: "Schwarz\u2013Ahlfors\u2013Pick theorem"
