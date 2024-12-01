@@ -60,6 +60,7 @@ Q180345:
 
 Q182505:
   title: Bayes' theorem
+  decl: ProbabilityTheory.cond_eq_inv_mul_cond_mul
 
 Q184410:
   title: Four color theorem
@@ -183,9 +184,11 @@ Q245098:
   title: Intermediate value theorem
   decl: intermediate_value_Icc
   url: https://leanprover-community.github.io/mathlib4_docs/Mathlib/Topology/Order/IntermediateValue.html#intermediate_value_Icc
+  author: Rob Lewis and Chris Hughes
 
 Q245098X:
   title: Bolzano's theorem
+  # variant of the intermediate value theorem above, TODO should exist in mathlib, add decl
 
 Q245902:
   title: "Riesz\u2013Thorin theorem"
@@ -323,9 +326,11 @@ Q401905:
 
 Q420714:
   title: "Akra\u2013Bazzi theorem"
+  decl: AkraBazziRecurrence.isBigO_asympBound
 
 Q422187:
   title: "Myhill\u2013Nerode theorem"
+  # TODO: there were two PRs to mathlib with this. add link!
 
 Q425432:
   title: Laurent expansion theorem
@@ -335,6 +340,8 @@ Q428134:
 
 Q459547:
   title: Ptolemy's theorem
+  decl: EuclideanGeometry.mul_dist_add_mul_dist_eq_mul_dist_of_cospherical
+  author: Manuel Candales
 
 Q467205:
   title: Fundamental theorems of welfare economics
@@ -344,18 +351,23 @@ Q467756:
 
 Q468391:
   title: "Bolzano\u2013Weierstrass theorem"
-  # TODO: this exists in mathlib, add decl!
+  decls:
+    - tendsto_subseq_of_frequently_bounded # less standard version
+    - tendsto_subseq_of_bounded
 
 Q470877:
   title: Stirling's theorem
-  # TODO: this exists in mathlib, add decl!
+  decl: tendsto_stirlingSeq_sqrt_pi
 
 Q472883:
   title: Quadratic reciprocity theorem
+  decl: jacobiSym.quadratic_reciprocity
+  author: Chris Hughes (first) and Michael Stoll (second)
 
 Q474881:
   title: Cantor's theorem
-  # a.k.a. Cantor's diagonal argument. TODO, add decl!
+  # a.k.a. Cantor's diagonal argument
+  decl: cantor_surjective
 
 Q476776:
   title: Solutions of a general quartic equation
@@ -376,6 +388,8 @@ Q504843:
 
 Q505798:
   title: Lagrange's theorem
+  # group theorem result; exist additive and multiplicative version
+  decl: card_subgroup_dvd_card
 
 Q510197:
   title: Tutte theorem
@@ -494,13 +508,15 @@ Q632546X:
 
 Q632546:
   title: Bertrand's postulate
-  # XXX. does somebody work on this already? say, the book project?
+  decl: Nat.bertrand
+  author: Bolton Bailey and Patrick Stevens
 
 Q637418:
   title: Napoleon's theorem
 
 Q642620:
   title: "Krein\u2013Milman theorem"
+  decl: closure_convexHull_extremePoints
 
 Q643513:
   title: "Riesz\u2013Fischer theorem"
@@ -510,6 +526,7 @@ Q643826:
 
 Q646523:
   title: Pick's theorem
+  # part of 100 theorems, missing (as of Dec 1, 2024)
 
 Q649469:
   title: Modularity theorem
@@ -529,7 +546,7 @@ Q656176:
 
 Q656198:
   title: Maschke's theorem
-  # TODO: this exists in mathlib, right? add decl!
+  # `RepresentationTheory/Maschke` comes very close, but doesn't prove the std form yet...
 
 Q656645:
   title: Hilbert's basis theorem
@@ -581,6 +598,7 @@ Q693083:
 
 Q716171:
   title: "Erd\u0151s\u2013Ginzburg\u2013Ziv theorem"
+  decl: ZMod.erdos_ginzburg_ziv
 
 Q718875:
   title: "Erd\u0151s\u2013Ko\u2013Rado theorem"
@@ -642,9 +660,12 @@ Q755991:
 
 Q756946:
   title: Lagrange's four-square theorem
+  decl: Nat.sum_four_squares
 
 Q764287:
   title: Van der Waerden's theorem
+  decl: Combinatorics.exists_mono_homothetic_copy
+  # XXX: this is some version; should this entry be modified accordingly?
 
 Q765987:
   title: "Heine\u2013Cantor theorem"
@@ -655,6 +676,7 @@ Q766722:
 
 Q776578:
   title: "Artin\u2013Wedderburn theorem"
+  # WIP, but not there yet (Dec 1, 2024)
 
 Q777924:
   title: Tijdeman's theorem
@@ -793,6 +815,7 @@ Q897769:
 
 Q899002:
   title: Pascal's theorem
+  # part of 100 problems, still open (Dec 1, 2024)
 
 Q899853:
   title: H-theorem
@@ -814,12 +837,17 @@ Q909517:
 
 Q913447:
   title: Morley's trisector theorem
+  # part of 100 theorems, not done (Dec 1, 2024)
 
 Q913849:
   title: Minimax theorem
 
 Q914517:
   title: Fermat's theorem on sums of two squares
+  decls:
+    - Nat.Prime.sq_add_sq
+    - Nat.Prime.sq_add_sq'
+  author: Chris Hughes (first), Jeremy Tan (second)
 
 Q915474:
   title: Robin's theorem
@@ -872,6 +900,7 @@ Q942046:
 
 Q943246:
   title: Wedderburn's little theorem
+  decl: littleWedderburn
 
 Q944297:
   title: Open mapping theorem
@@ -937,6 +966,7 @@ Q1008566:
 
 Q1032886:
   title: "Hales\u2013Jewett theorem"
+  decl: Combinatorics.Line.exists_mono_in_high_dimension
 
 Q1033910:
   title: "Cantor\u2013Bernstein\u2013Schroeder theorem"
@@ -953,6 +983,8 @@ Q1046232:
 
 Q1047749:
   title: "Tur\xE1n's theorem"
+  decl: SimpleGraph.isTuranMaximal_iff_nonempty_iso_turanGraph
+  author: Jeremy Tan
 
 Q1048589:
   title: "Hohenberg\u2013Kohn theorems"
@@ -965,9 +997,14 @@ Q1050037:
 
 Q1050203:
   title: Cantor's intersection theorem
+  # many versions; are this (and friends, in the same file) all of the wikipedia article?
+  decl: IsCompact.nonempty_sInter_of_directed_nonempty_isCompact_isClosed
 
 Q1050932:
   title: Hartogs's theorem
+  url: https://github.com/girving/ray/blob/main/Ray/Hartogs/Hartogs.lean
+  identifiers: Pair.hartogs
+  author: Geoffrey Irving
 
 Q1051404:
   title: "Ces\xE0ro's theorem"
@@ -991,7 +1028,11 @@ Q1056283:
 
 Q1057919:
   title: Sylow theorems
-  # exist, TODO add declarations. (and mention in the overview page!)
+  decls:
+    - exists_subgroup_card_pow_prime
+    - sylow_conjugate
+    - card_sylow_modEq_one
+  # TODO: mention on the overview page as well!
 
 Q1058662:
   title: Darboux's theorem
@@ -1005,6 +1046,7 @@ Q1064471:
 
 Q1065257:
   title: Squeeze theorem
+  decl: tendsto_of_tendsto_of_tendsto_of_le_of_le'
 
 Q1065966:
   title: Isomorphism theorem
@@ -1024,15 +1066,18 @@ Q1067156X:
 
 Q1068085:
   title: Closed graph theorem
+  decl: LinearMap.continuous_of_isClosed_graph
 
 Q1068283:
   title: "L\xF6wenheim\u2013Skolem theorem"
+  decl: exists_elementaryEmbedding_card_eq
 
 Q1068385:
   title: Clairaut's theorem
 
 Q1068976:
   title: Hilbert's Nullstellensatz
+  decl: MvPolynomial.vanishingIdeal_zeroLocus_eq_radical
 
 Q1075398:
   title: Jung's theorem
@@ -1051,6 +1096,7 @@ Q1082910:
 
 Q1095330:
   title: "Ap\xE9ry's theorem"
+  # TODO: proven recently, right? find discussion on zulip and add external link!
 
 Q1097021:
   title: Minkowski's theorem
@@ -1117,6 +1163,7 @@ Q1139524:
 
 Q1140119:
   title: Morera's theorem
+  # seems missing (Dec 1, 2024)
 
 Q1140200:
   title: PCP theorem
@@ -1203,15 +1250,19 @@ Q1188504:
 
 Q1191319:
   title: "Radon\u2013Nikodym theorem"
+  decl: MeasureTheory.Measure.absolutelyContinuous_iff_withDensity_rnDeriv_eq
 
 Q1191709:
   title: Egorov's theorem
+  decl: MeasureTheory.Egorov
 
 Q1191862:
   title: "Rouch\xE9's theorem"
 
 Q1194053:
   title: Metrization theorems
+  decl: metrizableSpace_of_t3_secondCountable
+  comment: "Urysohn's metrization theorem (only)"
 
 Q1196538:
   title: Descartes's theorem
@@ -1250,6 +1301,7 @@ Q1249069:
 
 Q1259814:
   title: "Nielsen\u2013Schreier theorem"
+  decl: subgroupIsFreeOfIsFree
 
 Q1276318:
   title: Schwartz kernel theorem
@@ -1262,6 +1314,8 @@ Q1306092:
 
 Q1306095:
   title: Whitney embedding theorem
+  decl: exists_embedding_euclidean_of_compact
+  comment: "baby version: for compact manifolds; embedding into some *n*"
 
 Q1307676:
   title: "K\xFCnneth theorem"
@@ -1289,6 +1343,7 @@ Q1340623:
 
 Q1346677:
   title: Tietze extension theorem
+  decl: exists_extension_norm_eq_of_isClosedEmbedding'
 
 Q1347094:
   title: Alternate Interior Angles Theorem
@@ -1602,6 +1657,7 @@ Q2022775:
 
 Q2027347:
   title: Optional stopping theorem
+  decl: MeasureTheory.submartingale_iff_expected_stoppedValue_mono
 
 Q2028341:
   title: Ado's theorem
@@ -1626,6 +1682,7 @@ Q2094241:
 
 Q2096184:
   title: Plancherel theorem
+  # TODO: mathlib has this, right? should have... verify and add decl
 
 Q2109761:
   title: Uniformization theorem
@@ -1635,6 +1692,7 @@ Q2120067:
 
 Q2190744:
   title: Feuerbach's theorem
+  # part of 100 theorems, still open (as of Dec 1, 2024)
 
 Q2197859:
   title: Nicomachus's theorem
@@ -2028,6 +2086,7 @@ Q3527100:
 
 Q3527102:
   title: "Kruskal\u2013Katona theorem"
+  decl: Finset.kruskal_katona
 
 Q3527110:
   title: "Lax\u2013Wendroff theorem"
@@ -2037,6 +2096,7 @@ Q3527113:
 
 Q3527118:
   title: Mahler's theorem
+  # XXX: there was a recent PR about this, right? TODO verify and add decl
 
 Q3527125:
   title: Monsky's theorem
@@ -2659,6 +2719,7 @@ Q5436274:
 
 Q5437947:
   title: "Fatou\u2013Lebesgue theorem"
+  # a.k.a. Fatou's lemma in measure theorem --- surely exists, right?
 
 Q5438320:
   title: "Faustman\u2013Ohlin theorem"
@@ -2713,6 +2774,8 @@ Q5503689:
 
 Q5504427:
   title: Friendship theorem
+  decl: Theorems100.friendship_theorem
+  author: Aaron Anderson and Jalex Stark and Kyle Miller
 
 Q5505098:
   title: Frobenius determinant theorem
@@ -2887,6 +2950,7 @@ Q6402928:
 
 Q6403282:
   title: Lagrange's theorem
+  # number theory
 
 Q6407842:
   title: "Killing\u2013Hopf theorem"
@@ -2896,6 +2960,7 @@ Q6414200:
 
 Q6421981:
   title: Kneser's theorem
+  # LeanCamCombi has Kneser's addition theorem; does this capture the page already?
 
 Q6425088:
   title: Kodaira embedding theorem
@@ -2986,6 +3051,8 @@ Q6749789:
 
 Q6757284:
   title: Marcinkiewicz theorem
+  # TODO: formalised in the Carleson project, right?
+  # then: Jim Portegies
 
 Q6760432:
   title: Marginal value theorem
@@ -3013,6 +3080,7 @@ Q6799039:
 
 Q6813106:
   title: Mellin inversion theorem
+  decl: mellin_inversion
 
 Q6859627:
   title: Milliken's tree theorem
@@ -3178,6 +3246,8 @@ Q7308146:
 
 Q7309601:
   title: "Whitney\u2013Graustein Theorem"
+  # there's an external project, deducing this from sphere-eversion
+  # TODO link statement (proof depends on some sorries about the winding number)
 
 Q7310041:
   title: Reider's theorem
@@ -3354,6 +3424,7 @@ Q7818977:
 
 Q7820874:
   title: Tonelli's theorem
+  decl: MeasureTheory.lintegral_prod
 
 Q7824894:
   title: Topkis's theorem
@@ -3459,6 +3530,7 @@ Q8081891:
 
 Q9993851:
   title: "Lax\u2013Milgram theorem"
+  decl: IsCoercive.continuousLinearEquivOfBilin
 
 Q10369454:
   title: Noether's second theorem
@@ -3507,6 +3579,7 @@ Q15895894:
 
 Q16251580:
   title: Matiyasevich's theorem
+  # was formalised by Mario Carneiro. TODO, link to formalisation!
 
 Q16680059:
   title: Strong perfect graph theorem
