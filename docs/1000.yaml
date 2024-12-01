@@ -411,15 +411,18 @@ Q528987:
 
 Q530152:
   title: "Picard&ndash;Lindel\xF6f theorem"
+  decl: IsPicardLindelof.exists_forall_hasDerivWithinAt_Icc_eq
 
 Q535366:
   title: Montel's theorem
 
 Q536640:
   title: Hall's marriage theorem
+  decl: Finset.all_card_le_biUnion_card_iff_exists_injective
 
 Q537618:
   title: "Banach\u2013Alaoglu theorem"
+  decl: WeakDual.isCompact_polar
 
 Q544292:
   title: Lagrange inversion theorem
@@ -429,7 +432,7 @@ Q544369:
 
 Q550402:
   title: Dirichlet's theorem on arithmetic progressions
-  # TODO: add decl!
+  decl: Nat.setOf_prime_and_eq_mod_infinite
 
 Q552367:
   title: Berge's theorem
@@ -1032,7 +1035,6 @@ Q1057919:
     - exists_subgroup_card_pow_prime
     - sylow_conjugate
     - card_sylow_modEq_one
-  # TODO: mention on the overview page as well!
 
 Q1058662:
   title: Darboux's theorem
@@ -1154,6 +1156,8 @@ Q1137206:
 
 Q1139041:
   title: Cauchy's theorem
+  # for finite groups
+  decl: exists_prime_orderOf_dvd_card
 
 Q1139430:
   title: Hurwitz's theorem
@@ -1215,6 +1219,8 @@ Q1153441:
 
 Q1153584:
   title: Monotone convergence theorem
+  # XXX: many versions, which one to choose? e.g. integral_tendsto_of_tendsto_of_antitone (Bochner integral)
+  # or lintegral_tendsto_of_tendsto_of_monotone (Lebesgue integral)
 
 Q1166774:
   title: Stone's representation theorem for Boolean algebras
@@ -1591,18 +1597,22 @@ Q1809539:
 
 Q1816952:
   title: Schur's lemma
+  decl: finrank_endomorphism_simple_eq_one
 
 Q1841237:
   title: Fubini's theorem on differentiation
+  # XXX: does mathib have this already?
 
 Q1855610:
   title: "Theorem of de Moivre\u2013Laplace"
+  # special case of the central limit theorem: binomial -> normal distrubution
 
 Q1888583:
   title: Holditch's theorem
 
 Q1893717:
   title: Rice's theorem
+  decl: rice
 
 Q1896455:
   title: Varignon's theorem
@@ -1642,6 +1652,7 @@ Q1995468:
 
 Q1996305:
   title: Burnside's theorem
+  # some external project proved part of this...
 
 Q2000090:
   title: Art gallery theorem
@@ -1676,6 +1687,7 @@ Q2071632:
 
 Q2093886:
   title: Primitive element theorem
+  decl: Field.exists_primitive_element
 
 Q2094241:
   title: "Hopf\u2013Rinow theorem"
@@ -1753,6 +1765,7 @@ Q2226786:
 
 Q2226800:
   title: "Schur\u2013Zassenhaus theorem"
+  decl: Subgroup.exists_left_complement'_of_coprime
 
 Q2226803:
   title: Tennenbaum's theorem
@@ -1771,6 +1784,8 @@ Q2226962:
 
 Q2253746:
   title: Bertrand's ballot theorem
+  decl: Ballot.ballot_problem
+  authors: Bhavik Mehta and Kexing Ying
 
 Q2266397:
   title: Intersecting chords theorem
@@ -1786,6 +1801,7 @@ Q2270905:
 
 Q2275191:
   title: Lebesgue differentiation theorem
+  decl: VitaliFamily.ae_tendsto_average
 
 Q2277040:
   title: Shannon's expansion theorem
@@ -3303,7 +3319,7 @@ Q7433034:
 
 Q7433182:
   title: "Schwartz\u2013Zippel theorem"
-  # XXX: wasn't there some in-progress PR?
+  # WIP PR at https://github.com/leanprover-community/mathlib4/pull/5297
 
 Q7433295:
   title: "Osterwalder\u2013Schrader theorem"
