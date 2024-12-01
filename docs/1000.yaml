@@ -257,12 +257,17 @@ Q287347:
 
 Q288465:
   title: Orbit-stabilizer theorem
+  decl: orbitEquivQuotientStabilizer
 
 Q303402:
   title: "Rank\u2013nullity theorem"
 
 Q318767:
   title: Abel's theorem
+  decls:
+    - Complex.tendsto_tsum_powerSeries_nhdsWithin_stolzCone
+    - Real.tendsto_tsum_powerSeries_nhdsWithin_lt
+  author: Jeremy Tan
 
 Q321237:
   title: Green's theorem
@@ -320,6 +325,7 @@ Q388525:
 
 Q401319:
   title: Puiseux's theorem
+  # in the 100 theorems; unsolved (as of Dec 1, 2024)
 
 Q401905:
   title: Skorokhod's representation theorem
@@ -330,7 +336,9 @@ Q420714:
 
 Q422187:
   title: "Myhill\u2013Nerode theorem"
-  # TODO: there were two PRs to mathlib with this. add link!
+  # two in-progress formalisations, none merged yet
+  # https://github.com/atarnoam/lean-automata/blob/main/src/regular_languages.lean
+  # https://github.com/leanprover-community/mathlib4/pull/11311
 
 Q425432:
   title: Laurent expansion theorem
@@ -442,7 +450,7 @@ Q567843:
 
 Q570779:
   title: Vieta's formulas
-  # TODO: this exists in mathlib, right? add decl!
+  decl: Multiset.prod_X_add_C_eq_sum_esymm
 
 Q574902:
   title: Tarski's indefinability theorem
@@ -496,7 +504,8 @@ Q617417:
 
 Q619985:
   title: Multinomial theorem
-  # TODO: this exists in mathlib, right? add decl
+  decl: Finset.sum_pow_eq_sum_piAntidiag_of_commute
+  # also Finset.sum_pow_of_commute, which one is better?
 
 Q620602:
   title: Virial theorem
@@ -533,7 +542,7 @@ Q646523:
 
 Q649469:
   title: Modularity theorem
-  # WIP: FLT is working on parts of it
+  # far away; FLT project is working on a special case
 
 Q649977:
   title: "Shirshov\u2013Cohn theorem"
@@ -549,7 +558,7 @@ Q656176:
 
 Q656198:
   title: Maschke's theorem
-  # `RepresentationTheory/Maschke` comes very close, but doesn't prove the std form yet...
+  # `RepresentationTheory/Maschke` comes very close, but doesn't prove the standard form yet...
 
 Q656645:
   title: Hilbert's basis theorem
@@ -568,7 +577,7 @@ Q657469X:
 
 Q657482:
   title: "Abel\u2013Ruffini theorem"
-  # TODO: exists in mathlib, add decl
+  decl: AbelRuffini.exists_not_solvable_by_rad
 
 Q657903:
   title: "Hilbert\u2013Waring theorem"
@@ -579,7 +588,14 @@ Q660799:
 
 Q670235:
   title: Fundamental theorem of arithmetic
-  # TODO: surely exists in mathlib, TODO add decl
+  decls:
+    - Nat.primeFactorsList_unique
+    - Int.euclideanDomain
+    - EuclideanDomain.to_principal_ideal_domain
+    - UniqueFactorizationMonoid
+    - UniqueFactorizationMonoid.factors_unique
+  author: Chris Hughes
+  comment: "it also has a generalized version, by showing that every Euclidean domain is a unique factorization domain, and showing that the integers form a Euclidean domain."
 
 Q671663:
   title: "Coleman\u2013Mandula theorem"
@@ -653,7 +669,7 @@ Q751120:
 
 Q752375:
   title: Extreme value theorem
-  # TODO: exists in mathlib already
+  decl: IsCompact.exists_isMinOn
 
 Q755986:
   title: "Atiyah\u2013Bott fixed-point theorem"
@@ -770,7 +786,11 @@ Q852973:
 
 Q853067:
   title: Solutions to Pell's equation
-  # TODO: exists, add to mathlib
+  decls:
+    - Pell.eq_pell
+    - Pell.exists_of_not_isSquare
+  author: Mario Carneiro (first), Michael Stoll (second)
+  note: "In `pell.eq_pell`, `d` is defined to be `a*a - 1` for an arbitrary `a > 1`."
 
 Q856032:
   title: CAP theorem
@@ -1095,10 +1115,13 @@ Q1077741:
 
 Q1082910:
   title: Euler's partition theorem
+  decl: Theorems100.partition_theorem
+  author: Bhavik Mehta and Aaron Anderson
 
 Q1095330:
   title: "Ap\xE9ry's theorem"
-  # TODO: proven recently, right? find discussion on zulip and add external link!
+  url: https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/pi.20is.20irrational.3F/near/478674074
+  # TODO: insert a link to a repository, and perhaps get that into mathlib :-)
 
 Q1097021:
   title: Minkowski's theorem
@@ -1474,6 +1497,7 @@ Q1564541:
 
 Q1566341:
   title: Hindman's theorem
+  decl: FP_partition_regular
 
 Q1566372:
   title: Haag's theorem
@@ -1483,9 +1507,12 @@ Q1568612:
 
 Q1568811:
   title: Hahn decomposition theorem
+  decl: MeasureTheory.SignedMeasure.exists_isCompl_positive_negative
+  authors: Kexing Ying
 
 Q1572474:
   title: "Lindemann\u2013Weierstrass theorem"
+  # WIP PR: https://github.com/leanprover-community/mathlib4/pull/6718
 
 Q1576235:
   title: Lochs's theorem
@@ -1844,6 +1871,7 @@ Q2379128:
 
 Q2379132:
   title: Going-up and going-down theorems
+  # TODO: does mathlib have these versions? add the right decls!
 
 Q2394548:
   title: Hurewicz theorem
@@ -2112,7 +2140,7 @@ Q3527113:
 
 Q3527118:
   title: Mahler's theorem
-  # XXX: there was a recent PR about this, right? TODO verify and add decl
+  decl: PadicInt.hasSum_mahler
 
 Q3527125:
   title: Monsky's theorem
@@ -3698,7 +3726,8 @@ Q20971632:
 
 Q22952648:
   title: Uncountability of the continuum
-  # TODO: add declaration; exists in mathlib for sure!
+  decl: Cardinal.not_countable_real
+  author: Floris van Doorn
 
 Q25099402:
   title: "Kolmogorov\u2013Arnold representation theorem"
