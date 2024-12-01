@@ -3,6 +3,7 @@ Copyright (c) 2024 Xavier Roblot. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Xavier Roblot
 -/
+import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 import Mathlib.NumberTheory.LSeries.Basic
 
@@ -27,37 +28,48 @@ theorem sum_mul_eq_sub_integral_mul' (hc : c 0 = 0) (b : ℝ)
 open Filter Topology
 
 
-theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℝ) :
-    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / (t ^ (s + 1) : ℝ)) := by
+-- TODO: generalize to `s : ℂ`
+theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) :
+    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1)) := by
   have hS : (fun n : ℕ ↦ ∑ x ∈ Icc 0 n, f x) =O[atTop] fun n ↦ (n : ℂ) := sorry
   have hs : LSeriesSummable f s := sorry
   have h1 : ∀ n,  ∑ k in range (n + 1), LSeries.term f s k =
-      ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, (k ^ (- s) : ℝ) * f k := by
+      ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, ↑k ^ (- s) * f k := by
     intro n
     rw [Nat.floor_natCast, ← Nat.Ico_zero_eq_range, Nat.Ico_succ_right]
     refine Finset.sum_congr rfl fun k _ ↦ ?_
     rw [LSeries.term]
     split_ifs with hk
     · rw [hk, hf, mul_zero]
-    · rw [mul_comm, mul_one_div, Complex.ofReal_cpow k.cast_nonneg, Complex.ofReal_natCast]
+    · -- rw [mul_comm, mul_one_div, Complex.ofReal_cpow k.cast_nonneg, Complex.ofReal_natCast]
+      sorry
   have h2 :
       Tendsto (fun n ↦ ∑ k in range (n + 1), LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
     (tendsto_add_atTop_iff_nat 1).mpr hs.hasSum.tendsto_sum_nat
   have h3 := fun n : ℕ ↦ sum_mul_eq_sub_integral_mul' f
-    (f := fun x : ℝ ↦ (x ^ (- s) : ℝ)) (b := n) hf sorry sorry
-  have h4 : Tendsto (fun n : ℕ ↦ (n ^ (- s) : ℝ) * ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, f k) atTop (𝓝 0) := by
+    (f := fun x : ℝ ↦ ↑x ^ (- s)) (b := n) hf sorry sorry
+  have h4 : Tendsto (fun n : ℕ ↦ ↑n ^ (- s) * ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, f k) atTop (𝓝 0) := by
     simp only [Nat.floor_natCast]
     sorry
   have h5 : Tendsto (fun n : ℕ ↦
-      ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ), deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t * ∑ k ∈ Icc 0 ⌊t⌋₊, f k)
-      atTop (𝓝 (∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t *
+      ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ), deriv (fun x : ℝ ↦ (x : ℂ) ^ (- s)) t * ∑ k ∈ Icc 0 ⌊t⌋₊, f k)
+      atTop (𝓝 (∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ (x : ℂ) ^ (- s)) t *
         (∑ k ∈ Icc 0 ⌊t⌋₊, f k))) := by
     sorry
-  have h6 : - ∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t *
+  have h6 : - ∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ (x : ℂ) ^ (- s)) t *
       (∑ k ∈ Icc 0 ⌊t⌋₊, f k) =
-      s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / (t ^ (s + 1) : ℝ)) := by
-
-    sorry
+      s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1)) := by
+    rw [← integral_mul_left, ← MeasureTheory.integral_neg]
+    refine integral_congr_ae ?_
+    rw [EventuallyEq, ae_restrict_iff' measurableSet_Ioi]
+    refine Eventually.of_forall fun x hx ↦ ?_
+    have := (hasDerivAt_ofReal_cpow (x := x) (r := - s - 1) (zero_lt_one.trans hx).ne' ?_).deriv
+    rw [sub_add_cancel, deriv_div_const, div_neg, ← neg_div, div_eq_iff] at this
+    rw [← neg_mul, this, ← neg_add', Complex.cpow_neg]
+    ring
+    · sorry
+    · rw [← sub_ne_zero, sub_neg_eq_add, sub_add_cancel, neg_ne_zero]
+      sorry
   rw [← h6]
   have h7 := Tendsto.sub h4 h5
   rw [zero_sub] at h7
@@ -65,7 +77,8 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℝ) :
   intro n
   rw [h1]
   specialize h3 n
-  rw [h3]
+  erw [h3]
+  rfl
 
 
 
