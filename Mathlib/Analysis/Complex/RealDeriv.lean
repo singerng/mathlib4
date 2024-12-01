@@ -130,6 +130,54 @@ theorem HasDerivAt.ofReal_comp {f : ℝ → ℝ} {u : ℝ} (hf : HasDerivAt f u 
   simpa only [ofRealCLM_apply, ofReal_one, real_smul, mul_one] using
     ofRealCLM.hasDerivAt.scomp z hf
 
+theorem hasDerivAt_ofReal_comp_iff {f : ℝ → ℝ} {u : ℝ} :
+    HasDerivAt (fun y : ℝ => ↑(f y) : ℝ → ℂ) u z ↔ HasDerivAt f u z:=
+  ⟨fun h ↦ by simpa only [reCLM_apply, ofReal_re] using reCLM.hasFDerivAt.comp_hasDerivAt z h,
+    fun h ↦ HasDerivAt.ofReal_comp h⟩
+
+theorem differentiableAt_ofReal_comp_iff {f : ℝ → ℝ} :
+    DifferentiableAt ℝ (fun y : ℝ => ↑(f y) : ℝ → ℂ) z ↔ DifferentiableAt ℝ f z := by
+  refine ⟨?_, ?_⟩
+  · intro h
+
+
+
+    rw [← hasDerivAt_deriv_iff] at h
+    have := HasDerivAt.real_of_complex (e := fun y : ℂ ↦ f y.re) (z := z)
+      (e' := deriv (fun y ↦ ↑(f y)) z) ?_
+    simp at this
+    exact HasFDerivAt.differentiableAt this
+    have :=  HasFDerivAt.comp_hasDerivAt (f := re) 
+  · intro h
+    rw [← hasDerivAt_deriv_iff] at h
+    have := h.ofReal_comp
+    exact HasFDerivAt.differentiableAt this
+
+
+theorem Complex.ofReal_deriv (f : ℝ → ℝ) :
+    (fun x ↦ ↑(deriv f x)) = deriv (fun x ↦ (f x : ℂ)) := by
+  ext x
+  by_cases h : DifferentiableAt ℝ f x
+  · rw [← hasDerivAt_deriv_iff] at h
+    have := HasDerivAt.ofReal_comp h
+    rw [HasDerivAt.deriv this]
+  · rw [deriv_zero_of_not_differentiableAt h]
+    rw [← differentiableAt_ofReal_comp_iff] at h
+    rw [deriv_zero_of_not_differentiableAt h, Complex.ofReal_zero]
+
+
+#exit
+
+  rw [deriv, fderiv]
+  split_ifs with h
+  · obtain ⟨f', hf⟩ := h
+    have := hf.hasDerivAt.ofReal_comp
+    have := HasDerivAt.deriv this
+    rw [this]
+
+    sorry
+  · sorry
+
 end RealDerivOfComplex
 
 section Conformality

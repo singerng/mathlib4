@@ -27,41 +27,49 @@ theorem sum_mul_eq_sub_integral_mul' (hc : c 0 = 0) (b : ℝ)
 open Filter Topology
 
 
-theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) :
-    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) := by
+theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℝ) :
+    LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / (t ^ (s + 1) : ℝ)) := by
   have hS : (fun n : ℕ ↦ ∑ x ∈ Icc 0 n, f x) =O[atTop] fun n ↦ (n : ℂ) := sorry
   have hs : LSeriesSummable f s := sorry
   have h1 : ∀ n,  ∑ k in range (n + 1), LSeries.term f s k =
-      ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, 1 / ↑↑k ^ s * f k := by
+      ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, (k ^ (- s) : ℝ) * f k := by
     intro n
     rw [Nat.floor_natCast, ← Nat.Ico_zero_eq_range, Nat.Ico_succ_right]
     refine Finset.sum_congr rfl fun k _ ↦ ?_
-    by_cases hk : k = 0
-    · simp [LSeries.term, if_pos hk, mul_zero, hk, hf]
-    · simp only [LSeries.term, if_neg hk, mul_comm, mul_one_div, Complex.ofReal_natCast]
+    rw [LSeries.term]
+    split_ifs with hk
+    · rw [hk, hf, mul_zero]
+    · rw [mul_comm, mul_one_div, Complex.ofReal_cpow k.cast_nonneg, Complex.ofReal_natCast]
   have h2 :
       Tendsto (fun n ↦ ∑ k in range (n + 1), LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
     (tendsto_add_atTop_iff_nat 1).mpr hs.hasSum.tendsto_sum_nat
   have h3 := fun n : ℕ ↦ sum_mul_eq_sub_integral_mul' f
-    (f := fun x ↦ 1 / x ^ s) (b := n) hf sorry sorry
-  have h4 : Tendsto (fun n : ℕ ↦ 1 / (n : ℝ) ^ s * ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, f k) atTop (𝓝 0) := by
+    (f := fun x : ℝ ↦ (x ^ (- s) : ℝ)) (b := n) hf sorry sorry
+  have h4 : Tendsto (fun n : ℕ ↦ (n ^ (- s) : ℝ) * ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, f k) atTop (𝓝 0) := by
     simp only [Nat.floor_natCast]
-
     sorry
   have h5 : Tendsto (fun n : ℕ ↦
-      ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ), deriv (fun x : ℝ ↦ 1 / (x : ℂ) ^ s) t * ∑ k ∈ Icc 0 ⌊t⌋₊, f k)
-      atTop (𝓝 (∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ 1 / (x : ℂ) ^ s) t *
+      ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ), deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t * ∑ k ∈ Icc 0 ⌊t⌋₊, f k)
+      atTop (𝓝 (∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t *
         (∑ k ∈ Icc 0 ⌊t⌋₊, f k))) := by
     sorry
-  have h6 : - ∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ 1 / (x : ℂ) ^ s) t *
-    (∑ k ∈ Icc 0 ⌊t⌋₊, f k) =
-    s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) := sorry
+  have h6 : - ∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ ↑(x ^ (- s) : ℝ)) t *
+      (∑ k ∈ Icc 0 ⌊t⌋₊, f k) =
+      s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / (t ^ (s + 1) : ℝ)) := by
+
+    sorry
   rw [← h6]
   have h7 := Tendsto.sub h4 h5
   rw [zero_sub] at h7
   refine tendsto_nhds_unique h2 (Tendsto.congr ?_ h7)
   intro n
-  erw [h1, h3 n]
+  rw [h1]
+  specialize h3 n
+  rw [h3]
+
+
+
+
 
   #exit
 
