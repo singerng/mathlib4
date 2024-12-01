@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2020 Yury Kudryashov. All rights reserved.
+Copyright (c) 2024 Yunzhou Xie. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yunzhou Xie
 -/
@@ -9,9 +9,28 @@ import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import Mathlib.SetTheory.Cardinal.Arithmetic
+import Mathlib.Algebra.Central.Basic
+import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib
 
+section def1
 
--- /-! space -/
+class IsMoritaEquivalent
+  (R : Type*) (S : Type*) [Ring R] [Ring S] : Prop where
+out : Nonempty <| ModuleCat R ≌ ModuleCat S
+
+variable (F A : Type*) [Field F] [Ring A] [Algebra F A]
+
+class IsQuaternionAlgebra (Q : Type*) [Ring Q] [Algebra F Q] extends
+    Algebra.IsCentral F Q where
+  rank_four : Module.finrank F Q = 4
+  simple : IsSimpleRing Q
+
+variable [hA : IsQuaternionAlgebra F A]
+
+end def1
+
+-- -- /-! space -/
 
 -- /-- Quaternion algebra over a type with fixed coefficients $a=i^2$ and $b=j^2$.
 -- Implemented as a structure with four fields: `re`, `imI`, `imJ`, and `imK`. -/
@@ -109,7 +128,8 @@ import Mathlib.SetTheory.Cardinal.Arithmetic
 -- @[simp, norm_cast]
 -- theorem coe_imK : (x : ℍ[R,c₁,c₂,c₃]).imK = 0 := rfl
 
--- theorem coe_injective : Function.Injective (coe : R → ℍ[R,c₁,c₂,c₃]) := fun _ _ h => congr_arg re h
+-- theorem coe_injective : Function.Injective (coe : R → ℍ[R,c₁,c₂,c₃]) :=
+    --fun _ _ h => congr_arg re h
 
 -- @[simp]
 -- theorem coe_inj {x y : R} : (x : ℍ[R,c₁,c₂,c₃]) = y ↔ x = y :=
@@ -460,6 +480,11 @@ import Mathlib.SetTheory.Cardinal.Arithmetic
 --       nth_rw 3 [add_comm, mul_comm]
 --       rw [← add_sub, add_assoc, add_assoc, add_assoc, add_assoc, add_assoc,
 --         add_assoc, add_right_inj]
+--       ring_nf!
+--       rw [add_comm (c₂ * c₁ * α.imI * β.imK * γ.imJ)]
+--       symm; rw [sub_eq_add_neg]; simp only [add_assoc, add_right_inj]
+--       rw [add_comm]; nth_rw 2 [add_comm]; symm
+--       rw [add_comm]; nth_rw 2 [add_comm]; simp only [add_assoc, add_right_inj]
 
 --       sorry
 --     · sorry
@@ -467,12 +492,12 @@ import Mathlib.SetTheory.Cardinal.Arithmetic
 --     · sorry
 --   one_mul _ := by ext <;> simp
 --   mul_one _ := by ext <;> simp
-
+-- #check sub_eq_add_neg
 -- @[norm_cast, simp]
 -- theorem coe_mul : ((x * y : R) : ℍ[R,c₁,c₂, c₃]) = x * y := by ext <;> simp
 
--- -- TODO: add weaker `MulAction`, `DistribMulAction`, and `Module` instances (and repeat them
--- -- for `ℍ[R]`)
+-- -- -- TODO: add weaker `MulAction`, `DistribMulAction`, and `Module` instances (and repeat them
+-- -- -- for `ℍ[R]`)
 -- instance [CommSemiring S] [Algebra S R] : Algebra S ℍ[R,c₁,c₂,c₃] where
 --   smul := (· • ·)
 --   toFun s := coe (algebraMap S R s)
@@ -658,7 +683,8 @@ import Mathlib.SetTheory.Cardinal.Arithmetic
 -- theorem self_add_star : a + star a = 2 * a.re + c₂ * a.imI := by
 --   simp [self_add_star', two_mul]
 
--- theorem star_add_self' : star a + a = ↑(2 * a.re + c₂ * a.imI) := by rw [add_comm, self_add_star']
+-- theorem star_add_self' : star a + a = ↑(2 * a.re + c₂ * a.imI) := by
+    --rw [add_comm, self_add_star']
 
 -- theorem star_add_self : star a + a = 2 * a.re + c₂ * a.imI := by rw [add_comm, self_add_star]
 
