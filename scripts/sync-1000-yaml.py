@@ -193,7 +193,7 @@ def _write_entry(entry: TheoremEntry) -> str:
             inner['comment'] = first.comment
     key = f"Q{entry.wikidata}" + (entry.id_suffix or "")
     res = {key: inner}
-    return yaml.dump(res, sort_keys=False)
+    return yaml.dump(res, sort_keys=False, allow_unicode=True)
 
 
 def regenerate_from_upstream(_args) -> None:
@@ -272,5 +272,5 @@ def regenerate_upstream_from_yaml(dest_dir: str) -> None:
 if __name__ == "__main__":
     import sys
 
-    # regenerate_from_upstream(sys.argv)
-    regenerate_upstream_from_yaml("../1000-plus.github.io/_thm")
+    regenerate_from_upstream(sys.argv)
+    # regenerate_upstream_from_yaml("../1000-plus.github.io/_thm")
