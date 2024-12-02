@@ -17,7 +17,7 @@ Q98831:
   title: Multiplication theorem
 
 Q117553:
-  title: "Modigliani\u2013Miller theorem"
+  title: Modigliani–Miller theorem
 
 Q119450:
   title: Brianchon's theorem
@@ -38,10 +38,10 @@ Q164262:
   title: Lebesgue covering dimension
 
 Q172298:
-  title: "Lasker\u2013Noether theorem"
+  title: Lasker–Noether theorem
 
 Q174955:
-  title: "Mih\u0103ilescu's theorem"
+  title: Mihăilescu's theorem
 
 Q179208:
   title: Cayley's theorem
@@ -107,16 +107,16 @@ Q194919:
   title: Inverse eigenvalues theorem
 
 Q195133:
-  title: "Wigner\u2013Eckart theorem"
+  title: Wigner–Eckart theorem
 
 Q200787:
-  title: "G\xF6del's incompleteness theorem"
+  title: Gödel's incompleteness theorem
 
 Q203565:
   title: Solutions of a general cubic equation
 
 Q204884:
-  title: "L\xF6b's theorem"
+  title: Löb's theorem
 
 Q205966:
   title: Critical line theorem
@@ -137,7 +137,7 @@ Q208756:
   title: Castelnuovo theorem
 
 Q211981:
-  title: "Hartman\u2013Grobman theorem"
+  title: Hartman–Grobman theorem
 
 Q213603:
   title: Ceva's theorem
@@ -149,16 +149,16 @@ Q225973:
   title: Ore's theorem
 
 Q226014:
-  title: "Poincar\xE9 recurrence theorem"
+  title: Poincaré recurrence theorem
 
 Q230848:
-  title: "Lam\xE9\u2019s theorem"
+  title: Lamé’s theorem
 
 Q240950:
   title: Faltings's theorem
 
 Q241868:
-  title: "Th\xE9venin's theorem"
+  title: Thévenin's theorem
 
 Q242045:
   title: Monotone class theorem
@@ -170,13 +170,13 @@ Q245098X:
   title: Bolzano's theorem
 
 Q245902:
-  title: "Riesz\u2013Thorin theorem"
+  title: Riesz–Thorin theorem
 
 Q248931:
-  title: "Poincar\xE9\u2013Bendixson theorem"
+  title: Poincaré–Bendixson theorem
 
 Q253214:
-  title: "Heine\u2013Borel theorem"
+  title: Heine–Borel theorem
 
 Q255996:
   title: Equipartition theorem
@@ -188,7 +188,7 @@ Q257387:
   title: Vitali theorem
 
 Q258374:
-  title: "Carath\xE9odory's theorem"
+  title: Carathéodory's theorem
 
 Q260928:
   title: Jordan curve theorem
@@ -200,10 +200,10 @@ Q268031:
   title: Abel's binomial theorem
 
 Q268132:
-  title: "Gauss\u2013Wantzel theorem"
+  title: Gauss–Wantzel theorem
 
 Q273037:
-  title: "Bondy\u2013Chv\xE1tal theorem"
+  title: Bondy–Chvátal theorem
 
 Q276082:
   title: Wilson's theorem
@@ -221,7 +221,7 @@ Q283690:
   title: Arrival theorem
 
 Q284960:
-  title: "Mordell\u2013Weil theorem"
+  title: Mordell–Weil theorem
 
 Q285719:
   title: Thales's theorem
@@ -233,7 +233,7 @@ Q288465:
   title: Orbit-stabilizer theorem
 
 Q303402:
-  title: "Rank\u2013nullity theorem"
+  title: Rank–nullity theorem
 
 Q318767:
   title: Abel's theorem
@@ -260,10 +260,10 @@ Q357858:
   title: Freyd's adjoint functor theorem
 
 Q371685:
-  title: "Kraft\u2013McMillan theorem"
+  title: Kraft–McMillan theorem
 
 Q372037:
-  title: "Seifert\u2013van Kampen theorem"
+  title: Seifert–van Kampen theorem
 
 Q376166:
   title: Cut-elimination theorem
@@ -275,7 +275,7 @@ Q377276:
   title: Cook's theorem
 
 Q379048:
-  title: "Riemann\u2013Roch theorem"
+  title: Riemann–Roch theorem
 
 Q380576:
   title: Measurable Riemann mapping theorem
@@ -284,7 +284,7 @@ Q383238:
   title: Hartogs's extension theorem
 
 Q384142:
-  title: "Herbrand\u2013Ribet theorem"
+  title: Herbrand–Ribet theorem
 
 Q386292:
   title: Prime number theorem
@@ -299,16 +299,16 @@ Q401905:
   title: Skorokhod's representation theorem
 
 Q420714:
-  title: "Akra\u2013Bazzi theorem"
+  title: Akra–Bazzi theorem
 
 Q422187:
-  title: "Myhill\u2013Nerode theorem"
+  title: Myhill–Nerode theorem
 
 Q425432:
   title: Laurent expansion theorem
 
 Q428134:
-  title: "Gauss\u2013Markov theorem"
+  title: Gauss–Markov theorem
 
 Q459547:
   title: Ptolemy's theorem
@@ -320,7 +320,7 @@ Q467756:
   title: Stokes's theorem
 
 Q468391:
-  title: "Bolzano\u2013Weierstrass theorem"
+  title: Bolzano–Weierstrass theorem
 
 Q470877:
   title: Stirling's theorem
@@ -341,7 +341,7 @@ Q488541:
   title: Fisher separation theorem
 
 Q495412:
-  title: "Jordan\u2013Sch\xF6nflies theorem"
+  title: Jordan–Schönflies theorem
 
 Q504843:
   title: Mycielski's theorem
@@ -356,19 +356,19 @@ Q512897:
   title: Brooks's theorem
 
 Q523832:
-  title: "Carath\xE9odory\u2013Jacobi\u2013Lie theorem"
+  title: Carathéodory–Jacobi–Lie theorem
 
 Q523876:
-  title: "Spin\u2013statistics theorem"
+  title: Spin–statistics theorem
 
 Q528955:
-  title: "Kochen\u2013Specker theorem"
+  title: Kochen–Specker theorem
 
 Q528987:
   title: Von Neumann bicommutant theorem
 
 Q530152:
-  title: "Picard&ndash;Lindel\xF6f theorem"
+  title: Picard&ndash;Lindelöf theorem
 
 Q535366:
   title: Montel's theorem
@@ -377,13 +377,13 @@ Q536640:
   title: Hall's marriage theorem
 
 Q537618:
-  title: "Banach\u2013Alaoglu theorem"
+  title: Banach–Alaoglu theorem
 
 Q544292:
   title: Lagrange inversion theorem
 
 Q544369:
-  title: "Glivenko\u2013Cantelli theorem"
+  title: Glivenko–Cantelli theorem
 
 Q550402:
   title: Dirichlet's theorem on arithmetic progressions
@@ -392,7 +392,7 @@ Q552367:
   title: Berge's theorem
 
 Q567843:
-  title: "Hahn\u2013Mazurkiewicz theorem"
+  title: Hahn–Mazurkiewicz theorem
 
 Q570779:
   title: Vieta's formulas
@@ -407,16 +407,16 @@ Q578555:
   title: Noether's theorem
 
 Q579515:
-  title: "Rao\u2013Blackwell theorem"
+  title: Rao–Blackwell theorem
 
 Q583147:
   title: Sard's theorem
 
 Q586051:
-  title: "Haag\u2013\u0141opusza\u0144ski\u2013Sohnius theorem"
+  title: Haag–Łopuszański–Sohnius theorem
 
 Q587081:
-  title: "Kolmogorov\u2013Arnold\u2013Moser theorem"
+  title: Kolmogorov–Arnold–Moser theorem
 
 Q588218:
   title: Koebe 1/4 theorem
@@ -434,10 +434,10 @@ Q608294:
   title: Max flow min cut theorem
 
 Q609612:
-  title: "Knaster\u2013Tarski theorem"
+  title: Knaster–Tarski theorem
 
 Q612021:
-  title: "Gibbard\u2013Satterthwaite theorem"
+  title: Gibbard–Satterthwaite theorem
 
 Q617417:
   title: Isoperimetric theorem
@@ -461,10 +461,10 @@ Q637418:
   title: Napoleon's theorem
 
 Q642620:
-  title: "Krein\u2013Milman theorem"
+  title: Krein–Milman theorem
 
 Q643513:
-  title: "Riesz\u2013Fischer theorem"
+  title: Riesz–Fischer theorem
 
 Q643826:
   title: Slutsky's theorem
@@ -476,7 +476,7 @@ Q649469:
   title: Modularity theorem
 
 Q649977:
-  title: "Shirshov\u2013Cohn theorem"
+  title: Shirshov–Cohn theorem
 
 Q650738:
   title: Folk theorem
@@ -494,19 +494,19 @@ Q656645:
   title: Hilbert's basis theorem
 
 Q656772:
-  title: "Cayley\u2013Hamilton theorem"
+  title: Cayley–Hamilton theorem
 
 Q657469:
   title: Lefschetz fixed-point theorem
 
 Q657469X:
-  title: "Lefschetz\u2013Hopf theorem"
+  title: Lefschetz–Hopf theorem
 
 Q657482:
-  title: "Abel\u2013Ruffini theorem"
+  title: Abel–Ruffini theorem
 
 Q657903:
-  title: "Hilbert\u2013Waring theorem"
+  title: Hilbert–Waring theorem
 
 Q660799:
   title: Darboux's theorem
@@ -515,13 +515,13 @@ Q670235:
   title: Fundamental theorem of arithmetic
 
 Q671663:
-  title: "Coleman\u2013Mandula theorem"
+  title: Coleman–Mandula theorem
 
 Q676413:
   title: Dandelin's theorem
 
 Q679800:
-  title: "Nyquist\u2013Shannon sampling theorem"
+  title: Nyquist–Shannon sampling theorem
 
 Q681406:
   title: Euler's rotation theorem
@@ -533,19 +533,19 @@ Q693083:
   title: Soundness theorem
 
 Q716171:
-  title: "Erd\u0151s\u2013Ginzburg\u2013Ziv theorem"
+  title: Erdős–Ginzburg–Ziv theorem
 
 Q718875:
-  title: "Erd\u0151s\u2013Ko\u2013Rado theorem"
+  title: Erdős–Ko–Rado theorem
 
 Q719966:
   title: Toda's theorem
 
 Q720469:
-  title: "Chevalley\u2013Warning theorem"
+  title: Chevalley–Warning theorem
 
 Q721695:
-  title: "Szemer\xE9di\u2013Trotter theorem"
+  title: Szemerédi–Trotter theorem
 
 Q727102:
   title: Fermat's theorem (stationary points)
@@ -560,10 +560,10 @@ Q733081:
   title: Impossibility of angle trisection
 
 Q737851:
-  title: "Banach\u2013Tarski theorem"
+  title: Banach–Tarski theorem
 
 Q737892:
-  title: "Bendixson\u2013Dulac theorem"
+  title: Bendixson–Dulac theorem
 
 Q739403:
   title: Stewart's theorem
@@ -572,25 +572,25 @@ Q740093:
   title: Peano existence theorem
 
 Q742833:
-  title: "Gauss\u2013Bonnet theorem"
+  title: Gauss–Bonnet theorem
 
 Q744440:
-  title: "Immerman\u2013Szelepcs\xE9nyi theorem"
+  title: Immerman–Szelepcsényi theorem
 
 Q748233:
-  title: "Sylvester\u2013Gallai theorem"
+  title: Sylvester–Gallai theorem
 
 Q751120:
-  title: "Thue\u2013Siegel\u2013Roth theorem"
+  title: Thue–Siegel–Roth theorem
 
 Q752375:
   title: Extreme value theorem
 
 Q755986:
-  title: "Atiyah\u2013Bott fixed-point theorem"
+  title: Atiyah–Bott fixed-point theorem
 
 Q755991:
-  title: "Atiyah\u2013Singer index theorem"
+  title: Atiyah–Singer index theorem
 
 Q756946:
   title: Lagrange's four-square theorem
@@ -599,13 +599,13 @@ Q764287:
   title: Van der Waerden's theorem
 
 Q765987:
-  title: "Heine\u2013Cantor theorem"
+  title: Heine–Cantor theorem
 
 Q766722:
   title: Liouville's theorem
 
 Q776578:
-  title: "Artin\u2013Wedderburn theorem"
+  title: Artin–Wedderburn theorem
 
 Q777924:
   title: Tijdeman's theorem
@@ -647,7 +647,7 @@ Q834025:
   title: Cauchy integral theorem
 
 Q834211:
-  title: "Wallace\u2013Bolyai\u2013Gerwien theorem"
+  title: Wallace–Bolyai–Gerwien theorem
 
 Q837506:
   title: Theorem on friends and strangers
@@ -668,10 +668,10 @@ Q845088:
   title: Pappus's centroid theorem
 
 Q846840:
-  title: "Erd\u0151s\u2013Kac theorem"
+  title: Erdős–Kac theorem
 
 Q848092:
-  title: "Borsuk\u2013Ulam theorem"
+  title: Borsuk–Ulam theorem
 
 Q848375:
   title: Implicit function theorem
@@ -707,13 +707,13 @@ Q858978:
   title: Castigliano's first and second theorems
 
 Q859122:
-  title: "Cauchy\u2013Hadamard theorem"
+  title: Cauchy–Hadamard theorem
 
 Q865665:
   title: Birkhoff's theorem
 
 Q866116:
-  title: "Hahn\u2013Banach theorem"
+  title: Hahn–Banach theorem
 
 Q867141:
   title: Ehresmann's theorem
@@ -731,10 +731,10 @@ Q877489:
   title: Apollonius's theorem
 
 Q890875:
-  title: "Bohr\u2013van Leeuwen theorem"
+  title: Bohr–van Leeuwen theorem
 
 Q897769:
-  title: "K\xF6nig's theorem"
+  title: König's theorem
 
 Q899002:
   title: Pascal's theorem
@@ -746,16 +746,16 @@ Q900831:
   title: Fluctuation theorem
 
 Q902052:
-  title: "G\xF6del's completeness theorem"
+  title: Gödel's completeness theorem
 
 Q902618:
   title: Floquet's theorem
 
 Q906809:
-  title: "Hellmann\u2013Feynman theorem"
+  title: Hellmann–Feynman theorem
 
 Q909517:
-  title: "Feit\u2013Thompson theorem"
+  title: Feit–Thompson theorem
 
 Q913447:
   title: Morley's trisector theorem
@@ -773,13 +773,13 @@ Q918099:
   title: Ramsey's theorem
 
 Q922012:
-  title: "Green\u2013Tao theorem"
+  title: Green–Tao theorem
 
 Q922367:
   title: Master theorem (analysis of algorithms)
 
 Q925224:
-  title: "Sonnenschein\u2013Mantel\u2013Debreu Theorem"
+  title: Sonnenschein–Mantel–Debreu Theorem
 
 Q925854:
   title: Angle bisector theorem
@@ -800,16 +800,16 @@ Q931001X:
   title: Constant rank theorem
 
 Q931404:
-  title: "Bertrand\u2013Diquet\u2013Puiseux theorem"
+  title: Bertrand–Diquet–Puiseux theorem
 
 Q939927:
-  title: "Stone\u2013Weierstrass theorem"
-  decl: ContinuousMap.subalgebra_topologicalClosure_eq_top_of_separatesPoints
+  title: Stone–Weierstrass theorem
+  decl: stone_weierstrass
   author: Scott Morrison and Heather Macbeth
   date: 2021-05-01
 
 Q942046:
-  title: "Schwarz\u2013Ahlfors\u2013Pick theorem"
+  title: Schwarz–Ahlfors–Pick theorem
 
 Q943246:
   title: Wedderburn's little theorem
@@ -833,7 +833,7 @@ Q965294:
   title: Thabit ibn Qurra's theorem
 
 Q966837:
-  title: "Cram\xE9r\u2013Wold theorem"
+  title: Cramér–Wold theorem
 
 Q967972:
   title: Open mapping theorem
@@ -842,13 +842,13 @@ Q973359:
   title: Rado's theorem
 
 Q974405:
-  title: "Hille\u2013Yosida theorem"
+  title: Hille–Yosida theorem
 
 Q976033:
-  title: "Gelfond\u2013Schneider theorem"
+  title: Gelfond–Schneider theorem
 
 Q976607:
-  title: "Erd\u0151s\u2013Szekeres theorem"
+  title: Erdős–Szekeres theorem
 
 Q977912:
   title: Stolper&ndash;Samuelson theorem
@@ -866,31 +866,31 @@ Q995926:
   title: Perpendicular axis theorem
 
 Q999783:
-  title: "Buckingham \u03C0 theorem"
+  title: Buckingham π theorem
 
 Q1008566:
-  title: "Gauss\u2013Lucas theorem"
+  title: Gauss–Lucas theorem
 
 Q1032886:
-  title: "Hales\u2013Jewett theorem"
+  title: Hales–Jewett theorem
 
 Q1033910:
-  title: "Cantor\u2013Bernstein\u2013Schroeder theorem"
+  title: Cantor–Bernstein–Schroeder theorem
 
 Q1037559:
-  title: "P\xF3lya enumeration theorem"
+  title: Pólya enumeration theorem
 
 Q1038716:
   title: Identity theorem
 
 Q1046232:
-  title: "Szemer\xE9di's theorem"
+  title: Szemerédi's theorem
 
 Q1047749:
-  title: "Tur\xE1n's theorem"
+  title: Turán's theorem
 
 Q1048589:
-  title: "Hohenberg\u2013Kohn theorems"
+  title: Hohenberg–Kohn theorems
 
 Q1048874:
   title: Gauss's Theorema Egregium
@@ -905,7 +905,7 @@ Q1050932:
   title: Hartogs's theorem
 
 Q1051404:
-  title: "Ces\xE0ro's theorem"
+  title: Cesàro's theorem
 
 Q1052021:
   title: Craig's interpolation theorem
@@ -914,7 +914,7 @@ Q1052678:
   title: Baire category theorem
 
 Q1052752:
-  title: "Stolz\u2013Ces\xE0ro theorem"
+  title: Stolz–Cesàro theorem
 
 Q1054106:
   title: Cox's theorem
@@ -950,7 +950,7 @@ Q1068085:
   title: Closed graph theorem
 
 Q1068283:
-  title: "L\xF6wenheim\u2013Skolem theorem"
+  title: Löwenheim–Skolem theorem
 
 Q1068385:
   title: Clairaut's theorem
@@ -962,10 +962,10 @@ Q1075398:
   title: Jung's theorem
 
 Q1076274:
-  title: "Choquet\u2013Bishop\u2013de Leeuw theorem"
+  title: Choquet–Bishop–de Leeuw theorem
 
 Q1077462:
-  title: "K\xF6nig's theorem"
+  title: König's theorem
 
 Q1077741:
   title: Hairy ball theorem
@@ -974,25 +974,25 @@ Q1082910:
   title: Euler's partition theorem
 
 Q1095330:
-  title: "Ap\xE9ry's theorem"
+  title: Apéry's theorem
 
 Q1097021:
   title: Minkowski's theorem
 
 Q1103054:
-  title: "Lions\u2013Lax\u2013Milgram theorem"
+  title: Lions–Lax–Milgram theorem
 
 Q1119094:
   title: Paley&ndash;Wiener theorem
 
 Q1121027:
-  title: "Krylov\u2013Bogolyubov theorem"
+  title: Krylov–Bogolyubov theorem
 
 Q1125462:
   title: Dinostratus' theorem
 
 Q1129636:
-  title: "Lehmann\u2013Scheff\xE9 theorem"
+  title: Lehmann–Scheffé theorem
 
 Q1130846:
   title: Ladner's theorem
@@ -1043,7 +1043,7 @@ Q1141747:
   title: Carnot's theorem
 
 Q1143540:
-  title: "Heckscher\u2013Ohlin theorem"
+  title: Heckscher–Ohlin theorem
 
 Q1144897:
   title: Brouwer fixed-point theorem
@@ -1058,7 +1058,7 @@ Q1149022:
   title: Fubini's theorem
 
 Q1149185X:
-  title: "Kirby\u2013Paris theorem"
+  title: Kirby–Paris theorem
 
 Q1149185:
   title: Goodstein's theorem
@@ -1070,7 +1070,7 @@ Q1149522:
   title: Lami's theorem
 
 Q1152521:
-  title: "Mohr\u2013Mascheroni theorem"
+  title: Mohr–Mascheroni theorem
 
 Q1153441:
   title: Goldstone's theorem
@@ -1082,7 +1082,7 @@ Q1166774:
   title: Stone's representation theorem for Boolean algebras
 
 Q1177508:
-  title: "R\xE9dei's theorem"
+  title: Rédei's theorem
 
 Q1179446:
   title: De Rham's theorem
@@ -1091,7 +1091,7 @@ Q1182249:
   title: Deduction theorem
 
 Q1186134:
-  title: "Poncelet\u2013Steiner theorem"
+  title: Poncelet–Steiner theorem
 
 Q1186808:
   title: Lucas's theorem
@@ -1109,13 +1109,13 @@ Q1188504:
   title: Pitman&ndash;Koopman&ndash;Darmois theorem
 
 Q1191319:
-  title: "Radon\u2013Nikodym theorem"
+  title: Radon–Nikodym theorem
 
 Q1191709:
   title: Egorov's theorem
 
 Q1191862:
-  title: "Rouch\xE9's theorem"
+  title: Rouché's theorem
 
 Q1194053:
   title: Metrization theorems
@@ -1148,19 +1148,19 @@ Q1242398:
   title: Doob decomposition theorem
 
 Q1243340:
-  title: "Birkhoff\u2013Von Neumann theorem"
+  title: Birkhoff–Von Neumann theorem
 
 Q1249069:
   title: Richardson's theorem
 
 Q1259814:
-  title: "Nielsen\u2013Schreier theorem"
+  title: Nielsen–Schreier theorem
 
 Q1276318:
   title: Schwartz kernel theorem
 
 Q1305766:
-  title: "Poincar\xE9\u2013Hopf theorem"
+  title: Poincaré–Hopf theorem
 
 Q1306092:
   title: Nash embedding theorem
@@ -1169,10 +1169,10 @@ Q1306095:
   title: Whitney embedding theorem
 
 Q1307676:
-  title: "K\xFCnneth theorem"
+  title: Künneth theorem
 
 Q1308502:
-  title: "Church\u2013Rosser theorem"
+  title: Church–Rosser theorem
 
 Q1315949:
   title: Mittag-Leffler's theorem
@@ -1202,7 +1202,7 @@ Q1348736:
   title: Rybczynski theorem
 
 Q1349282:
-  title: "Eilenberg\u2013Zilber theorem"
+  title: Eilenberg–Zilber theorem
 
 Q1357684:
   title: Riesz representation theorem
@@ -1214,10 +1214,10 @@ Q1361393:
   title: Luzin's theorem
 
 Q1366581:
-  title: "Erd\u0151s\u2013Rado theorem"
+  title: Erdős–Rado theorem
 
 Q1369453:
-  title: "Kronecker\u2013Weber theorem"
+  title: Kronecker–Weber theorem
 
 Q1370316:
   title: Casey's theorem
@@ -1226,7 +1226,7 @@ Q1376515:
   title: No-hair theorem
 
 Q1396592:
-  title: "Franel\u2013Landau theorem"
+  title: Franel–Landau theorem
 
 Q1420905:
   title: Hilbert's theorem 90
@@ -1250,7 +1250,7 @@ Q1425529:
   title: Chebotarev's density theorem
 
 Q1426292:
-  title: "Banach\u2013Steinhaus theorem"
+  title: Banach–Steinhaus theorem
 
 Q1434158:
   title: Fluctuation dissipation theorem
@@ -1262,7 +1262,7 @@ Q1443036:
   title: Parseval's theorem
 
 Q1452678:
-  title: "Penrose\u2013Hawking singularity theorems"
+  title: Penrose–Hawking singularity theorems
 
 Q1455794:
   title: Freudenthal suspension theorem
@@ -1277,7 +1277,7 @@ Q1472120:
   title: Hellinger&ndash;Toeplitz theorem
 
 Q1477053:
-  title: "Arzel\xE0\u2013Ascoli theorem"
+  title: Arzelà–Ascoli theorem
 
 Q1505529:
   title: Runge's theorem
@@ -1286,31 +1286,31 @@ Q1506253:
   title: Euclid's theorem
 
 Q1529941:
-  title: "Peter\u2013Weyl theorem"
+  title: Peter–Weyl theorem
 
 Q1530275:
-  title: "Dunford\u2013Pettis theorem"
+  title: Dunford–Pettis theorem
 
 Q1535225:
-  title: "\u0141o\u015B' theorem"
+  title: Łoś' theorem
 
 Q1542114:
-  title: "B\xE9zout's theorem"
+  title: Bézout's theorem
 
 Q1543149:
-  title: "Sokhatsky\u2013Weierstrass theorem"
+  title: Sokhatsky–Weierstrass theorem
 
 Q1547975:
-  title: "Mermin\u2013Wagner theorem"
+  title: Mermin–Wagner theorem
 
 Q1551745:
   title: Binomial inverse theorem
 
 Q1555342:
-  title: "Reeh\u2013Schlieder theorem"
+  title: Reeh–Schlieder theorem
 
 Q1564541:
-  title: "Perron\u2013Frobenius theorem"
+  title: Perron–Frobenius theorem
 
 Q1566341:
   title: Hindman's theorem
@@ -1325,19 +1325,19 @@ Q1568811:
   title: Hahn decomposition theorem
 
 Q1572474:
-  title: "Lindemann\u2013Weierstrass theorem"
+  title: Lindemann–Weierstrass theorem
 
 Q1576235:
   title: Lochs's theorem
 
 Q1602819:
-  title: "Lumer\u2013Phillips theorem"
+  title: Lumer–Phillips theorem
 
 Q1614464:
-  title: "Cauchy\u2013Kowalevski theorem"
+  title: Cauchy–Kowalevski theorem
 
 Q1621180:
-  title: "Orlicz\u2013Pettis theorem"
+  title: Orlicz–Pettis theorem
 
 Q1630588:
   title: Hurwitz's theorem
@@ -1346,7 +1346,7 @@ Q1631749:
   title: Lester's theorem
 
 Q1631992:
-  title: "Steiner\u2013Lehmus theorem"
+  title: Steiner–Lehmus theorem
 
 Q1632301:
   title: Sturm's theorem
@@ -1358,7 +1358,7 @@ Q1637085:
   title: Poynting's theorem
 
 Q1660147:
-  title: "Mazur\u2013Ulam theorem"
+  title: Mazur–Ulam theorem
 
 Q1668861:
   title: Picard theorem
@@ -1367,7 +1367,7 @@ Q1683356:
   title: Japanese theorem for concyclic quadrilaterals
 
 Q1687147:
-  title: "Sprague\u2013Grundy theorem"
+  title: Sprague–Grundy theorem
 
 Q1694565:
   title: Vinogradov's theorem
@@ -1376,7 +1376,7 @@ Q1699024:
   title: John ellipsoid
 
 Q1704878:
-  title: "Appell\u2013Humbert theorem"
+  title: Appell–Humbert theorem
 
 Q1716166:
   title: Mercer's theorem
@@ -1391,7 +1391,7 @@ Q1727461:
   title: Intersecting secants theorem
 
 Q1739994:
-  title: "Brauer\u2013Suzuki theorem"
+  title: Brauer–Suzuki theorem
 
 Q1751105:
   title: Blum's speedup theorem
@@ -1406,10 +1406,10 @@ Q1752621:
   title: Sylvester's law of inertia
 
 Q1752988:
-  title: "Kutta\u2013Joukowski theorem"
+  title: Kutta–Joukowski theorem
 
 Q1756194:
-  title: "Shannon\u2013Hartley theorem"
+  title: Shannon–Hartley theorem
 
 Q1765521:
   title: Doob's martingale convergence theorems
@@ -1421,7 +1421,7 @@ Q1785610:
   title: Poncelet's closure theorem
 
 Q1785872:
-  title: "Berry\u2013Ess\xE9en theorem"
+  title: Berry–Esséen theorem
 
 Q1786292:
   title: Schur's theorem
@@ -1442,7 +1442,7 @@ Q1841237:
   title: Fubini's theorem on differentiation
 
 Q1855610:
-  title: "Theorem of de Moivre\u2013Laplace"
+  title: Theorem of de Moivre–Laplace
 
 Q1888583:
   title: Holditch's theorem
@@ -1454,10 +1454,10 @@ Q1896455:
   title: Varignon's theorem
 
 Q1899432:
-  title: "Grothendieck\u2013Hirzebruch\u2013Riemann\u2013Roch theorem"
+  title: Grothendieck–Hirzebruch–Riemann–Roch theorem
 
 Q1914905:
-  title: "Ramanujan\u2013Skolem's theorem"
+  title: Ramanujan–Skolem's theorem
 
 Q1930577:
   title: Herbrand's theorem
@@ -1466,10 +1466,10 @@ Q1933521:
   title: Kleene's recursion theorem
 
 Q1938251:
-  title: "Hasse\u2013Minkowski theorem"
+  title: Hasse–Minkowski theorem
 
 Q1946642X:
-  title: "S\u2013cobordism theorem"
+  title: S–cobordism theorem
 
 Q1946642:
   title: H-cobordism theorem
@@ -1478,13 +1478,13 @@ Q1964537:
   title: Mergelyan's theorem
 
 Q1966978:
-  title: "L\xE9vy continuity theorem"
+  title: Lévy continuity theorem
 
 Q1974087:
   title: Riemann's theorem on removable singularities
 
 Q1995468:
-  title: "H\xF6lder's theorem"
+  title: Hölder's theorem
 
 Q1996305:
   title: Burnside's theorem
@@ -1499,7 +1499,7 @@ Q2013213:
   title: Reuschle's theorem
 
 Q2022775:
-  title: "Hilbert\u2013Schmidt theorem"
+  title: Hilbert–Schmidt theorem
 
 Q2027347:
   title: Optional stopping theorem
@@ -1508,22 +1508,22 @@ Q2028341:
   title: Ado's theorem
 
 Q2046647:
-  title: "Karhunen\u2013Lo\xE8ve theorem"
+  title: Karhunen–Loève theorem
 
 Q2063099:
-  title: "Poincar\xE9 duality theorem"
+  title: Poincaré duality theorem
 
 Q2068227:
-  title: "Artin\u2013Schreier theorem"
+  title: Artin–Schreier theorem
 
 Q2071632:
-  title: "Rouch\xE9\u2013Capelli theorem"
+  title: Rouché–Capelli theorem
 
 Q2093886:
   title: Primitive element theorem
 
 Q2094241:
-  title: "Hopf\u2013Rinow theorem"
+  title: Hopf–Rinow theorem
 
 Q2096184:
   title: Plancherel theorem
@@ -1532,7 +1532,7 @@ Q2109761:
   title: Uniformization theorem
 
 Q2120067:
-  title: "Diller\u2013Dress theorem"
+  title: Diller–Dress theorem
 
 Q2190744:
   title: Feuerbach's theorem
@@ -1544,34 +1544,34 @@ Q2222575:
   title: Shell theorem
 
 Q2226602:
-  title: "Bauer\u2013Fike theorem"
+  title: Bauer–Fike theorem
 
 Q2226606:
-  title: "Beckman\u2013Quarles theorem"
+  title: Beckman–Quarles theorem
 
 Q2226610:
-  title: "Banach\u2013Mazur theorem"
+  title: Banach–Mazur theorem
 
 Q2226624:
-  title: "Bruck\u2013Chowla\u2013Ryser theorem"
+  title: Bruck–Chowla–Ryser theorem
 
 Q2226625:
   title: Commandino's theorem
 
 Q2226640:
-  title: "Cram\xE9r\u2019s decomposition theorem"
+  title: Cramér’s decomposition theorem
 
 Q2226644:
   title: Easton's theorem
 
 Q2226650:
-  title: "Eberlein\u2013\u0160mulian theorem"
+  title: Eberlein–Šmulian theorem
 
 Q2226677:
-  title: "Gelfand\u2013Mazur theorem"
+  title: Gelfand–Mazur theorem
 
 Q2226682:
-  title: "Gelfand\u2013Naimark theorem"
+  title: Gelfand–Naimark theorem
 
 Q2226691:
   title: Kirchhoff's theorem
@@ -1583,19 +1583,19 @@ Q2226698:
   title: Kantorovich theorem
 
 Q2226709:
-  title: "Krull\u2013Schmidt theorem"
+  title: Krull–Schmidt theorem
 
 Q2226750:
-  title: "Malgrange\u2013Ehrenpreis theorem"
+  title: Malgrange–Ehrenpreis theorem
 
 Q2226774:
-  title: "K\xF6nig's theorem"
+  title: König's theorem
 
 Q2226786:
   title: Sperner's theorem
 
 Q2226800:
-  title: "Schur\u2013Zassenhaus theorem"
+  title: Schur–Zassenhaus theorem
 
 Q2226803:
   title: Tennenbaum's theorem
@@ -1610,7 +1610,7 @@ Q2226868:
   title: Geometric mean theorem
 
 Q2226962:
-  title: "Weierstrass\u2013Casorati theorem"
+  title: Weierstrass–Casorati theorem
 
 Q2253746:
   title: Bertrand's ballot theorem
@@ -1625,7 +1625,7 @@ Q2269888:
   title: Cohn's irreducibility criterion
 
 Q2270905:
-  title: "Poincar\xE9\u2013Birkhoff\u2013Witt theorem"
+  title: Poincaré–Birkhoff–Witt theorem
 
 Q2275191:
   title: Lebesgue differentiation theorem
@@ -1640,7 +1640,7 @@ Q2309682:
   title: Sphere theorem
 
 Q2309760:
-  title: "Looman\u2013Menchoff theorem"
+  title: Looman–Menchoff theorem
 
 Q2310718:
   title: Pitot theorem
@@ -1655,10 +1655,10 @@ Q2347139:
   title: Carnot's theorem
 
 Q2360531:
-  title: "Jordan\u2013Schur theorem"
+  title: Jordan–Schur theorem
 
 Q2374733:
-  title: "Skolem\u2013Mahler\u2013Lech theorem"
+  title: Skolem–Mahler–Lech theorem
 
 Q2376918:
   title: Abelian and Tauberian theorems
@@ -1667,7 +1667,7 @@ Q2378270:
   title: Thue's theorem
 
 Q2379128:
-  title: "Lindstr\xF6m's theorem"
+  title: Lindström's theorem
 
 Q2379132:
   title: Going-up and going-down theorems
@@ -1688,7 +1688,7 @@ Q2449984X:
   title: Pivot theorem
 
 Q2471737:
-  title: "Carath\xE9odory's theorem"
+  title: Carathéodory's theorem
 
 Q2473965:
   title: Ugly duckling theorem
@@ -1703,10 +1703,10 @@ Q2495664:
   title: Universal coefficient theorem
 
 Q2500406:
-  title: "Li\xE9nard's theorem"
+  title: Liénard's theorem
 
 Q2500408:
-  title: "Th\xE9bault's theorem"
+  title: Thébault's theorem
 
 Q2518048:
   title: Kodaira vanishing theorem
@@ -1715,31 +1715,31 @@ Q2524990:
   title: Jackson's theorem
 
 Q2525646:
-  title: "Jordan\u2013H\xF6lder theorem"
+  title: Jordan–Hölder theorem
 
 Q2533936:
   title: Descartes's theorem on total angular defect
 
 Q2540738:
-  title: "Cartan\u2013Dieudonn\xE9 theorem"
+  title: Cartan–Dieudonné theorem
 
 Q2558669:
-  title: "Artin\u2013Zorn theorem"
+  title: Artin–Zorn theorem
 
 Q2588432:
   title: Wold's theorem
 
 Q2600653:
-  title: "Taylor\u2013Proudman theorem"
+  title: Taylor–Proudman theorem
 
 Q2607007:
   title: Hinge theorem
 
 Q2621667:
-  title: "Nagata\u2013Smirnov metrization theorem"
+  title: Nagata–Smirnov metrization theorem
 
 Q2631152:
-  title: "Carath\xE9odory's extension theorem"
+  title: Carathéodory's extension theorem
 
 Q2635326:
   title: Structured program theorem
@@ -1754,13 +1754,13 @@ Q2733672:
   title: Price's theorem
 
 Q2734084:
-  title: "Bohr\u2013Mollerup theorem"
+  title: Bohr–Mollerup theorem
 
 Q2793600:
-  title: "Stark\u2013Heegner theorem"
+  title: Stark–Heegner theorem
 
 Q2799491:
-  title: "Ringel\u2013Youngs theorem"
+  title: Ringel–Youngs theorem
 
 Q2800071:
   title: Perfect graph theorem
@@ -1781,28 +1781,28 @@ Q2981012:
   title: Monge's theorem
 
 Q2984415:
-  title: "Hajnal\u2013Szemer\xE9di theorem"
+  title: Hajnal–Szemerédi theorem
 
 Q2993026:
   title: Ankeny&ndash;Artin&ndash;Chowla theorem
 
 Q2993308:
-  title: "Cameron\u2013Erd\u0151s theorem"
+  title: Cameron–Erdős theorem
 
 Q2993319:
-  title: "Mirsky\u2013Newman theorem"
+  title: Mirsky–Newman theorem
 
 Q2995691:
-  title: "Newlander\u2013Niremberg theorem"
+  title: Newlander–Niremberg theorem
 
 Q3001796:
-  title: "Skolem\u2013Noether theorem"
+  title: Skolem–Noether theorem
 
 Q3007384:
   title: Post's theorem
 
 Q3075250:
-  title: "Hardy\u2013Littlewood maximal theorem"
+  title: Hardy–Littlewood maximal theorem
 
 Q3077634:
   title: Sahlqvist correspondence theorem
@@ -1817,13 +1817,13 @@ Q3180727:
   title: Perlis theorem
 
 Q3229335:
-  title: "Borel\u2013Carath\xE9odory theorem"
+  title: Borel–Carathéodory theorem
 
 Q3229352:
   title: Vitali covering theorem
 
 Q3345678:
-  title: "Moore\u2013Aronszajn theorem"
+  title: Moore–Aronszajn theorem
 
 Q3424029:
   title: Chasles's theorems
@@ -1832,22 +1832,22 @@ Q3443426:
   title: Bondy's theorem
 
 Q3458641:
-  title: "Szeg\u0151 limit theorems"
+  title: Szegő limit theorems
 
 Q3502015:
   title: Hasse's theorem on elliptic curves
 
 Q3505260:
-  title: "Cayley\u2013Salmon theorem"
+  title: Cayley–Salmon theorem
 
 Q3526969:
   title: AF+BG theorem
 
 Q3526976:
-  title: "Ax\u2013Kochen theorem"
+  title: Ax–Kochen theorem
 
 Q3526982:
-  title: "Erd\u0151s\u2013Anning theorem"
+  title: Erdős–Anning theorem
 
 Q3526990:
   title: Euler's theorem
@@ -1865,7 +1865,7 @@ Q3527004:
   title: BEST theorem
 
 Q3527008:
-  title: "Balian\u2013Low theorem"
+  title: Balian–Low theorem
 
 Q3527009:
   title: Baker's theorem
@@ -1877,7 +1877,7 @@ Q3527015:
   title: Bernstein's theorem
 
 Q3527017:
-  title: "Beurling\u2013Lax theorem"
+  title: Beurling–Lax theorem
 
 Q3527019:
   title: Birch's theorem
@@ -1886,16 +1886,16 @@ Q3527034:
   title: Cauchy's theorem
 
 Q3527040:
-  title: "Chomsky\u2013Sch\xFCtzenberger representation theorem"
+  title: Chomsky–Schützenberger representation theorem
 
 Q3527044:
   title: Pappus's area theorem
 
 Q3527054:
-  title: "De Bruijn\u2013Erd\u0151s theorem (graph theory)"
+  title: De Bruijn–Erdős theorem (graph theory)
 
 Q3527056:
-  title: "De Bruijn\u2013Erd\u0151s theorem (incidence geometry)"
+  title: De Bruijn–Erdős theorem (incidence geometry)
 
 Q3527064:
   title: Donsker's theorem
@@ -1904,7 +1904,7 @@ Q3527067:
   title: F. and M. Riesz theorem
 
 Q3527071:
-  title: "F\xE1ry\u2013Milnor theorem"
+  title: Fáry–Milnor theorem
 
 Q3527079:
   title: Freiman's theorem
@@ -1916,7 +1916,7 @@ Q3527091:
   title: Gromov's theorem on groups of polynomial growth
 
 Q3527093:
-  title: "Hilbert\u2013Speiser theorem"
+  title: Hilbert–Speiser theorem
 
 Q3527095:
   title: Jacobi's four-square theorem
@@ -1925,13 +1925,13 @@ Q3527100:
   title: Kruskal's tree theorem
 
 Q3527102:
-  title: "Kruskal\u2013Katona theorem"
+  title: Kruskal–Katona theorem
 
 Q3527110:
-  title: "Lax\u2013Wendroff theorem"
+  title: Lax–Wendroff theorem
 
 Q3527113:
-  title: "Lie\u2013Kolchin theorem"
+  title: Lie–Kolchin theorem
 
 Q3527118:
   title: Mahler's theorem
@@ -1940,13 +1940,13 @@ Q3527125:
   title: Monsky's theorem
 
 Q3527129:
-  title: "M\xFCntz\u2013Sz\xE1sz theorem"
+  title: Müntz–Szász theorem
 
 Q3527132:
-  title: "Nagell\u2013Lutz theorem"
+  title: Nagell–Lutz theorem
 
 Q3527155:
-  title: "Robertson\u2013Seymour theorem"
+  title: Robertson–Seymour theorem
 
 Q3527162:
   title: Sophie Germain's theorem
@@ -1991,7 +1991,7 @@ Q3527226:
   title: Linear speedup theorem
 
 Q3527230:
-  title: "Von Staudt\u2013Clausen theorem"
+  title: Von Staudt–Clausen theorem
 
 Q3527233:
   title: Kolmogorov's three-series theorem
@@ -2042,10 +2042,10 @@ Q3893473:
   title: Tameness theorem
 
 Q3915398:
-  title: "Brunn\u2013Minkowski theorem"
+  title: Brunn–Minkowski theorem
 
 Q3983968:
-  title: "Sturm\u2013Picone comparison theorem"
+  title: Sturm–Picone comparison theorem
 
 Q3983972:
   title: Simplicial approximation theorem
@@ -2057,7 +2057,7 @@ Q3984017:
   title: Helly's selection theorem
 
 Q3984020:
-  title: "Holmstr\xF6m's theorem"
+  title: Holmström's theorem
 
 Q3984052:
   title: Equidistribution theorem
@@ -2093,16 +2093,16 @@ Q4272645:
   title: Final value theorem
 
 Q4378868:
-  title: "Phragm\xE9n\u2013Lindel\xF6f theorem"
+  title: Phragmén–Lindelöf theorem
 
 Q4378889:
-  title: "Carath\xE9odory's theorem"
+  title: Carathéodory's theorem
 
 Q4408070:
   title: De Finetti's theorem
 
 Q4454910:
-  title: "Ostrowski\u2013Hadamard gap theorem"
+  title: Ostrowski–Hadamard gap theorem
 
 Q4454919:
   title: Aumann's agreement theorem
@@ -2117,7 +2117,7 @@ Q4454958:
   title: Min-max theorem
 
 Q4454973:
-  title: "Lindel\xF6f's theorem"
+  title: Lindelöf's theorem
 
 Q4454976:
   title: Liouville's theorem
@@ -2132,7 +2132,7 @@ Q4455003:
   title: Pomeranchuk's theorem
 
 Q4455015:
-  title: "Routh\u2013Hurwitz theorem"
+  title: Routh–Hurwitz theorem
 
 Q4455016:
   title: Reeb sphere theorem
@@ -2147,7 +2147,7 @@ Q4455030:
   title: Stone's theorem on one-parameter unitary groups
 
 Q4455031:
-  title: "F\xE1ry's theorem"
+  title: Fáry's theorem
 
 Q4455033:
   title: Fatou's theorem
@@ -2156,25 +2156,25 @@ Q4455037:
   title: Hardy's theorem
 
 Q4455043:
-  title: "Cayley\u2013Bacharach theorem"
+  title: Cayley–Bacharach theorem
 
 Q4455046:
   title: Monodromy theorem
 
 Q4634017:
-  title: "2\u03C0 theorem"
+  title: 2π theorem
 
 Q4663326:
-  title: "Hirzebruch\u2013Riemann\u2013Roch theorem"
+  title: Hirzebruch–Riemann–Roch theorem
 
 Q4666729:
-  title: "Abel\u2013Jacobi theorem"
+  title: Abel–Jacobi theorem
 
 Q4666729X:
   title: Abel's curve theorem
 
 Q4667501:
-  title: "Abhyankar\u2013Moh theorem"
+  title: Abhyankar–Moh theorem
 
 Q4677985:
   title: Acyclic models theorem
@@ -2186,10 +2186,10 @@ Q4700718:
   title: Akhiezer's theorem
 
 Q4712316:
-  title: "Albert\u2013Brauer\u2013Hasse\u2013Noether theorem"
+  title: Albert–Brauer–Hasse–Noether theorem
 
 Q4713046:
-  title: "Alchian\u2013Allen theorem"
+  title: Alchian–Allen theorem
 
 Q4724004B:
   title: Riemann's existence theorem
@@ -2198,16 +2198,16 @@ Q4724004A:
   title: Chow's theorem
 
 Q4734002:
-  title: "Gromov\u2013Ruh theorem"
+  title: Gromov–Ruh theorem
 
 Q4734844:
-  title: "Alperin\u2013Brauer\u2013Gorenstein theorem"
+  title: Alperin–Brauer–Gorenstein theorem
 
 Q4736422:
   title: Denjoy theorem
 
 Q4746948:
-  title: "Amitsur\u2013Levitzki theorem"
+  title: Amitsur–Levitzki theorem
 
 Q4751110:
   title: Analyst's traveling salesman theorem
@@ -2219,10 +2219,10 @@ Q4753992:
   title: Anderson's theorem
 
 Q4756099:
-  title: "Andreotti\u2013Frankel theorem"
+  title: Andreotti–Frankel theorem
 
 Q4783822:
-  title: "Arithmetic Riemann\u2013Roch theorem"
+  title: Arithmetic Riemann–Roch theorem
 
 Q4788680:
   title: Area theorem (conformal mapping)
@@ -2231,13 +2231,13 @@ Q4801169:
   title: Artin approximation theorem
 
 Q4801183:
-  title: "Artin\u2013Verdier duality theorem"
+  title: Artin–Verdier duality theorem
 
 Q4801563:
   title: Artstein's theorem
 
 Q4815879:
-  title: "Atiyah\u2013Segal completion theorem"
+  title: Atiyah–Segal completion theorem
 
 Q4815899:
   title: Atkinson's theorem
@@ -2249,22 +2249,22 @@ Q4827308:
   title: Auxiliary polynomial theorem
 
 Q4830725:
-  title: "Ax\u2013Grothendieck theorem"
+  title: Ax–Grothendieck theorem
 
 Q4832965:
   title: Aztec diamond theorem
 
 Q4838119:
-  title: "Babu\u0161ka\u2013Lax\u2013Milgram theorem"
+  title: Babuška–Lax–Milgram theorem
 
 Q4848497:
-  title: "Baily\u2013Borel theorem"
+  title: Baily–Borel theorem
 
 Q4853767:
-  title: "Banach\u2013Stone theorem"
+  title: Banach–Stone theorem
 
 Q4857506:
-  title: "Bapat\u2013Beg theorem"
+  title: Bapat–Beg theorem
 
 Q4865980:
   title: Barwise compactness theorem
@@ -2276,13 +2276,13 @@ Q4866385X:
   title: Proper base change theorem
 
 Q4877965:
-  title: "Beauville\u2013Laszlo theorem"
+  title: Beauville–Laszlo theorem
 
 Q4878586:
   title: Beck's monadicity theorem
 
 Q4880958:
-  title: "Behnke\u2013Stein theorem"
+  title: Behnke–Stein theorem
 
 Q4884789:
   title: Beltrami's theorem
@@ -2291,7 +2291,7 @@ Q4884950:
   title: Belyi's theorem
 
 Q4891633:
-  title: "Berger\u2013Kazdan comparison theorem"
+  title: Berger–Kazdan comparison theorem
 
 Q4894565:
   title: Bernstein's theorem
@@ -2300,19 +2300,19 @@ Q4914101:
   title: Bing's recognition theorem
 
 Q4916483:
-  title: "Birkhoff\u2013Grothendieck theorem"
+  title: Birkhoff–Grothendieck theorem
 
 Q4918128:
-  title: "Bishop\u2013Cannings theorem"
+  title: Bishop–Cannings theorem
 
 Q4927458:
   title: Blondel's theorem
 
 Q4937691:
-  title: "Bogoliubov\u2013Parasyuk theorem"
+  title: Bogoliubov–Parasyuk theorem
 
 Q4941364:
-  title: "Bondareva\u2013Shapley theorem"
+  title: Bondareva–Shapley theorem
 
 Q4942215:
   title: Bonnet theorem
@@ -2324,10 +2324,10 @@ Q4944908:
   title: Borel fixed-point theorem
 
 Q4944923:
-  title: "Borel\u2013Bott\u2013Weil theorem"
+  title: Borel–Bott–Weil theorem
 
 Q4944923X:
-  title: "Borel\u2013Weil theorem"
+  title: Borel–Weil theorem
 
 Q4948983:
   title: Bott periodicity theorem
@@ -2336,7 +2336,7 @@ Q4949984:
   title: Bounded inverse theorem
 
 Q4950096:
-  title: "Bourbaki\u2013Witt theorem"
+  title: Bourbaki–Witt theorem
 
 Q4956438:
   title: Branching theorem
@@ -2348,13 +2348,13 @@ Q4958221:
   title: Brauer's three main theorems
 
 Q4958227:
-  title: "Brauer\u2013Nesbitt theorem"
+  title: Brauer–Nesbitt theorem
 
 Q4958230:
-  title: "Brauer\u2013Siegel theorem"
+  title: Brauer–Siegel theorem
 
 Q4958233:
-  title: "Brauer\u2013Suzuki\u2013Wall theorem"
+  title: Brauer–Suzuki–Wall theorem
 
 Q4971339:
   title: British flag theorem
@@ -2363,10 +2363,10 @@ Q4975963:
   title: Brown's representability theorem
 
 Q4979609:
-  title: "Brun\u2013Titchmarsh theorem"
+  title: Brun–Titchmarsh theorem
 
 Q4991415:
-  title: "Chowla\u2013Mordell theorem"
+  title: Chowla–Mordell theorem
 
 Q4998912:
   title: Burke's theorem
@@ -2375,19 +2375,19 @@ Q5001327:
   title: Busemann's theorem
 
 Q5005143:
-  title: "B\xF4cher's theorem"
+  title: Bôcher's theorem
 
 Q5005965:
   title: C-theorem
 
 Q5026435:
-  title: "Cameron\u2013Martin theorem"
+  title: Cameron–Martin theorem
 
 Q5037752:
-  title: "Carath\xE9odory's existence theorem"
+  title: Carathéodory's existence theorem
 
 Q5041175:
-  title: "Carleson\u2013Jacobs theorem"
+  title: Carleson–Jacobs theorem
 
 Q5042898:
   title: Carlson's theorem
@@ -2396,19 +2396,19 @@ Q5047043:
   title: Cartan's theorems A and B
 
 Q5047046:
-  title: "Brauer\u2013Cartan\u2013Hua theorem"
+  title: Brauer–Cartan–Hua theorem
 
 Q5047048:
-  title: "Cartan\u2013Hadamard theorem"
+  title: Cartan–Hadamard theorem
 
 Q5047051:
-  title: "Cartan\u2013Kuranishi prolongation theorem"
+  title: Cartan–Kuranishi prolongation theorem
 
 Q5047052:
-  title: "Cartan\u2013K\xE4hler theorem"
+  title: Cartan–Kähler theorem
 
 Q5049717:
-  title: "Castelnuovo\u2013de Franchis theorem"
+  title: Castelnuovo–de Franchis theorem
 
 Q5091194:
   title: Cheng's eigenvalue comparison theorem
@@ -2417,7 +2417,7 @@ Q5094298:
   title: Chevalley's structure theorem
 
 Q5094305:
-  title: "Chevalley\u2013Shephard\u2013Todd theorem"
+  title: Chevalley–Shephard–Todd theorem
 
 Q5103861:
   title: Choi's theorem on completely positive maps
@@ -2426,7 +2426,7 @@ Q5125859:
   title: Clapeyron's theorem
 
 Q5127710:
-  title: "Clark\u2013Ocone theorem"
+  title: Clark–Ocone theorem
 
 Q5132839:
   title: Clifford's circle theorems
@@ -2450,7 +2450,7 @@ Q5157054:
   title: Compression theorem
 
 Q5161245:
-  title: "Conley\u2013Zehnder theorem"
+  title: Conley–Zehnder theorem
 
 Q5163116:
   title: Conservativity theorem
@@ -2480,13 +2480,13 @@ Q5188510:
   title: Crossbar theorem
 
 Q5195996:
-  title: "Curtis\u2013Hedlund\u2013Lyndon theorem"
+  title: Curtis–Hedlund–Lyndon theorem
 
 Q5221089:
   title: Danskin's theorem
 
 Q5242704:
-  title: "Dawson\u2013G\xE4rtner theorem"
+  title: Dawson–Gärtner theorem
 
 Q5244285:
   title: de Bruijn's theorem
@@ -2504,7 +2504,7 @@ Q5278348:
   title: Galvin's theorem
 
 Q5282059:
-  title: "Harish\u2013Chandra theorem"
+  title: Harish–Chandra theorem
 
 Q5282247:
   title: Disintegration theorem
@@ -2513,7 +2513,7 @@ Q5295351:
   title: Donaldson's theorem
 
 Q5296972:
-  title: "Doob\u2013Meyer decomposition theorem"
+  title: Doob–Meyer decomposition theorem
 
 Q5299605:
   title: Glivenko's theorem
@@ -2522,10 +2522,10 @@ Q5311783:
   title: Dudley's theorem
 
 Q5315060:
-  title: "Dunford\u2013Schwartz theorem"
+  title: Dunford–Schwartz theorem
 
 Q5319505:
-  title: "Zeilberger\u2013Bressoud theorem"
+  title: Zeilberger–Bressoud theorem
 
 Q5337931:
   title: Edgeworth's limit theorem
@@ -2537,28 +2537,28 @@ Q5384150:
   title: Equal incircles theorem
 
 Q5385323:
-  title: "Erd\u0151s\u2013Gallai theorem"
+  title: Erdős–Gallai theorem
 
 Q5385324:
-  title: "Erd\u0151s\u2013Nagy theorem"
+  title: Erdős–Nagy theorem
 
 Q5385325:
-  title: "Erd\u0151s\u2013P\xF3sa theorem"
+  title: Erdős–Pósa theorem
 
 Q5385326:
-  title: "Erd\u0151s\u2013Stone theorem"
+  title: Erdős–Stone theorem
 
 Q5421989:
   title: Exterior angle theorem
 
 Q5436274:
-  title: "Farrell\u2013Markushevich theorem"
+  title: Farrell–Markushevich theorem
 
 Q5437947:
-  title: "Fatou\u2013Lebesgue theorem"
+  title: Fatou–Lebesgue theorem
 
 Q5438320:
-  title: "Faustman\u2013Ohlin theorem"
+  title: Faustman–Ohlin theorem
 
 Q5443003:
   title: Fenchel's duality theorem
@@ -2567,19 +2567,19 @@ Q5443004:
   title: Fenchel's theorem
 
 Q5443005:
-  title: "Fenchel\u2013Moreau theorem"
+  title: Fenchel–Moreau theorem
 
 Q5445112:
   title: Fernique's theorem
 
 Q5445311:
-  title: "Ferrero\u2013Washington theorem"
+  title: Ferrero–Washington theorem
 
 Q5447238:
   title: Fieller's theorem
 
 Q5454965:
-  title: "Fisher\u2013Tippett\u2013Gnedenko theorem"
+  title: Fisher–Tippett–Gnedenko theorem
 
 Q5455495:
   title: Fitting's theorem
@@ -2594,19 +2594,19 @@ Q5473576:
   title: Foster's theorem
 
 Q5494134:
-  title: "Fra\u0148kov\xE1\u2013Helly selection theorem"
+  title: Fraňková–Helly selection theorem
 
 Q5498822:
   title: Birkhoff's theorem
 
 Q5499906:
-  title: "Shirshov\u2013Witt theorem"
+  title: Shirshov–Witt theorem
 
 Q5501344:
-  title: "Freidlin\u2013Wentzell theorem"
+  title: Freidlin–Wentzell theorem
 
 Q5503689:
-  title: "Bombieri\u2013Friedlander\u2013Iwaniec theorem"
+  title: Bombieri–Friedlander–Iwaniec theorem
 
 Q5504427:
   title: Friendship theorem
@@ -2627,7 +2627,7 @@ Q5508180:
   title: Full employment theorem
 
 Q5508482:
-  title: "Fulton\u2013Hansen connectedness theorem"
+  title: Fulton–Hansen connectedness theorem
 
 Q5508973:
   title: Fundamental theorem of arbitrage-free pricing
@@ -2645,19 +2645,19 @@ Q5567394:
   title: Gleason's theorem
 
 Q5576268:
-  title: "Goddard\u2013Thorn theorem"
+  title: Goddard–Thorn theorem
 
 Q5579030:
-  title: "Goldberg\u2013Sachs theorem"
+  title: Goldberg–Sachs theorem
 
 Q5580171:
   title: Goldie's theorem
 
 Q5586067:
-  title: "Gordon\u2013Newell theorem"
+  title: Gordon–Newell theorem
 
 Q5588002:
-  title: "Gottesman\u2013Knill theorem"
+  title: Gottesman–Knill theorem
 
 Q5597098:
   title: Graph structure theorem
@@ -2678,10 +2678,10 @@ Q5612131:
   title: Grunsky's theorem
 
 Q5612159:
-  title: "Grunwald\u2013Wang theorem"
+  title: Grunwald–Wang theorem
 
 Q5612871:
-  title: "Gr\xF6tzsch's theorem"
+  title: Grötzsch's theorem
 
 Q5638112:
   title: Hadwiger's theorem
@@ -2690,40 +2690,40 @@ Q5638886:
   title: Hahn embedding theorem
 
 Q5643485:
-  title: "Halpern\u2013L\xE4uchli theorem"
+  title: Halpern–Läuchli theorem
 
 Q5645731:
-  title: "Hammersley\u2013Clifford theorem"
+  title: Hammersley–Clifford theorem
 
 Q5656673:
-  title: "Hardy\u2013Littlewood tauberian theorem"
+  title: Hardy–Littlewood tauberian theorem
 
 Q5656674:
-  title: "Hardy\u2013Ramanujan theorem"
+  title: Hardy–Ramanujan theorem
 
 Q5657833:
-  title: "Harish\u2013Chandra's regularity theorem"
+  title: Harish–Chandra's regularity theorem
 
 Q5659675:
   title: Harnack's curve theorem
 
 Q5675112:
-  title: "Hartogs\u2013Rosenthal theorem"
+  title: Hartogs–Rosenthal theorem
 
 Q5680041:
-  title: "Hasse\u2013Arf theorem"
+  title: Hasse–Arf theorem
 
 Q5697916B:
   title: Waldhausen's theorem
 
 Q5697916A:
-  title: "Reidemeister\u2013Singer Theorem"
+  title: Reidemeister–Singer Theorem
 
 Q5697927:
-  title: "Gross\u2013Zagier theorem"
+  title: Gross–Zagier theorem
 
 Q5709171:
-  title: "Helly\u2013Bray theorem"
+  title: Helly–Bray theorem
 
 Q5709377:
   title: Helmholtz theorem (classical mechanics)
@@ -2732,7 +2732,7 @@ Q5761142:
   title: Hilbert's irreducibility theorem
 
 Q5874979:
-  title: "Hobby\u2013Rice theorem"
+  title: Hobby–Rice theorem
 
 Q5876058:
   title: Hodge index theorem
@@ -2744,13 +2744,13 @@ Q6015420:
   title: Increment theorem
 
 Q6059532:
-  title: "Aronszajn\u2013Smith theorem"
+  title: Aronszajn–Smith theorem
 
 Q6086104:
   title: Isomorphism extension theorem
 
 Q6119825:
-  title: "Jacobson\u2013Bourbaki theorem"
+  title: Jacobson–Bourbaki theorem
 
 Q6276298:
   title: Jordan's theorem (multiply transitive groups)
@@ -2759,22 +2759,22 @@ Q6344729:
   title: Kachurovskii's theorem
 
 Q6360586:
-  title: "Kanamori\u2013McAloon theorem"
+  title: Kanamori–McAloon theorem
 
 Q6373327:
-  title: "Karp\u2013Lipton theorem"
+  title: Karp–Lipton theorem
 
 Q6378596:
-  title: "Katz\u2013Lang finiteness theorem"
+  title: Katz–Lang finiteness theorem
 
 Q6379606:
-  title: "Kawamata\u2013Viehweg vanishing theorem"
+  title: Kawamata–Viehweg vanishing theorem
 
 Q6379715:
   title: Kawasaki's theorem
 
 Q6387087:
-  title: "Kempf\u2013Ness theorem"
+  title: Kempf–Ness theorem
 
 Q6400676:
   title: Kharitonov's theorem
@@ -2786,10 +2786,10 @@ Q6403282:
   title: Lagrange's theorem
 
 Q6407842:
-  title: "Killing\u2013Hopf theorem"
+  title: Killing–Hopf theorem
 
 Q6414200:
-  title: "Kinoshita\u2013Lee\u2013Nauenberg theorem"
+  title: Kinoshita–Lee–Nauenberg theorem
 
 Q6421981:
   title: Kneser's theorem
@@ -2807,7 +2807,7 @@ Q6446396:
   title: Kurosh subgroup theorem
 
 Q6455211:
-  title: "K\u014Dmura's theorem"
+  title: Kōmura's theorem
 
 Q6456122:
   title: L-balance theorem
@@ -2816,7 +2816,7 @@ Q6471668:
   title: Lafforgue's theorem
 
 Q6481192:
-  title: "Lambek\u2013Moser theorem"
+  title: Lambek–Moser theorem
 
 Q6484331:
   title: Landau prime ideal theorem
@@ -2828,7 +2828,7 @@ Q6513990:
   title: Lee Hwa Chung theorem
 
 Q6516611:
-  title: "Lee\u2013Yang theorem"
+  title: Lee–Yang theorem
 
 Q6516731:
   title: Lefschetz hyperplane theorem
@@ -2840,7 +2840,7 @@ Q6528747:
   title: Leray's theorem
 
 Q6528751:
-  title: "Leray\u2013Hirsch theorem"
+  title: Leray–Hirsch theorem
 
 Q6528849:
   title: Lerner symmetry theorem
@@ -2852,7 +2852,7 @@ Q6535741:
   title: Levitzky's theorem
 
 Q6544508:
-  title: "Lie\u2013Palais theorem"
+  title: Lie–Palais theorem
 
 Q6701653:
   title: Lukacs's proportion-sum independence theorem
@@ -2861,7 +2861,7 @@ Q6707093:
   title: Lyapunov&ndash;Malkin theorem
 
 Q6711207:
-  title: "L\xE9vy's modulus of continuity theorem"
+  title: Lévy's modulus of continuity theorem
 
 Q6722024:
   title: MacMahon Master theorem
@@ -2879,7 +2879,7 @@ Q6743217:
   title: Malgrange preparation theorem
 
 Q6749789:
-  title: "Manin\u2013Drinfeld theorem"
+  title: Manin–Drinfeld theorem
 
 Q6757284:
   title: Marcinkiewicz theorem
@@ -2888,13 +2888,13 @@ Q6760432:
   title: Marginal value theorem
 
 Q6771536:
-  title: "Markus\u2212Yamabe theorem"
+  title: Markus−Yamabe theorem
 
 Q6777133:
   title: Martingale representation theorem
 
 Q6783821:
-  title: "Mason\u2013Stothers theorem"
+  title: Mason–Stothers theorem
 
 Q6795637:
   title: Maximal ergodic theorem
@@ -2915,16 +2915,16 @@ Q6859627:
   title: Milliken's tree theorem
 
 Q6859648:
-  title: "Milliken\u2013Taylor theorem"
+  title: Milliken–Taylor theorem
 
 Q6860180:
-  title: "Milman\u2013Pettis theorem"
+  title: Milman–Pettis theorem
 
 Q6867853:
   title: Minkowski's second theorem
 
 Q6867867:
-  title: "Minkowski\u2013Hlawka theorem"
+  title: Minkowski–Hlawka theorem
 
 Q6867878:
   title: Minlos's theorem
@@ -2951,7 +2951,7 @@ Q6957141:
   title: Nachbin's theorem
 
 Q6967039:
-  title: "Nash\u2013Moser theorem"
+  title: Nash–Moser theorem
 
 Q7020025:
   title: Newton's theorem about ovals
@@ -2981,10 +2981,10 @@ Q7098850:
   title: Optical equivalence theorem
 
 Q7100033A:
-  title: "Orbit theorem (Nagano\u2013Sussmann)"
+  title: Orbit theorem (Nagano–Sussmann)
 
 Q7100033B:
-  title: "Rashevsky\u2013Chow theorem"
+  title: Rashevsky–Chow theorem
 
 Q7103669:
   title: Ornstein theorem
@@ -2999,7 +2999,7 @@ Q7130794:
   title: Pandya theorem
 
 Q7137494:
-  title: "Paris\u2013Harrington theorem"
+  title: Paris–Harrington theorem
 
 Q7139570:
   title: Parovicenko's theorem
@@ -3017,7 +3017,7 @@ Q7160983:
   title: Peixoto's theorem
 
 Q7190748:
-  title: "Pickands\u2013Balkema\u2013de Haan theorem"
+  title: Pickands–Balkema–de Haan theorem
 
 Q7200963:
   title: Planar separator theorem
@@ -3044,13 +3044,13 @@ Q7269106:
   title: Quantum threshold theorem
 
 Q7269437:
-  title: "Denjoy\u2013Carleman theorem"
+  title: Denjoy–Carleman theorem
 
 Q7269559:
   title: Sylvester pentahedral theorem
 
 Q7272004:
-  title: "Quillen\u2013Suslin theorem"
+  title: Quillen–Suslin theorem
 
 Q7272898:
   title: Quotient of subspace theorem
@@ -3074,13 +3074,13 @@ Q7308146:
   title: Regev's theorem
 
 Q7309601:
-  title: "Whitney\u2013Graustein Theorem"
+  title: Whitney–Graustein Theorem
 
 Q7310041:
   title: Reider's theorem
 
 Q7312009:
-  title: "Remmert\u2013Stein theorem"
+  title: Remmert–Stein theorem
 
 Q7318284:
   title: Reversed compound agent theorem
@@ -3089,10 +3089,10 @@ Q7322366:
   title: Ribet's theorem
 
 Q7323144:
-  title: "Rice\u2013Shapiro theorem"
+  title: Rice–Shapiro theorem
 
 Q7333126:
-  title: "Riemann\u2013Roch theorem for surfaces"
+  title: Riemann–Roch theorem for surfaces
 
 Q7341043:
   title: Robbins theorem
@@ -3104,7 +3104,7 @@ Q7359997:
   title: Rokhlin's theorem
 
 Q7396621:
-  title: "Saccheri\u2013Legendre theorem"
+  title: Saccheri–Legendre theorem
 
 Q7430892:
   title: Schaefer's dichotomy theorem
@@ -3119,19 +3119,19 @@ Q7432872:
   title: Schreier refinement theorem
 
 Q7432915:
-  title: "Schroeder\u2013Bernstein theorem for measurable spaces"
+  title: Schroeder–Bernstein theorem for measurable spaces
 
 Q7432918:
-  title: "Schr\xF6der\u2013Bernstein theorems for operator algebras"
+  title: Schröder–Bernstein theorems for operator algebras
 
 Q7433034:
   title: Great orthogonality theorem
 
 Q7433182:
-  title: "Schwartz\u2013Zippel theorem"
+  title: Schwartz–Zippel theorem
 
 Q7433295:
-  title: "Osterwalder\u2013Schrader theorem"
+  title: Osterwalder–Schrader theorem
 
 Q7437564:
   title: Scott core theorem
@@ -3143,13 +3143,13 @@ Q7496252:
   title: Shift theorem
 
 Q7510574:
-  title: "Siegel\u2013Walfisz theorem"
+  title: Siegel–Walfisz theorem
 
 Q7512855:
   title: Hirzebruch signature theorem
 
 Q7516736:
-  title: "Silverman\u2013Toeplitz theorem"
+  title: Silverman–Toeplitz theorem
 
 Q7524563:
   title: Sinkhorn's theorem
@@ -3158,13 +3158,13 @@ Q7525341:
   title: Sion's minimax theorem
 
 Q7525845:
-  title: "Sipser\u2013Lautemann theorem"
+  title: Sipser–Lautemann theorem
 
 Q7532192:
   title: Siu's semicontinuity theorem
 
 Q7536097:
-  title: "Skoda\u2013El Mir theorem"
+  title: Skoda–El Mir theorem
 
 Q7536350:
   title: Skorokhod's embedding theorem
@@ -3179,7 +3179,7 @@ Q7597316:
   title: Stallings theorem about ends of groups
 
 Q7597317:
-  title: "Stallings\u2013Zeeman theorem"
+  title: Stallings–Zeeman theorem
 
 Q7599389:
   title: Stanley's reciprocity theorem
@@ -3191,7 +3191,7 @@ Q7606897:
   title: Steinitz theorem
 
 Q7606940:
-  title: "Stein\u2013Str\xF6mberg theorem"
+  title: Stein–Strömberg theorem
 
 Q7617407:
   title: Stinespring factorization theorem
@@ -3200,7 +3200,7 @@ Q7619060:
   title: The duality theorem
 
 Q7619449:
-  title: "Stone\u2013von Neumann theorem"
+  title: Stone–von Neumann theorem
 
 Q7621715:
   title: Strassmann's theorem
@@ -3266,7 +3266,7 @@ Q7841060:
   title: Trichotomy theorem
 
 Q7845353:
-  title: "Trombi\u2013Varadarajan theorem"
+  title: Trombi–Varadarajan theorem
 
 Q7847268:
   title: Trudinger's theorem
@@ -3278,7 +3278,7 @@ Q7853325:
   title: Tunnell's theorem
 
 Q7856599:
-  title: "Tur\xE1n\u2013Kubilius theorem"
+  title: Turán–Kubilius theorem
 
 Q7857350:
   title: Tverberg's theorem
@@ -3290,13 +3290,13 @@ Q7894110:
   title: Universal approximation theorem
 
 Q7911648:
-  title: "Valiant\u2013Vazirani theorem"
+  title: Valiant–Vazirani theorem
 
 Q7928688:
-  title: "Vietoris\u2013Begle mapping theorem"
+  title: Vietoris–Begle mapping theorem
 
 Q7936914:
-  title: "Vitali\u2013Hahn\u2013Saks theorem"
+  title: Vitali–Hahn–Saks theorem
 
 Q7941491:
   title: Von Neumann's theorem
@@ -3311,7 +3311,7 @@ Q7978735:
   title: Weber's theorem
 
 Q7980241:
-  title: "Weinberg\u2013Witten theorem"
+  title: Weinberg–Witten theorem
 
 Q7996766:
   title: Whitney extension theorem
@@ -3320,7 +3320,7 @@ Q7996769:
   title: Whitney immersion theorem
 
 Q7999144:
-  title: "Wiener\u2013Ikehara theorem"
+  title: Wiener–Ikehara theorem
 
 Q7999797:
   title: Beer's theorem
@@ -3341,7 +3341,7 @@ Q8064722:
   title: Zahorski theorem
 
 Q8066611:
-  title: "K\xF6vari\u2013S\xF3s\u2013Tur\xE1n theorem"
+  title: Kövari–Sós–Turán theorem
 
 Q8066795:
   title: Zariski's main theorem
@@ -3350,16 +3350,16 @@ Q8074796:
   title: Zsigmondy's theorem
 
 Q8081891:
-  title: "\u015Aleszy\u0144ski\u2013Pringsheim theorem"
+  title: Śleszyński–Pringsheim theorem
 
 Q9993851:
-  title: "Lax\u2013Milgram theorem"
+  title: Lax–Milgram theorem
 
 Q10369454:
   title: Noether's second theorem
 
 Q10859514:
-  title: "Vafa\u2013Witten theorem"
+  title: Vafa–Witten theorem
 
 Q10942247:
   title: Hironaka theorem
@@ -3371,7 +3371,7 @@ Q11573495:
   title: Plancherel theorem for spherical functions
 
 Q11704319:
-  title: "Chern\u2013Gauss\u2013Bonnet theorem"
+  title: Chern–Gauss–Bonnet theorem
 
 Q11722674:
   title: Takens's theorem
@@ -3383,7 +3383,7 @@ Q15080987:
   title: Lie's third theorem
 
 Q15813392:
-  title: "Barban\u2013Davenport\u2013Halberstam theorem"
+  title: Barban–Davenport–Halberstam theorem
 
 Q15830473:
   title: Morley's categoricity theorem
@@ -3398,7 +3398,7 @@ Q15872491:
   title: Newton's theorem (quadrilateral)
 
 Q15895894:
-  title: "Finsler\u2013Hadwiger theorem"
+  title: Finsler–Hadwiger theorem
 
 Q16251580:
   title: Matiyasevich's theorem
@@ -3407,7 +3407,7 @@ Q16680059:
   title: Strong perfect graph theorem
 
 Q16978447:
-  title: "Grauert\u2013Riemenschneider vanishing theorem"
+  title: Grauert–Riemenschneider vanishing theorem
 
 Q17001601:
   title: 2-factor theorem
@@ -3422,13 +3422,13 @@ Q17005116:
   title: Birkhoff's representation theorem
 
 Q17008559:
-  title: "Davenport\u2013Schmidt theorem"
+  title: Davenport–Schmidt theorem
 
 Q17017973:
   title: Godunov's theorem
 
 Q17018210:
-  title: "Golod\u2013Shafarevich theorem"
+  title: Golod–Shafarevich theorem
 
 Q17019684:
   title: Grushko theorem
@@ -3452,7 +3452,7 @@ Q17089994:
   title: Fixed-point theorems in infinite-dimensional spaces
 
 Q17098075:
-  title: "Jurkat\u2013Richert theorem"
+  title: Jurkat–Richert theorem
 
 Q17098298:
   title: Jacobson density theorem
@@ -3464,7 +3464,7 @@ Q17101806:
   title: Intersection theorem
 
 Q17102744:
-  title: "Riemann\u2013Roch theorem for smooth manifolds"
+  title: Riemann–Roch theorem for smooth manifolds
 
 Q17103352:
   title: Maximum power theorem
@@ -3473,25 +3473,25 @@ Q17104025:
   title: Riemann singularity theorem
 
 Q17104863:
-  title: "Nielsen\u2013Ninomiya theorem"
+  title: Nielsen–Ninomiya theorem
 
 Q17125544:
-  title: "Lickorish\u2013Wallace theorem"
+  title: Lickorish–Wallace theorem
 
 Q18205730:
-  title: "Byers\u2013Yang theorem"
+  title: Byers–Yang theorem
 
 Q18206032:
   title: Cartan's theorem
 
 Q18206266:
-  title: "Euclid\u2013Euler theorem"
+  title: Euclid–Euler theorem
 
 Q18630480:
   title: Euler's quadrilateral theorem
 
 Q19323571:
-  title: "Chomsky\u2013Sch\xFCtzenberger enumeration theorem"
+  title: Chomsky–Schützenberger enumeration theorem
 
 Q19779530:
   title: Thomsen's theorem
@@ -3506,16 +3506,16 @@ Q22952648:
   title: Uncountability of the continuum
 
 Q25099402:
-  title: "Kolmogorov\u2013Arnold representation theorem"
+  title: Kolmogorov–Arnold representation theorem
 
 Q25303622:
-  title: "Browder\u2013Minty theorem"
+  title: Browder–Minty theorem
 
 Q25304227:
   title: Arakelyan's theorem
 
 Q25304301:
-  title: "Bregman\u2013Minc inequality"
+  title: Bregman–Minc inequality
 
 Q25345219:
   title: BBD decomposition theorem
@@ -3536,13 +3536,13 @@ Q31838822:
   title: Kirchberger's theorem
 
 Q48996535:
-  title: "Sol\xE8r's theorem"
+  title: Solèr's theorem
 
 Q48998319:
   title: Frobenius reciprocity theorem
 
 Q55647729:
-  title: "Cram\xE9r's theorem (large deviations)"
+  title: Cramér's theorem (large deviations)
 
 Q56291669:
   title: Alspach's theorem
@@ -3560,13 +3560,13 @@ Q96375449:
   title: Conway circle theorem
 
 Q96377355:
-  title: "Erd\u0151s\u2013Dushnik\u2013Miller theorem"
+  title: Erdős–Dushnik–Miller theorem
 
 Q97359729:
   title: Stahl's theorem
 
 Q104841721:
-  title: "Jacobson\u2013Morozov theorem"
+  title: Jacobson–Morozov theorem
 
 Q104871594:
   title: Joubert's theorem
@@ -3578,19 +3578,19 @@ Q107535899:
   title: Bochner's tube theorem
 
 Q107547910:
-  title: "Malgrange\u2013Zerner theorem"
+  title: Malgrange–Zerner theorem
 
 Q107709489:
-  title: "B\xFCchi-Elgot-Trakhtenbrot theorem"
+  title: Büchi-Elgot-Trakhtenbrot theorem
 
 Q107710112:
   title: Cantor's isomorphism theorem
 
 Q110921617:
-  title: "Feferman\u2013Vaught theorem"
+  title: Feferman–Vaught theorem
 
 Q111982312:
-  title: "Friedberg\u2013Muchnik theorem"
+  title: Friedberg–Muchnik theorem
 
 Q112659261:
   title: Gamas's Theorem
