@@ -44,10 +44,10 @@ class FormalisationEntry(NamedTuple):
     status: FormalizationStatus
     library: Library
     # A URL pointing to the formalization
-    # (or a list collecting a list of theorems for a particular proof assistant).
-    url: str
-    # XXX: this is missing from the README -> clarify if this should replace the URL field for 'std/main library' formalisations!
-    identifiers: str | None
+    url: str | None
+    # A list of theorems for a particular proof assistant: can we make this required instead?
+    # Perhaps make the URL optional for 'S' or 'M' formalisations? Need to discuss!
+    identifiers: str
     authors: str | None
     # Format YYYY-MM-DD
     date: str | None
@@ -85,8 +85,11 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
         "X": Library.External,
     }
     library = lib[entry["library"]]
+    identifiers = entry.get("identifiers")
+    if library == Library.External and identifiers is None:
+        print("invalid data: external formalisations should add precise identifiers!", file=sys.stderr)
     return FormalisationEntry(
-        status, library, entry["url"], entry.get("identifiers"), entry.get("authors"), entry.get("date"), entry.get("comment")
+        status, library, entry.get("url"), identifiers, entry.get("authors"), entry.get("date"), entry.get("comment")
     )
 
 
@@ -254,8 +257,8 @@ def regenerate_upstream_from_yaml(dest_dir: str) -> None:
             else:
                 inner["library"] = "X"
                 inner["url"] = entry["url"]
-                # TODO: the yaml file omits this for now, so cannot reconstruct it here...
-                # inner["identifiers"] = "TODO",
+                if "identifiers" in entry:
+                    inner["identifiers"] = entry["identifiers"]
             if "author" in entry:
                 inner["authors"] = entry["author"].split(" and ")
             if "date" in entry:
