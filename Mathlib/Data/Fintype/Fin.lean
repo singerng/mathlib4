@@ -48,10 +48,20 @@ theorem Ioi_succ (i : Fin n) : Ioi i.succ = (Ioi i).map (Fin.succEmb _) := by
     simpa
 
 @[simp]
+theorem Ici_succ (i : Fin n) : Ici i.succ = (Ici i).map (Fin.succEmb _) := by
+  rw [Ici_eq_cons_Ioi, Ici_eq_cons_Ioi, map_cons]
+  simp only [Ioi_succ, cons_eq_insert, val_succEmb]
+
+@[simp]
 theorem Iio_castSucc (i : Fin n) : Iio (castSucc i) = (Iio i).map Fin.castSuccEmb := by
   apply Finset.map_injective Fin.valEmbedding
   rw [Finset.map_map, Fin.map_valEmbedding_Iio]
   exact (Fin.map_valEmbedding_Iio i).symm
+
+theorem Iic_castSucc (i : Fin n) : Iic (castSucc i) = (Iic i).map (Fin.castSuccEmb) := by
+  rw [Iic_eq_cons_Iio, Iic_eq_cons_Iio, map_cons]
+  simp only [Iio_castSucc, cons_eq_insert, castSuccEmb_apply]
+  congr
 
 theorem card_filter_univ_succ (p : Fin (n + 1) → Prop) [DecidablePred p] :
     #{x | p x} = if p 0 then #{x | p (.succ x)} + 1 else #{x | p (.succ x)} := by
@@ -61,7 +71,7 @@ theorem card_filter_univ_succ' (p : Fin (n + 1) → Prop) [DecidablePred p] :
     #{x | p x} = ite (p 0) 1 0 + #{x | p (.succ x)}:= by
   rw [card_filter_univ_succ]; split_ifs <;> simp [add_comm]
 
-theorem card_filter_univ_eq_vector_get_eq_count [DecidableEq α] (a : α) (v : Vector α n) :
+theorem card_filter_univ_eq_vector_get_eq_count [DecidableEq α] (a : α) (v : Mathlib.Vector α n) :
     #{i | v.get i = a} = v.toList.count a := by
   induction' v with n x xs hxs
   · simp
