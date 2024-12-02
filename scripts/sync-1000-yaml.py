@@ -44,12 +44,13 @@ class FormalisationEntry(NamedTuple):
     status: FormalizationStatus
     library: Library
     # A URL pointing to the formalization
-    url: str | None
+    url: str
     # A list of theorems for a particular proof assistant: can we make this required instead?
     # Perhaps make the URL optional for 'S' or 'M' formalisations? Need to discuss!
+    # Actually, I think requiring it is a better decision.
     identifiers: str
     authors: str | None
-    # Format YYYY-MM-DD
+    # Format YYYY-MM-DD in the source file.
     date: datetime | None
     comment: str | None
 
@@ -89,7 +90,7 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     if library == Library.External and identifiers is None:
         print("invalid data: external formalisations should add precise identifiers!", file=sys.stderr)
     return FormalisationEntry(
-        status, library, entry.get("url"), identifiers,
+        status, library, entry["url"], identifiers,
         entry.get("authors"), entry.get("date"), entry.get("comment")
     )
 
@@ -229,7 +230,7 @@ def regenerate_upstream_from_yaml(dest_dir: str) -> None:
     with open(os.path.join("docs", "1000.yaml"), "r") as f:
         data_1000_yaml = yaml.safe_load(f)
     for id_with_suffix, entry in data_1000_yaml.items():
-        has_formalisation = "decl" in entry or "decls" in entry or "url" in entry
+        has_formalisation = "decl" in entry or "decls" in entry or "identifiers" in entry
         # For each downstream declaration, read in the "upstream" yaml file and compare with the
         # downstream result.
         with open(os.path.join(dest_dir, f"{id_with_suffix}.md"), 'r') as f:
@@ -261,8 +262,7 @@ def regenerate_upstream_from_yaml(dest_dir: str) -> None:
             else:
                 inner["library"] = "X"
                 inner["url"] = entry["url"]
-                if "identifiers" in entry:
-                    inner["identifiers"] = entry["identifiers"]
+                inner["identifiers"] = entry["identifiers"]
             if "author" in entry:
                 inner["authors"] = entry["author"].split(" and ")
             if "date" in entry:
