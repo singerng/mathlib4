@@ -1,7 +1,7 @@
 import os
 from enum import Enum, auto
 from typing import List, NamedTuple
-
+from datetime import datetime
 import yaml
 
 """
@@ -50,7 +50,7 @@ class FormalisationEntry(NamedTuple):
     identifiers: str
     authors: str | None
     # Format YYYY-MM-DD
-    date: str | None
+    date: datetime | None
     comment: str | None
 
 
@@ -89,7 +89,8 @@ def _parse_formalization_entry(entry: dict) -> FormalisationEntry:
     if library == Library.External and identifiers is None:
         print("invalid data: external formalisations should add precise identifiers!", file=sys.stderr)
     return FormalisationEntry(
-        status, library, entry.get("url"), identifiers, entry.get("authors"), entry.get("date"), entry.get("comment")
+        status, library, entry.get("url"), identifiers,
+        entry.get("authors"), entry.get("date"), entry.get("comment")
     )
 
 
