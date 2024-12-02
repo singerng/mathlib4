@@ -7,7 +7,7 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 import Mathlib.NumberTheory.LSeries.Basic
-import Mathlib
+import Mathlib.Analysis.Calculus.FDeriv.RestrictScalars
 
 /-!
 # Docstring
@@ -28,22 +28,6 @@ theorem sum_mul_eq_sub_integral_mul' (hc : c 0 = 0) (b : ℝ)
   sorry
 
 open Filter Topology
-
-theorem zap (𝕜 : Type*) {𝕜' : Type*} [NontriviallyNormedField 𝕜] [NontriviallyNormedField 𝕜']
-    {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [NormedSpace 𝕜' E] {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace 𝕜 F] [NormedSpace 𝕜' F] [SMul 𝕜 𝕜']
-    [IsScalarTower 𝕜 𝕜' E] [IsScalarTower 𝕜 𝕜' F] {f : E → F} {x : E}
-    (hf : DifferentiableAt 𝕜' f x) :
-    DifferentiableAt 𝕜 f x := by
-  obtain ⟨u, hu⟩ := hf
-  refine ⟨u.restrictScalars 𝕜, by rwa [hasFDerivAt_iff_tendsto] at hu ⊢⟩
-
-theorem zap2 (𝕜 : Type*) {𝕜' : Type*} [NontriviallyNormedField 𝕜] [NontriviallyNormedField 𝕜']
-    {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [NormedSpace 𝕜' E] {F : Type*}
-    [NormedAddCommGroup F] [NormedSpace 𝕜 F] [NormedSpace 𝕜' F] [SMul 𝕜 𝕜']
-    [IsScalarTower 𝕜 𝕜' E] [IsScalarTower 𝕜 𝕜' F] {f : E → F}
-    (hf : Differentiable 𝕜' f) :
-    Differentiable 𝕜 f := fun x ↦ zap 𝕜 (hf x)
 
 theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) :
     LSeries f s = s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1)) := by
@@ -99,15 +83,15 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) :
   rfl
   · intro t ht
     refine DifferentiableAt.comp (𝕜 := ℝ) t (f := Complex.ofReal) (g := fun z : ℂ ↦ z ^ (-s)) ?_ ?_
+    · have : DifferentiableAt ℂ (fun z : ℂ ↦ z ^ (- s)) t := by
+        refine DifferentiableAt.cpow ?_ ?_ ?_
+        exact differentiableAt_id
+        exact differentiableAt_const _
+        refine Complex.ofReal_mem_slitPlane.mpr ?_
+        exact lt_of_lt_of_le zero_lt_one ht.1
+      exact this.restrictScalars ℝ
     · refine Differentiable.differentiableAt ?_
-      have : Differentiable ℂ (fun z : ℂ ↦ z ^ (- s)) := by
-        refine Differentiable.cpow ?_ ?_ ?_
-        · exact differentiable_id
-        · exact differentiable_const _
-        · sorry
-      exact zap2 ℝ this
-    · refine Differentiable.differentiableAt ?_
-      exact zap2 ℝ Complex.ofRealCLM.differentiable
+      exact Complex.ofRealCLM.differentiable.restrictScalars ℝ
   
 
 
