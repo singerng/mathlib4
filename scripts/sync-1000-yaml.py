@@ -188,7 +188,7 @@ def _write_entry(entry: TheoremEntry) -> str:
             # case, tooling can distinguish these just fine.
             inner["identifiers"] = first.identifiers
         if first.authors:
-            # XXX: this is inconsistent between 100.yaml
+            # XXX: this is inconsistent with 100.yaml
             # the former uses 'author' always; the 1000+ theorems project always uses 'authors'
             inner["author"] = " and ".join(first.authors)
         # Add additional metadata, so no information is lost in the generated yaml file.
