@@ -249,12 +249,15 @@ def regenerate_upstream_from_yaml(dest_dir: str) -> None:
             print(f"update: found a new formalisation of {id_with_suffix} in 1000.yaml, "
               "trying to update upstream file now")
             # Augment the original file with information about the Lean formalisation.
-            decl = entry.get("decl") or entry.get("decls")
+            decl = [entry.get("decl")] or entry.get("decls")
             inner = {"status": "formalized"}
             if decl:
-                inner["library"] = "M"  # FIXME: cannot determine if anything was from the std lib!
-                # inner["url"] = # TODO, omitted from the yaml file!
+                # XXX: we assume no items came from the standard library...
+                inner["library"] = "M"
+                # We link an URL that "auto-fixes" itself: have doc-gen search for the declaration.
+                # As we know it exists, that will work fine :-)
                 inner["identifiers"] = decl
+                decl = f"https://leanprover-community.github.io/mathlib4_docs/find/?pattern={decl[0]}#doc"
             else:
                 inner["library"] = "X"
                 inner["url"] = entry["url"]
