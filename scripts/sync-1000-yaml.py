@@ -180,8 +180,10 @@ def _write_entry(entry: TheoremEntry) -> str:
             first = form[0]
             assert first.library == Library.External  # internal consistency check
             inner["url"] = first.url
-            # One *could* also write out the identifier(s) of the relevant theorems:
-            # since this cannot easily be checked, we don't do so.
+            # We conciously write out the identifiers of the external theorems,
+            # so they can be added upstream. Since we use a different key from the 'main library'
+            # case, tooling can distinguish these just fine.
+            inner["identifiers"] = first.identifiers
         if first.authors:
             # XXX: this is inconsistent between 100.yaml
             # the former uses 'author' always; the 1000+ theorems project always uses 'authors'
