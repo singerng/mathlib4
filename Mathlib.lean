@@ -3831,9 +3831,8 @@ import Mathlib.NumberTheory.LSeries.Linearity
 import Mathlib.NumberTheory.LSeries.MellinEqDirichlet
 import Mathlib.NumberTheory.LSeries.Nonvanishing
 import Mathlib.NumberTheory.LSeries.Positivity
-import Mathlib.NumberTheory.LSeries.QuadraticNonvanishing
-import Mathlib.NumberTheory.LSeries.Residue
 import Mathlib.NumberTheory.LSeries.PrimesInAP
+import Mathlib.NumberTheory.LSeries.Residue
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.NumberTheory.LSeries.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
@@ -4620,6 +4619,7 @@ import Mathlib.RingTheory.WittVector.Truncated
 import Mathlib.RingTheory.WittVector.Verschiebung
 import Mathlib.RingTheory.WittVector.WittPolynomial
 import Mathlib.RingTheory.ZMod
+import Mathlib.Sandox
 import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.SetTheory.Cardinal.Basic
@@ -4665,6 +4665,7 @@ import Mathlib.SetTheory.Surreal.Multiplication
 import Mathlib.SetTheory.ZFC.Basic
 import Mathlib.SetTheory.ZFC.Ordinal
 import Mathlib.SetTheory.ZFC.Rank
+import Mathlib.Solutions_S02_Differential_Calculus_in_Normed_Spaces
 import Mathlib.Std.Data.HashMap
 import Mathlib.Tactic
 import Mathlib.Tactic.Abel
