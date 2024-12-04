@@ -94,7 +94,7 @@ theorem _root_.Measurable.lmarginal [∀ i, SigmaFinite (μ i)] (hf : Measurable
   · simpa [hi, updateFinset] using measurable_pi_iff.1 measurable_snd _
   · simpa [hi, updateFinset] using measurable_pi_iff.1 measurable_fst _
 
-theorem _root_.Measurable.lmarginal_update [∀ i, SigmaFinite (μ i)] (hf : Measurable f) :
+theorem _root_.Measurable.lmarginal_update [∀ i, SigmaFinite (μ i)] (hf : Measurable f) (i) :
     Measurable fun xᵢ ↦ (∫⋯∫⁻_s, f ∂μ) (Function.update x i xᵢ) :=
   (Measurable.lmarginal _ hf).comp (measurable_update x)
 

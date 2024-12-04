@@ -67,6 +67,37 @@ private theorem ineqofmemIco' {k : ℕ} (hk : k ∈ Ico (⌊a⌋₊ + 1) ⌊b⌋
     a ≤ k ∧ k + 1 ≤ b :=
   ineqofmemIco (by rwa [← Finset.coe_Ico])
 
+theorem integrable_partial_sum (ha : 0 ≤ a) :
+    IntegrableOn  (fun t ↦ ∑ k ∈ Icc 0 ⌊t⌋₊, c k) (Set.Icc a b) := by
+  by_cases hb : ⌊a⌋₊ < ⌊b⌋₊
+  · have h_locint {t₁ t₂ : ℝ} {n : ℕ} (h : t₁ ≤ t₂) (h₁ : n ≤ t₁) (h₂ : t₂ ≤ n + 1)
+        (h₃ : a ≤ t₁) (h₄ : t₂ ≤ b) :
+        IntervalIntegrable (fun t ↦ ∑ k ∈ Icc 0 ⌊t⌋₊, c k) volume t₁ t₂ := by
+      rw [intervalIntegrable_iff_integrableOn_Icc_of_le h]
+      refine Integrable.congr ?_ (by
+        refine ae_restrict_of_ae_restrict_of_subset (Set.Icc_subset_Icc h₁ h₂) ?_
+        rw [ae_restrict_iff' measurableSet_Icc]
+        filter_upwards [sumlocc c n] with t h ht
+        rw [h ht])
+      rw [integrable_const_iff]
+      right
+      exact IsFiniteMeasure.measure_univ_lt_top
+    have aux1 : 0 ≤ b := (Nat.pos_of_floor_pos <| (Nat.zero_le _).trans_lt hb).le
+    have aux2 : ⌊a⌋₊ + 1 ≤ b := by rwa [← Nat.cast_add_one, ← Nat.le_floor_iff aux1]
+    have aux3 : a ≤ ⌊a⌋₊ + 1 := (Nat.lt_floor_add_one _).le
+    have aux4 : a ≤ ⌊b⌋₊ := le_of_lt (by rwa [← Nat.floor_lt ha])
+    -- now break up into 3 subintervals
+    rw [← intervalIntegrable_iff_integrableOn_Icc_of_le (aux3.trans aux2)]
+    have I1 : IntervalIntegrable _ volume a ↑(⌊a⌋₊ + 1) :=
+      h_locint (mod_cast aux3) (Nat.floor_le ha) (mod_cast le_rfl) le_rfl (mod_cast aux2)
+    have I2 : IntervalIntegrable _ volume ↑(⌊a⌋₊ + 1) ⌊b⌋₊ :=
+      trans_iterate_Ico hb fun k hk ↦ h_locint (mod_cast k.le_succ)
+        le_rfl (mod_cast le_rfl) (ineqofmemIco hk).1 (mod_cast (ineqofmemIco hk).2)
+    have I3 : IntervalIntegrable _ volume ⌊b⌋₊ b :=
+      h_locint (Nat.floor_le aux1) le_rfl (Nat.lt_floor_add_one _).le aux4 le_rfl
+    exact (I1.trans I2).trans I3
+  · sorry
+
 private theorem integrablemulsum (ha : 0 ≤ a) (hb : ⌊a⌋₊ < ⌊b⌋₊)
     (hf_int : IntegrableOn (deriv f) (Set.Icc a b)) :
     IntegrableOn (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) (Set.Icc a b) := by
