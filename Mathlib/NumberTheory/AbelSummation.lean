@@ -68,7 +68,7 @@ private theorem ineqofmemIco' {k : ℕ} (hk : k ∈ Ico (⌊a⌋₊ + 1) ⌊b⌋
   ineqofmemIco (by rwa [← Finset.coe_Ico])
 
 theorem integrable_partial_sum (ha : 0 ≤ a) :
-    IntegrableOn  (fun t ↦ ∑ k ∈ Icc 0 ⌊t⌋₊, c k) (Set.Icc a b) := by
+    IntegrableOn (fun t ↦ ∑ k ∈ Icc 0 ⌊t⌋₊, c k) (Set.Icc a b) := by
   by_cases hb : ⌊a⌋₊ < ⌊b⌋₊
   · have h_locint {t₁ t₂ : ℝ} {n : ℕ} (h : t₁ ≤ t₂) (h₁ : n ≤ t₁) (h₂ : t₂ ≤ n + 1)
         (h₃ : a ≤ t₁) (h₄ : t₂ ≤ b) :
@@ -98,31 +98,47 @@ theorem integrable_partial_sum (ha : 0 ≤ a) :
     exact (I1.trans I2).trans I3
   · sorry
 
-private theorem integrablemulsum (ha : 0 ≤ a) (hb : ⌊a⌋₊ < ⌊b⌋₊)
-    (hf_int : IntegrableOn (deriv f) (Set.Icc a b)) :
-    IntegrableOn (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) (Set.Icc a b) := by
-  have h_locint {t₁ t₂ : ℝ} {n : ℕ} (h : t₁ ≤ t₂) (h₁ : n ≤ t₁) (h₂ : t₂ ≤ n + 1)
-      (h₃ : a ≤ t₁) (h₄ : t₂ ≤ b) :
-      IntervalIntegrable (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) volume t₁ t₂ := by
-    rw [intervalIntegrable_iff_integrableOn_Icc_of_le h]
-    exact (IntegrableOn.mono_set (hf_int.mul_const _) (Set.Icc_subset_Icc h₃ h₄)).congr
-      <| ae_restrict_of_ae_restrict_of_subset (Set.Icc_subset_Icc h₁ h₂)
-        <| (ae_restrict_iff' measurableSet_Icc).mpr
-          (by filter_upwards [sumlocc c n] with t h ht using by rw [h ht])
-  have aux1 : 0 ≤ b := (Nat.pos_of_floor_pos <| (Nat.zero_le _).trans_lt hb).le
-  have aux2 : ⌊a⌋₊ + 1 ≤ b := by rwa [← Nat.cast_add_one, ← Nat.le_floor_iff aux1]
-  have aux3 : a ≤ ⌊a⌋₊ + 1 := (Nat.lt_floor_add_one _).le
-  have aux4 : a ≤ ⌊b⌋₊ := le_of_lt (by rwa [← Nat.floor_lt ha])
-  -- now break up into 3 subintervals
-  rw [← intervalIntegrable_iff_integrableOn_Icc_of_le (aux3.trans aux2)]
-  have I1 : IntervalIntegrable _ volume a ↑(⌊a⌋₊ + 1) :=
-    h_locint (mod_cast aux3) (Nat.floor_le ha) (mod_cast le_rfl) le_rfl (mod_cast aux2)
-  have I2 : IntervalIntegrable _ volume ↑(⌊a⌋₊ + 1) ⌊b⌋₊ :=
-    trans_iterate_Ico hb fun k hk ↦ h_locint (mod_cast k.le_succ)
-      le_rfl (mod_cast le_rfl) (ineqofmemIco hk).1 (mod_cast (ineqofmemIco hk).2)
-  have I3 : IntervalIntegrable _ volume ⌊b⌋₊ b :=
-    h_locint (Nat.floor_le aux1) le_rfl (Nat.lt_floor_add_one _).le aux4 le_rfl
-  exact (I1.trans I2).trans I3
+-- FIX NAME
+theorem integrablemulsum (g : ℝ → 𝕜) (ha : 0 ≤ a) (hg_int : IntegrableOn g (Set.Icc a b)) :
+    IntegrableOn (fun t ↦ g t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) (Set.Icc a b) := by
+  obtain hab | hab := le_or_gt a b
+  · obtain hb | hb := eq_or_lt_of_le (Nat.floor_le_floor hab)
+    · have : IntegrableOn (fun t ↦ g t * ∑ k ∈ Icc 0 ⌊a⌋₊, c k) (Set.Icc a b) := by
+        exact hg_int.mul_const _
+      refine IntegrableOn.congr_fun_ae this ?_
+      refine ae_restrict_of_ae_restrict_of_subset
+        (Set.Icc_subset_Icc (a₂ := ↑⌊a⌋₊) (b₂ := ⌊a⌋₊ + (1 : ℝ)) ?_ ?_) ?_
+      · exact Nat.floor_le ha
+      · rw [hb]
+        exact (Nat.lt_floor_add_one _).le
+      · dsimp only
+        rw [ae_restrict_iff' measurableSet_Icc]
+        filter_upwards [sumlocc c ⌊a⌋₊] with t h ht
+        rw [h ht]
+    · have h_locint {t₁ t₂ : ℝ} {n : ℕ} (h : t₁ ≤ t₂) (h₁ : n ≤ t₁) (h₂ : t₂ ≤ n + 1)
+          (h₃ : a ≤ t₁) (h₄ : t₂ ≤ b) :
+          IntervalIntegrable (fun t ↦ g t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) volume t₁ t₂ := by
+        rw [intervalIntegrable_iff_integrableOn_Icc_of_le h]
+        exact (IntegrableOn.mono_set (hg_int.mul_const _) (Set.Icc_subset_Icc h₃ h₄)).congr
+          <| ae_restrict_of_ae_restrict_of_subset (Set.Icc_subset_Icc h₁ h₂)
+            <| (ae_restrict_iff' measurableSet_Icc).mpr
+              (by filter_upwards [sumlocc c n] with t h ht using by rw [h ht])
+      have aux1 : 0 ≤ b := ha.trans hab
+      have aux2 : ⌊a⌋₊ + 1 ≤ b := by rwa [← Nat.cast_add_one, ← Nat.le_floor_iff aux1]
+      have aux3 : a ≤ ⌊a⌋₊ + 1 := (Nat.lt_floor_add_one _).le
+      have aux4 : a ≤ ⌊b⌋₊ := le_of_lt (by rwa [← Nat.floor_lt ha])
+      -- now break up into 3 subintervals
+      rw [← intervalIntegrable_iff_integrableOn_Icc_of_le hab]
+      have I1 : IntervalIntegrable _ volume a ↑(⌊a⌋₊ + 1) :=
+        h_locint (mod_cast aux3) (Nat.floor_le ha) (mod_cast le_rfl) le_rfl (mod_cast aux2)
+      have I2 : IntervalIntegrable _ volume ↑(⌊a⌋₊ + 1) ⌊b⌋₊ :=
+        trans_iterate_Ico hb fun k hk ↦ h_locint (mod_cast k.le_succ)
+          le_rfl (mod_cast le_rfl) (ineqofmemIco hk).1 (mod_cast (ineqofmemIco hk).2)
+      have I3 : IntervalIntegrable _ volume ⌊b⌋₊ b :=
+        h_locint (Nat.floor_le aux1) le_rfl (Nat.lt_floor_add_one _).le aux4 le_rfl
+      exact (I1.trans I2).trans I3
+  · rw [Set.Icc_eq_empty_of_lt hab]
+    exact integrableOn_empty
 
 /-- Abel's summation formula. -/
 theorem _root_.sum_mul_eq_sub_sub_integral_mul (ha : 0 ≤ a) (hab : a ≤ b)
@@ -160,15 +176,15 @@ theorem _root_.sum_mul_eq_sub_sub_integral_mul (ha : 0 ≤ a) (hab : a ≤ b)
   -- (Note we have 5 goals, but the 1st and 3rd are identical. TODO: find a non-hacky way of dealing
   -- with both at once.)
   · rw [intervalIntegrable_iff_integrableOn_Icc_of_le aux6]
-    exact (integrablemulsum c ha hb hf_int).mono_set (Set.Icc_subset_Icc_right aux5)
+    exact (integrablemulsum c (deriv f) ha hf_int).mono_set (Set.Icc_subset_Icc_right aux5)
   · rw [intervalIntegrable_iff_integrableOn_Icc_of_le aux5]
-    exact (integrablemulsum c ha hb hf_int).mono_set (Set.Icc_subset_Icc_left aux6)
+    exact (integrablemulsum c (deriv f) ha hf_int).mono_set (Set.Icc_subset_Icc_left aux6)
   · rw [intervalIntegrable_iff_integrableOn_Icc_of_le aux6]
-    exact (integrablemulsum c ha hb hf_int).mono_set (Set.Icc_subset_Icc_right aux5)
+    exact (integrablemulsum c (deriv f) ha hf_int).mono_set (Set.Icc_subset_Icc_right aux5)
   · rw [intervalIntegrable_iff_integrableOn_Icc_of_le aux3]
-    exact (integrablemulsum c ha hb hf_int).mono_set (Set.Icc_subset_Icc_right aux4)
+    exact (integrablemulsum c (deriv f) ha hf_int).mono_set (Set.Icc_subset_Icc_right aux4)
   · exact fun k hk ↦ (intervalIntegrable_iff_integrableOn_Icc_of_le (mod_cast k.le_succ)).mpr
-      <| (integrablemulsum c ha hb hf_int).mono_set
+      <| (integrablemulsum c (deriv f) ha hf_int).mono_set
         <| (Set.Icc_subset_Icc_iff (mod_cast k.le_succ)).mpr <| mod_cast (ineqofmemIco hk)
 
 end abelSummationProof

@@ -12,6 +12,7 @@ import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Integral.Asymptotics
 import Mathlib.Topology.LocallyClosed
+import Mathlib.NumberTheory.AbelSummation
 
 /-!
 # Docstring
@@ -93,13 +94,6 @@ noncomputable section
 open Finset intervalIntegral MeasureTheory IntervalIntegrable
 
 variable {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜) {f : ℝ → 𝕜}
-
-theorem sum_mul_eq_sub_integral_mul' (hc : c 0 = 0) (b : ℝ)
-     (hf_diff : ∀ t ∈ Set.Icc 1 b, DifferentiableAt ℝ f t)
-     (hf_int : IntegrableOn (deriv f) (Set.Icc 1 b)) :
-     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
-       f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 1 b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
-  sorry
 
 open Filter Topology
 
@@ -195,8 +189,16 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) (hs : 1 < s.re)
               refine Bornology.IsBounded.subset_Icc_sInf_sSup ?_
               exact IsCompact.isBounded hK₂
             refine IntegrableOn.mono_set ?_ this
-            
-            sorry
+            convert abelSummationProof.integrablemulsum f (fun _ ↦ 1) (a := sInf K) (b := sSup K)
+              ?_ ?_
+            · rw [one_mul]
+            · refine Real.sInf_nonneg ?_
+              intro x hx
+              have := hK₁ hx
+              exact zero_le_one.trans this
+            · rw [integrableOn_const]
+              right
+              exact measure_Icc_lt_top
           · exact isLocallyClosed_Ici
         · refine ContinuousOn.cpow_const ?_ ?_
           · refine Continuous.continuousOn ?_
@@ -218,26 +220,6 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) (hs : 1 < s.re)
         · rw [integrableOn_Ioi_cpow_iff]
           · simp [hs]
           · exact zero_lt_one
-
---      refine Asymptotics.IsBigO.integrable (g := fun x : ℝ ↦ (x : ℂ) ^ (- s)) ?_ ?_ ?_
-      -- · refine Measurable.aestronglyMeasurable ?_
-      --   refine Measurable.mul ?_ ?_
-      --   · refine Measurable.pow_const ?_ _
-      --     exact Complex.measurable_ofReal
-      --   · have h₁ : Measurable (fun x : ℝ ↦ ⌊x⌋₊) := Nat.measurable_floor
-      --     have h₂ : Measurable (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k) := by
-      --       exact fun ⦃t⦄ a ↦ trivial
-      --     have := Measurable.comp h₂ h₁
-      --     exact this
-      -- · rw [Asymptotics.isBigO_iff]
-      --   use C
-      --   rw [eventually_top]
-      --   filter_upwards [hC]
-      --   sorry
-      -- · refine IntegrableOn.integrable ?_
-      --   rw [integrableOn_Ioi_cpow_iff]
-      --   · simp [hs]
-      --   · exact zero_lt_one
     have h6 : - ∫ (t : ℝ) in Set.Ioi 1, deriv (fun x : ℝ ↦ (x : ℂ) ^ (- s)) t *
         (∑ k ∈ Icc 0 ⌊t⌋₊, f k) =
         s * (∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1)) := by
@@ -282,22 +264,40 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) (hs : 1 < s.re)
       rw [hderiv]
       exact (zero_lt_one.trans_le hx.1).ne'
 
-  #exit
+variable (f : ℕ → ℂ) (l : ℂ)
+  (hlim : Tendsto (fun n : ℕ ↦ (∑ k ∈ Icc 0 n, f k : ℂ) / n) atTop (𝓝 l))
 
-  have t₂ : (fun n ↦ ∑ k ∈ range n, LSeries.term f s k) =ᶠ[atTop]
-     fun n ↦ (∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, (k : ℝ) ^ (-s) * if k = 0 then 0 else f k) := sorry
-  have t₃ : Tendsto (fun n ↦ ∑ k in range n, LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
-    HasSum.tendsto_sum_nat ?_
-  have t₄ := t₃.congr' t₂
-  simp_rw [t₁] at t₄
-  have t₅ : Tendsto (fun n : ℕ ↦ s * ∫ (t : ℝ) in Set.Ioc 1 (n : ℝ),
-    (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / t ^ (s + 1)) atTop
-    (𝓝 (s * ∫ (t : ℝ) in Set.Ioi 1, (∑ k ∈ Icc 0 ⌊t⌋₊, f k) / ↑t ^ (s + 1))) := sorry
-  refine tendsto_nhds_unique_of_eventuallyEq t₄ t₅ ?_
-  filter_upwards [eventually_ne_atTop 0] with k hk
-  simp_rw [if_neg sorry]
+include hlim
 
-  sorry
+theorem lemma1 :
+    Tendsto (fun t : ℝ ↦ (∑ k ∈ Icc 0 ⌊t⌋₊, f k : ℂ) / t) atTop (𝓝 l) := by
+  have lim1 : Tendsto (fun t : ℝ ↦ (∑ k ∈ Icc 0 ⌊t⌋₊, f k : ℂ) / ⌊t⌋₊) atTop (𝓝 l) :=
+    Tendsto.comp hlim (tendsto_nat_floor_atTop (α := ℝ))
+  have lim2 : Tendsto (fun t : ℝ ↦ ↑(⌊t⌋₊ / t : ℝ)) atTop (𝓝 (1 : ℂ)) := by
+    rw [← Complex.ofReal_one]
+    rw [tendsto_ofReal_iff]
+    exact tendsto_nat_floor_div_atTop
+  have lim3 := Tendsto.mul lim1 lim2
+  rw [mul_one] at lim3
+  refine Tendsto.congr' ?_ lim3
+  filter_upwards [eventually_ge_atTop 1] with t ht
+  rw [Complex.ofReal_div, Complex.ofReal_natCast, div_mul_div_cancel₀]
+  rw [Nat.cast_ne_zero, ne_eq, Nat.floor_eq_zero, not_lt]
+  exact ht
+
+theorem assume1 {ε : ℝ} (hε : 0 < ε) :
+    ∀ᶠ t : ℝ in atTop, ‖∑ k ∈ Icc 0 ⌊t⌋₊, f k - l * t‖ < ε * t := by
+  rw [Metric.tendsto_nhds] at hlim
+  specialize this ε hε
+  filter_upwards [eventually_gt_atTop 0, this] with t ht₁ ht₂
+  rwa [← div_lt_iff₀, ← Real.norm_of_nonneg (r := t), ← Complex.norm_real, ← norm_div,
+    Complex.norm_real, Real.norm_of_nonneg (r := t), sub_div, mul_div_cancel_right₀]
+  · exact_mod_cast ht₁.ne'
+  · exact ht₁.le
+  · exact ht₁.le
+  · exact ht₁
+
+#where
 
 #exit
 
