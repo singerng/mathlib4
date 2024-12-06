@@ -5,6 +5,7 @@ Authors: Kyle Miller
 -/
 import Lean.Elab.Deriving.Ord
 import Mathlib.Tactic.ToLevel
+import Mathlib.ListArrayMap
 
 /-!
 # A `ToExpr` derive handler
@@ -135,7 +136,7 @@ def mkLocalInstanceLetDecls (ctx : Deriving.Context) (argNames : Array Name) :
 def fixIndType (indVal : InductiveVal) (t : Term) : TermElabM Term :=
   match t with
   | `(@$f $args*) =>
-    let levels := indVal.levelParams.toArray.map mkIdent
+    let levels := (indVal.levelParams).toArrayMap mkIdent
     `(@$f.{$levels,*} $args*)
   | _ => throwError "(internal error) expecting output of `mkInductiveApp`"
 
@@ -168,7 +169,7 @@ def mkAuxFunction (ctx : Deriving.Context) (i : Nat) : TermElabM Command := do
   let binders := header.binders.pop
     ++ (← mkToLevelBinders indVal)
     ++ #[← addLevels header.binders.back!]
-  let levels := indVal.levelParams.toArray.map mkIdent
+  let levels := indVal.levelParams.toArrayMap mkIdent
   if ctx.usePartial then
     `(private partial def $(mkIdent auxFunName):ident.{$levels,*} $binders:bracketedBinder* :
         Expr := $body:term)
@@ -200,7 +201,7 @@ def mkInstanceCmds (ctx : Deriving.Context) (typeNames : Array Name) :
       let binders      := binders ++ (← mkToLevelBinders indVal)
       let indType      ← fixIndType indVal (← mkInductiveApp indVal argNames)
       let toTypeExpr   ← mkToTypeExpr argNames indVal
-      let levels       := indVal.levelParams.toArray.map mkIdent
+      let levels       := indVal.levelParams.toArrayMap mkIdent
       let instCmd ← `(instance $binders:implicitBinder* : ToExpr $indType where
                         toExpr := $(mkIdent auxFunName).{$levels,*}
                         toTypeExpr := $toTypeExpr)

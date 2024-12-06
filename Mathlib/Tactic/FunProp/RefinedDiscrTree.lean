@@ -5,6 +5,7 @@ Authors: J. W. Gerbscheid
 -/
 import Mathlib.Tactic.FunProp.StateList
 import Mathlib.Algebra.Group.Pi.Basic
+import Mathlib.ListArrayMap
 
 /-!
 We define discrimination trees for the purpose of unifying local expressions with library results.
@@ -981,7 +982,7 @@ private abbrev M := ReaderT Context <| StateListM State
 /-- Return all values from `x` in an array, together with their scores. -/
 private def M.run (unify : Bool) (x : M (Trie α)) :
     Array (Array α × Nat) :=
-  ((x.run { unify }).run {}).toArray.map (fun (t, s) => (t.values!, s.score))
+  ((x.run { unify }).run {}).toArrayMap (fun (t, s) ↦ (t.values!, s.score))
 
 /-- Increment the score by `n`. -/
 private def incrementScore (n : Nat) : M Unit :=
