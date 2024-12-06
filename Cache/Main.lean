@@ -5,6 +5,7 @@ Authors: Arthur Paulino
 -/
 
 import Cache.Requests
+import Mathlib.ListArrayMap
 
 def help : String := "Mathlib4 caching CLI
 Usage: cache [COMMAND]
@@ -73,7 +74,7 @@ def main (args : List String) : IO Unit := do
   -- so we can use the cache on `Archive` or `Counterexamples`.
   let extraRoots := match args with
   | [] => #[]
-  | _ :: t => t.toArray.map FilePath.mk
+  | _ :: t => t.toArrayMap FilePath.mk
   if args.isEmpty then
     println help
     Process.exit 0
