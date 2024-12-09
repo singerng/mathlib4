@@ -239,7 +239,7 @@ theorem tendsto_sum_mul_atTop_integral (hf_diff : ∀ t ∈ Set.Ici 0, Different
     {g : ℝ → 𝕜} (hg₁ : (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) =O[atTop] g)
     (hg₂ : IntegrableAtFilter g atTop) :
     Tendsto (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k * c k) atTop
-      (𝓝 (- ∫ t in Set.Ioi 0, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k))) := by
+      (𝓝 (∫ t in Set.Ioi 0, - (deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)))) := by
   have hlim₁ : Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 0) :=
     h_cmp.tendsto_div_nhds_zero.congr fun n ↦ by rw [div_inv_eq_mul, mul_comm]
   have hlim₂ : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (0 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
@@ -249,7 +249,7 @@ theorem tendsto_sum_mul_atTop_integral (hf_diff : ∀ t ∈ Set.Ici 0, Different
     refine integrableOn_Ici_iff_integrableOn_Ioi.mp
       <| (locallyintegrablemulsum c le_rfl hf_int).integrableOn_of_isBigO_atTop hg₁ hg₂
   have hlim₃ := (hlim₁.sub hlim₂)
-  rw [zero_sub] at hlim₃
+  rw [zero_sub, ← MeasureTheory.integral_neg] at hlim₃
   refine Tendsto.congr (fun _ ↦ ?_) hlim₃
   rw [sum_mul_eq_sub_integral_mul' _ _ (fun t ht ↦ hf_diff _ ht.1)
     (hf_int.mono_set Set.Icc_subset_Ici_self)]
@@ -261,7 +261,7 @@ theorem tendsto_sum_mul_atTop_integral₀ (hc : c 0 = 0)
     {g : ℝ → 𝕜} (hg₁ : (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) =O[atTop] g)
     (hg₂ : IntegrableAtFilter g atTop) :
     Tendsto (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k * c k) atTop
-      (𝓝 (- ∫ t in Set.Ioi 1, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k))) := by
+      (𝓝 (∫ t in Set.Ioi 1, - (deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)))) := by
   have hlim₁ : Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 0) :=
     h_cmp.tendsto_div_nhds_zero.congr fun n ↦ by rw [div_inv_eq_mul, mul_comm]
   have hlim₂ : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (1 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
@@ -273,7 +273,7 @@ theorem tendsto_sum_mul_atTop_integral₀ (hc : c 0 = 0)
     refine integrableOn_Ici_iff_integrableOn_Ioi.mp
       <| (locallyintegrablemulsum c zero_le_one hf_int).integrableOn_of_isBigO_atTop hg₁ hg₂
   have hlim₃ := (hlim₁.sub hlim₂)
-  rw [zero_sub] at hlim₃
+  rw [zero_sub, ← MeasureTheory.integral_neg] at hlim₃
   refine Tendsto.congr (fun _ ↦ ?_) hlim₃
   rw [sum_mul_eq_sub_integral_mul₀' _ hc _ (fun t ht ↦ hf_diff _ ht.1)
     (hf_int.mono_set Set.Icc_subset_Ici_self)]

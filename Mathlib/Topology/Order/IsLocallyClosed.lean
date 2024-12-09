@@ -9,7 +9,7 @@ import Mathlib.Topology.LocallyClosed
 /-!
 # Intervals are locally closed
 
-We prove that the intervals on a topological ordered space are locally closed. 
+We prove that the intervals on a topological ordered space are locally closed.
 -/
 
 variable {X : Type*} [TopologicalSpace X] {a b : X}
