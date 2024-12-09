@@ -93,9 +93,34 @@ noncomputable section
 
 open Finset intervalIntegral MeasureTheory IntervalIntegrable
 
-variable {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜) {f : ℝ → 𝕜}
-
 open Filter Topology
+
+theorem toto {E : Type*} [NormedAddCommGroup E] [CompleteSpace E] (f : ℕ → E)
+    (hf : ∃ C, ∀ n, ∑ i ∈ Finset.range n, ‖f i‖ < C) :
+    Summable f :=
+  Summable.of_norm (by rwa [summable_iff_partial_sums_bounded  (fun _ ↦ norm_nonneg _)])
+
+example (f : ℕ → ℝ) (hf : ∀ n, 0 ≤ f n) (r : ℝ)
+    (hO : (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k) =O[atTop] fun n ↦ (n : ℝ) ^ r)
+    (s : ℝ) (h : s > r) :
+    LSeriesSummable (fun n ↦ f n) s := by
+  refine toto _ ?_
+  use 1
+  intro n
+  simp_rw [LSeries.norm_term_eq, Complex.norm_real, Real.norm_of_nonneg (hf _), Complex.ofReal_re]
+  cases n with
+  | zero => simp
+  | succ n =>
+      rw [Nat.range_eq_Icc_zero_sub_one _ n.add_one_ne_zero]
+      rw [add_tsub_cancel_right]
+      have : (fun k : ℕ ↦ if k = 0 then (0 : ℝ) else f k / (k : ℝ) ^ s) =
+        fun k : ℕ ↦ (k : ℝ) ^ (- s) * (if k = 0 then 0 else f k) := sorry
+      simp_rw [this]
+      have := sum_mul_eq_sub_integral_mul₀' (fun k ↦ if k = 0 then 0 else f k)
+        (f := fun x ↦ x ^ (-s)) (by simp) n ?_ ?_
+      rw [this]
+
+
 
 theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) (hs : 1 < s.re)
     (hO : (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k) =O[atTop] fun n ↦ (n : ℂ))
@@ -127,7 +152,7 @@ theorem integral_repr (f : ℕ → ℂ) (hf : f 0 = 0) (s : ℂ) (hs : 1 < s.re)
   have h2 :
       Tendsto (fun n ↦ ∑ k in range (n + 1), LSeries.term f s k) atTop (𝓝 (LSeries f s)) :=
     (tendsto_add_atTop_iff_nat 1).mpr hLS.hasSum.tendsto_sum_nat
-  have h3 := fun n : ℕ ↦ sum_mul_eq_sub_integral_mul' f
+  have h3 := fun n : ℕ ↦ sum_mul_eq_sub_integral_mul₀ f
     (f := fun x : ℝ ↦ ↑x ^ (- s)) (b := n) hf ?_ ?_
   · have h4 : Tendsto (fun n : ℕ ↦ ↑n ^ (- s) * ∑ k ∈ Icc 0 ⌊(n : ℝ)⌋₊, f k) atTop (𝓝 0) := by
       simp only [Nat.floor_natCast]
@@ -287,7 +312,8 @@ theorem lemma1 :
 
 theorem assume1 {ε : ℝ} (hε : 0 < ε) :
     ∀ᶠ t : ℝ in atTop, ‖∑ k ∈ Icc 0 ⌊t⌋₊, f k - l * t‖ < ε * t := by
-  rw [Metric.tendsto_nhds] at hlim
+  have := lemma1 f l hlim
+  rw [Metric.tendsto_nhds] at this
   specialize this ε hε
   filter_upwards [eventually_gt_atTop 0, this] with t ht₁ ht₂
   rwa [← div_lt_iff₀, ← Real.norm_of_nonneg (r := t), ← Complex.norm_real, ← norm_div,
@@ -297,17 +323,110 @@ theorem assume1 {ε : ℝ} (hε : 0 < ε) :
   · exact ht₁.le
   · exact ht₁
 
-#where
+theorem final_step1 (hf : f 0 = 0) (ε : ℝ) (hε : 0 < ε) :
+   -- maybe state as ‖(LSeries f s) / s - l / (s - 1)‖ ≤ C + ε / (s - 1)
+    ∃ C, ∀ s : ℝ, 1 < s → ‖(LSeries f s) / s - l / (s - 1)‖ ≤ C + ε / (s - 1) := by
+  obtain ⟨T, hT⟩ := eventually_atTop.mp <| assume1 f l hlim hε
+  -- need : 1 < T
+  let C := ∫ t in Set.Ioc 1 T, ‖((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (1 + 1 : ℂ)‖
+--  let C₁ := ε * ∫ t in Set.Ioc 1 T, t⁻¹
+  use C
+  intro s hs
+  calc
+    _ = ‖∫ t in Set.Ioi (1 : ℝ), ((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (s + 1 : ℂ)‖ := ?_
+    _ ≤ ∫ t in Set.Ioi (1 : ℝ), ‖((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (s + 1 : ℂ)‖ := ?_
+    _ = (∫ t in Set.Ioc 1 T, ‖((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (s + 1 : ℂ)‖)
+      + ∫ t in Set.Ioi T, ‖((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (s + 1 : ℂ)‖ := ?_
+    _ ≤ C + ∫ t in Set.Ioi T, ‖ε * t / (t : ℂ) ^ (s + 1 : ℂ)‖ := ?_
+    _ = C + ∫ t in Set.Ioi T, ε * t / t ^ (s + 1) := ?_
+    _ = C + ε * ∫ t in Set.Ioi T, t ^ (- s) := ?_
+    _ ≤ C + ε * ∫ t in Set.Ioi 1, t ^ (- s) := ?_
+    _ = C + ε /(s - 1) := ?_
+  · rw [integral_repr]
+    · sorry
+    · exact hf
+    · simpa using hs
+    · sorry
+    · sorry
+  · exact norm_integral_le_integral_norm _
+  · rw [show Set.Ioi 1 = Set.Ioc 1 T ∪ Set.Ioi T by sorry]
+    rw [setIntegral_union]
+    · sorry
+    · sorry
+    · sorry
+    · sorry
+  · gcongr
+    · sorry
+    · sorry
+    · sorry
+    · sorry
+  · rw [add_left_cancel_iff]
+    refine setIntegral_congr_fun measurableSet_Ioi fun x hx ↦ ?_
+    rw [show (s : ℂ) + 1 = (s + 1 : ℝ) by sorry, ← Complex.ofReal_cpow, ← Complex.ofReal_mul,
+      ← Complex.ofReal_div, Complex.norm_real, Real.norm_of_nonneg]
+    · sorry
+    · sorry
+  · simp_rw [mul_div_assoc]
+    rw [integral_mul_left]
+    rw [add_left_cancel_iff, mul_left_cancel_iff_of_pos hε]
+    refine setIntegral_congr_fun measurableSet_Ioi fun x hx ↦ ?_
+    have : x ≠ 0 := sorry
+    rw [Real.rpow_add_one, Real.rpow_neg]
+    · exact div_mul_cancel_right₀ this _
+    · sorry
+    · exact this
+  · gcongr
+    refine setIntegral_mono_set ?_ ?_ ?_
+    · sorry
+    · sorry
+    · refine HasSubset.Subset.eventuallyLE ?_
+      refine Set.Ioi_subset_Ioi ?_
+      sorry
+  · rw [add_left_cancel_iff, ← mul_one_div, mul_left_cancel_iff_of_pos hε]
+    rw [integral_Ioi_rpow_of_lt, Real.one_rpow, neg_div, ← div_neg, neg_add', neg_neg]
+    · sorry
+    · sorry
+
+theorem final_step2 (hf : f 0 = 0) :
+    Tendsto (fun s : ℝ ↦ ‖s * (s - 1) * LSeries f s - s * l‖) (𝓝[>] 1) (𝓝 0) := by
+  rw [← tendsto_zero_iff_norm_tendsto_zero]
+  rw [NormedAddCommGroup.tendsto_nhds_zero]
+  intro ε hε
+  have h1 := final_step1 f l hlim hf ε hε
+  sorry
+
+theorem final : Tendsto (fun s : ℝ ↦ (s - 1) * LSeries f s) (𝓝[>] 1) (𝓝 l) := by
+  have hlim : Tendsto (fun s : ℝ ↦ ‖s * (s - 1) * LSeries f s - s * l‖) (𝓝[>] 1) (𝓝 0) := sorry
+  rw [← tendsto_zero_iff_norm_tendsto_zero] at hlim
+  rw [NormedAddCommGroup.tendsto_nhds_zero] at hlim
+  rw [Metric.tendsto_nhds]
+  intro ε hε
+  specialize hlim ε sorry
+  filter_upwards [hlim, eventually_mem_nhdsWithin] with x hx₁ hx₂
+  rw [mul_assoc, ← mul_sub, norm_mul, ← lt_div_iff₀'] at hx₁
+  · refine lt_trans hx₁ ?_
+    refine div_lt_self ?_ ?_
+    · exact hε
+    · sorry
+  · sorry
+
+
 
 #exit
 
-theorem assume1 {ε : ℝ} (hε : 0 < ε) :
-    ∃ t : ℝ, ‖S f t - l * t‖ ≤ ε := sorry
+  have eq₁ : (LSeries f s) / s - l / (s - 1) =
+    (∫ t in Set.Ioi (1 : ℝ), ((∑ k ∈ Icc 0 ⌊t⌋₊, f k) - l * t) / (t : ℂ) ^ (s + 1: ℂ)) := sorry
+  obtain ⟨T, hT⟩ := eventually_atTop.mp <| assume1 f l hlim hε
+  have : Set.Ioi 1 = Set.Ioc 1 T ∪ Set.Ioi T := sorry
+
+
+
+#exit
+
+
 
 theorem final_step1 (s : ℝ) (ε : ℝ) :
     ∃ c, ‖(LSeries f s) / s - l / (s - 1)‖ ≤ ε / (s - 1) + c := sorry
 
 theorem final_step2 (ε : ℝ) (hε : 0 < ε) :
     limsup (fun s : ℝ ↦ ‖(s - 1) * LSeries f s - l‖) (𝓝[<] 1) ≤ ε := sorry
-
-theorem final : Tendsto (fun s : ℝ ↦ (s - 1) * LSeries f s) (𝓝[>] 1) (𝓝 l) := sorry
