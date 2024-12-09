@@ -41,8 +41,9 @@ noncomputable section
 /- We work in the `VectorField` namespace because pullbacks, Lie brackets, and so on, are notions
 that make sense in a variety of contexts. We also prefix the notions with `m` to distinguish the
 manifold notions from the vector spaces notions. For instance, the Lie bracket of two vector
-fields in a manifold is denoted with `mlieBracket I V W x`, where `I` is the relevant model with
-corners, `V W : Π (x : M), TangentSpace I x` are the vector fields, and `x : M` is the basepoint.
+fields in a manifold is denoted with `VectorField.mlieBracket I V W x`, where `I` is the relevant
+model with corners, `V W : Π (x : M), TangentSpace I x` are the vector fields, and `x : M` is
+the basepoint.
 -/
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
@@ -534,7 +535,7 @@ protected lemma _root_.ContMDiff.mpullback_vectorField
 
 end
 
-lemma mpullbackWithin_comp_of_left
+lemma mpullbackWithin_comp_of_isInvertible_left
     {g : M' → M''} {f : M → M'} {V : Π (x : M''), TangentSpace I'' x}
     {s : Set M} {t : Set M'} {x₀ : M} (hg : MDifferentiableWithinAt I' I'' g t (f x₀))
     (hf : MDifferentiableWithinAt I I' f s x₀) (h : Set.MapsTo f s t)
@@ -546,7 +547,7 @@ lemma mpullbackWithin_comp_of_left
   · rfl
   · exact hg'
 
-lemma mpullbackWithin_comp_of_right
+lemma mpullbackWithin_comp_of_isInvertible_right
     {g : M' → M''} {f : M → M'} {V : Π (x : M''), TangentSpace I'' x}
     {s : Set M} {t : Set M'} {x₀ : M} (hg : MDifferentiableWithinAt I' I'' g t (f x₀))
     (hf : MDifferentiableWithinAt I I' f s x₀) (h : Set.MapsTo f s t)
@@ -558,3 +559,5 @@ lemma mpullbackWithin_comp_of_right
   rfl
 
 end
+
+end VectorField
