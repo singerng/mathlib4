@@ -70,6 +70,7 @@ def cardHom : Multiset α →+ ℕ where
   map_zero' := card_zero
   map_add' := card_add
 
+@[simp]
 lemma card_nsmul (s : Multiset α) (n : ℕ) : card (n • s) = n * card s := cardHom.map_nsmul ..
 
 /-! ### `Multiset.replicate` -/
