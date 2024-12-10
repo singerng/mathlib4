@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Mitchell Horner
 -/
 import Mathlib.Combinatorics.SimpleGraph.Operations
+import Mathlib.Algebra.Order.Floor
 
 /-!
 # Extremal graph theory
@@ -190,5 +191,97 @@ theorem free_iff_of_iso (f : A ≃g B) :
   exact isIsoSubgraph_iff_of_iso f
 
 end Free
+
+section ExtremalNumber
+
+open Classical in
+/-- The extremal number of a finite type `β` and a simple graph `A` is the the maximum number of
+edges in a `A`-free simple graph on the vertex type `β`.
+
+If `A` is contained in all simple graphs on the vertex type `β`, then this is `0`. -/
+noncomputable def extremalNumber (β : Type*) [Fintype β] (A : SimpleGraph α) : ℕ :=
+  Finset.sup (Finset.univ.filter A.Free : Finset (SimpleGraph β))
+    (·.edgeFinset.card : SimpleGraph β → ℕ)
+
+variable [Fintype β] [DecidableRel B.Adj]
+
+open Classical in
+/-- If `B` is `A`-free, then `B` has at most `extremalNumber β A` edges. -/
+theorem le_extremalNumber (h : A.Free B) :
+    B.edgeFinset.card ≤ extremalNumber β A := by
+  have hB : B ∈ Finset.univ.filter A.Free := by
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ B, h⟩
+  convert Finset.le_sup hB; convert rfl
+
+/-- If `B` has more than `extremalNumber β A` edges, then `B` contains a copy of `A`. -/
+theorem extremalNumber_lt (h : extremalNumber β A < B.edgeFinset.card) :
+    A.IsIsoSubgraph B := by
+  contrapose! h
+  exact le_extremalNumber h
+
+/-- `extremalNumber β A` is at most `x` if and only if every `A`-free simple graph `B` has at most
+`x` edges. -/
+theorem extremalNumber_le_iff (β : Type*) [Fintype β] (A : SimpleGraph α) (x : ℕ) :
+    extremalNumber β A ≤ x ↔
+      ∀ (B : SimpleGraph β) [DecidableRel B.Adj], A.Free B → B.edgeFinset.card ≤ x := by
+  simp_rw [extremalNumber, Finset.sup_le_iff, Finset.mem_filter, Finset.mem_univ, true_and]
+  exact ⟨fun h B _ hB ↦ by convert h B hB, fun h B hB ↦ by convert h B hB⟩
+
+/-- `extremalNumber β A` is greater than `x` if and only if there exists a `A`-free simple graph `B`
+with greater than `x` edges. -/
+theorem lt_extremalNumber_iff (β : Type*) [Fintype β] (A : SimpleGraph α) (x : ℕ) :
+    x < extremalNumber β A ↔
+      ∃ B : SimpleGraph β, ∃ _ : DecidableRel B.Adj, A.Free B ∧ x < B.edgeFinset.card := by
+  simp_rw [extremalNumber, Finset.lt_sup_iff, Finset.mem_filter, Finset.mem_univ, true_and]
+  exact ⟨fun ⟨B, h₁, h₂⟩ ↦ ⟨B, _, h₁, h₂⟩, fun ⟨B, _, h₁, h₂⟩ ↦ ⟨B, h₁, by convert h₂⟩⟩
+
+variable {R : Type*} [LinearOrderedSemiring R] [FloorSemiring R]
+
+@[inherit_doc extremalNumber_le_iff]
+theorem extremalNumber_le_iff_of_nonneg
+    (β : Type*) [Fintype β] (A : SimpleGraph α) {x : R} (h : 0 ≤ x) :
+    extremalNumber β A ≤ x ↔
+      ∀ (B : SimpleGraph β) [DecidableRel B.Adj], A.Free B → B.edgeFinset.card ≤ x := by
+  simp_rw [←Nat.le_floor_iff h]
+  exact extremalNumber_le_iff β A ⌊x⌋₊
+
+@[inherit_doc lt_extremalNumber_iff]
+theorem lt_extremalNumber_iff_of_nonneg
+    (β : Type*) [Fintype β] (A : SimpleGraph α) {x : R} (h : 0 ≤ x) :
+    x < extremalNumber β A ↔
+      ∃ B : SimpleGraph β, ∃ _ : DecidableRel B.Adj, A.Free B ∧ x < B.edgeFinset.card := by
+  simp_rw [←Nat.floor_lt h]
+  exact lt_extremalNumber_iff β A ⌊x⌋₊
+
+/-- If `C` contains a copy of `A`, then `extremalNumber β A` is at most `extremalNumber β C`. -/
+theorem extremalNumber_le_extremalNumber_of_isIsoSubgraph (h : A.IsIsoSubgraph C) :
+    extremalNumber β A ≤ extremalNumber β C := by
+  rw [extremalNumber_le_iff]
+  intro B _
+  contrapose!
+  intro h_lt
+  rw [not_not]
+  exact h.trans (extremalNumber_lt h_lt)
+
+/-- If `β₁ ≃ β₂` or `A₁ ≃g A₂`, then `extremalNumber β₁ A₁` equals `extremalNumber β₂ A₂`. -/
+theorem extremalNumber_eq_extremalNumber_of_iso
+    {α₁ β₁ α₂ β₂ : Type*} [DecidableEq β₁] [Fintype β₁] [DecidableEq β₂] [Fintype β₂]
+    {A₁ : SimpleGraph α₁} {A₂ : SimpleGraph α₂} (e : β₁ ≃ β₂) (φ : A₁ ≃g A₂) :
+    extremalNumber β₁ A₁ = extremalNumber β₂ A₂ := by
+  simp_rw [eq_iff_le_not_lt, not_lt, extremalNumber_le_iff]
+  and_intros
+  on_goal 2 =>
+    replace e := e.symm
+    replace φ := φ.symm
+  all_goals
+    intro B _ hB
+    rw [Iso.card_edgeFinset_eq (Iso.map e B)]
+    apply le_extremalNumber
+    intro hB'
+    absurd hB
+    exact (hB'.trans' ⟨φ.toSubgraphIso⟩).trans ⟨(Iso.map e B).symm.toSubgraphIso⟩
+
+end ExtremalNumber
 
 end SimpleGraph
