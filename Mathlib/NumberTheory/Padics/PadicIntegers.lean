@@ -314,38 +314,46 @@ lemma valuation_coe_nonneg : 0 ≤ (x : ℚ_[p]).valuation := by
   obtain rfl | hx := eq_or_ne x 0
   · simp
   have := x.2
-  rwa [Padic.norm_eq_zpow_neg_valuation <| coe_ne_zero.2 hx,
-    zpow_le_one_iff_right_of_lt_one₀] at this
-  exact mod_cast hp.1.one_lt
+  rwa [Padic.norm_eq_zpow_neg_valuation <| coe_ne_zero.2 hx, zpow_le_one_iff_right₀, neg_nonpos]
+    at this
+  exact mod_cast (Fact.out : p.Prime).one_lt
 
 /-- `PadicInt.valuation` lifts the `p`-adic valuation on `ℚ` to `ℤ_[p]`. -/
 def valuation (x : ℤ_[p]) : ℕ := (x : ℚ_[p]).valuation.toNat
 
-theorem norm_eq_zpow_neg_valuation {x : ℤ_[p]} (hx : x ≠ 0) : ‖x‖ = p ^ (-x.valuation : ℤ) := by
-  simp [valuation, norm_eq_zpow_neg_valuation <| coe_ne_zero.2 hx]
-
-@[deprecated (since := "2024-12-10")] alias norm_eq_pow_val := norm_eq_pow_neg_valuation
+@[simp, norm_cast] lemma valuation_coe (x : ℤ_[p]) : (x : ℚ_[p]).valuation = x.valuation := by
+  simp [valuation, valuation_coe_nonneg]
 
 @[simp] lemma valuation_zero : valuation (0 : ℤ_[p]) = 0 := by simp [valuation]
 @[simp] lemma valuation_one : valuation (1 : ℤ_[p]) = 0 := by simp [valuation]
 @[simp] lemma valuation_p : valuation (p : ℤ_[p]) = 1 := by simp [valuation]
 
+lemma le_valuation_add (hxy : x + y ≠ 0) : min x.valuation y.valuation ≤ (x + y).valuation := by
+  zify; simpa [← valuation_coe] using Padic.le_valuation_add <| coe_ne_zero.2 hxy
+
+@[simp] lemma valuation_mul (hx : x ≠ 0) (hy : y ≠ 0) :
+    (x * y).valuation = x.valuation + y.valuation := by
+  zify; simp [← valuation_coe, Padic.valuation_mul (coe_ne_zero.2 hx) (coe_ne_zero.2 hy)]
+
+@[simp]
+lemma valuation_pow (x : ℤ_[p]) (n : ℕ) : (x ^ n).valuation = n * x.valuation := by
+  zify; simp [← valuation_coe]
+
+@[simp]
+lemma valuation_zpow (x : ℚ_[p]) : ∀ n : ℤ, (x ^ n).valuation = n * x.valuation
+  | (n : ℕ) => by simp
+  | .negSucc n => by simp [← neg_mul]; simp [Int.negSucc_eq]
+
+lemma norm_eq_zpow_neg_valuation {x : ℤ_[p]} (hx : x ≠ 0) : ‖x‖ = p ^ (-x.valuation : ℤ) := by
+  simp [norm_def, Padic.norm_eq_zpow_neg_valuation <| coe_ne_zero.2 hx]
+
+@[deprecated (since := "2024-12-10")] alias norm_eq_pow_val := norm_eq_zpow_neg_valuation
+
+-- TODO: Do we really need this lemma?
 @[simp]
 theorem valuation_p_pow_mul (n : ℕ) (c : ℤ_[p]) (hc : c ≠ 0) :
     ((p : ℤ_[p]) ^ n * c).valuation = n + c.valuation := by
-  have : ‖(p : ℤ_[p]) ^ n * c‖ = ‖(p : ℤ_[p]) ^ n‖ * ‖c‖ := norm_mul _ _
-  have aux : (p : ℤ_[p]) ^ n * c ≠ 0 := by
-    contrapose! hc
-    rw [mul_eq_zero] at hc
-    cases' hc with hc hc
-    · refine (hp.1.ne_zero ?_).elim
-      exact_mod_cast pow_eq_zero hc
-    · exact hc
-  rwa [norm_eq_zpow_neg_valuation aux, norm_p_pow, norm_eq_zpow_neg_valuation hc, ← zpow_add₀,
-    ← neg_add, zpow_right_inj₀, neg_inj] at this
-  · exact mod_cast hp.1.pos
-  · exact mod_cast hp.1.ne_one
-  · exact mod_cast hp.1.ne_zero
+  rw [valuation_mul (NeZero.ne _) hc, valuation_pow, valuation_p, mul_one]
 
 section Units
 
@@ -402,26 +410,22 @@ theorem norm_units (u : ℤ_[p]ˣ) : ‖(u : ℤ_[p])‖ = 1 := isUnit_iff.mp <|
 /-- `unitCoeff hx` is the unit `u` in the unique representation `x = u * p ^ n`.
 See `unitCoeff_spec`. -/
 def unitCoeff {x : ℤ_[p]} (hx : x ≠ 0) : ℤ_[p]ˣ :=
-  let u : ℚ_[p] := x * (p : ℚ_[p]) ^ (-x.valuation)
+  let u : ℚ_[p] := x * (p : ℚ_[p]) ^ (-x.valuation : ℤ)
   have hu : ‖u‖ = 1 := by
-    simp [u, hx, zpow_ne_zero (G₀ := ℝ) _ (Nat.cast_ne_zero.2 hp.1.pos.ne'),
-      norm_eq_zpow_neg_valuation]
+    simp [u, hx, pow_ne_zero _ (NeZero.ne _), norm_eq_zpow_neg_valuation]
   mkUnits hu
 
 @[simp]
 theorem unitCoeff_coe {x : ℤ_[p]} (hx : x ≠ 0) :
-    (unitCoeff hx : ℚ_[p]) = x * (p : ℚ_[p]) ^ (-x.valuation) := rfl
+    (unitCoeff hx : ℚ_[p]) = x * (p : ℚ_[p]) ^ (-x.valuation : ℤ) := rfl
 
 theorem unitCoeff_spec {x : ℤ_[p]} (hx : x ≠ 0) :
-    x = (unitCoeff hx : ℤ_[p]) * (p : ℤ_[p]) ^ Int.natAbs (valuation x) := by
+    x = (unitCoeff hx : ℤ_[p]) * (p : ℤ_[p]) ^ x.valuation := by
   apply Subtype.coe_injective
   push_cast
-  have repr : (x : ℚ_[p]) = unitCoeff hx * (p : ℚ_[p]) ^ x.valuation := by
-    rw [unitCoeff_coe, mul_assoc, ← zpow_add₀]
-    · simp
-    · exact mod_cast hp.1.ne_zero
-  convert repr using 2
-  rw [← zpow_natCast, Int.natAbs_of_nonneg (valuation_nonneg x)]
+  rw [unitCoeff_coe, mul_assoc, ← zpow_natCast, ← zpow_add₀]
+  · simp
+  · exact NeZero.ne _
 
 end Units
 
@@ -431,35 +435,22 @@ section NormLeIff
 
 
 theorem norm_le_pow_iff_le_valuation (x : ℤ_[p]) (hx : x ≠ 0) (n : ℕ) :
-    ‖x‖ ≤ (p : ℝ) ^ (-n : ℤ) ↔ ↑n ≤ x.valuation := by
-  rw [norm_eq_zpow_neg_valuation hx]
-  lift x.valuation to ℕ using x.valuation_nonneg with k
-  simp only [Int.ofNat_le, zpow_neg, zpow_natCast]
-  have aux : ∀ m : ℕ, 0 < (p : ℝ) ^ m := by
-    intro m
-    refine pow_pos ?_ m
-    exact mod_cast hp.1.pos
-  rw [inv_le_inv₀ (aux _) (aux _)]
-  have : p ^ n ≤ p ^ k ↔ n ≤ k := (pow_right_strictMono₀ hp.1.one_lt).le_iff_le
-  rw [← this]
-  norm_cast
+    ‖x‖ ≤ (p : ℝ) ^ (-n : ℤ) ↔ n ≤ x.valuation := by
+  rw [norm_eq_zpow_neg_valuation hx, zpow_le_zpow_iff_right₀, neg_le_neg_iff, Nat.cast_le]
+  exact mod_cast (Fact.out : p.Prime).one_lt
 
 theorem mem_span_pow_iff_le_valuation (x : ℤ_[p]) (hx : x ≠ 0) (n : ℕ) :
-    x ∈ (Ideal.span {(p : ℤ_[p]) ^ n} : Ideal ℤ_[p]) ↔ ↑n ≤ x.valuation := by
+    x ∈ (Ideal.span {(p : ℤ_[p]) ^ n} : Ideal ℤ_[p]) ↔ n ≤ x.valuation := by
   rw [Ideal.mem_span_singleton]
   constructor
   · rintro ⟨c, rfl⟩
     suffices c ≠ 0 by
-      rw [valuation_p_pow_mul _ _ this, le_add_iff_nonneg_right]
-      apply valuation_nonneg
+      rw [valuation_p_pow_mul _ _ this]
+      exact le_self_add
     contrapose! hx
     rw [hx, mul_zero]
   · nth_rewrite 2 [unitCoeff_spec hx]
-    lift x.valuation to ℕ using x.valuation_nonneg with k
-    simp only [Int.natAbs_ofNat, Units.isUnit, IsUnit.dvd_mul_left, Int.ofNat_le]
-    intro H
-    obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le H
-    simp only [pow_add, dvd_mul_right]
+    simpa [Units.isUnit, IsUnit.dvd_mul_left] using pow_dvd_pow _
 
 theorem norm_le_pow_iff_mem_span_pow (x : ℤ_[p]) (n : ℕ) :
     ‖x‖ ≤ (p : ℝ) ^ (-n : ℤ) ↔ x ∈ (Ideal.span {(p : ℤ_[p]) ^ n} : Ideal ℤ_[p]) := by
@@ -499,7 +490,7 @@ instance : IsLocalRing ℤ_[p] :=
   IsLocalRing.of_nonunits_add <| by simp only [mem_nonunits]; exact fun x y => norm_lt_one_add
 
 theorem p_nonnunit : (p : ℤ_[p]) ∈ nonunits ℤ_[p] := by
-  have : (p : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ <| mod_cast hp.1.one_lt
+  have : (p : ℝ)⁻¹ < 1 := inv_lt_one_of_one_lt₀ <| mod_cast (Fact.out : p.Prime).one_lt
   rwa [← norm_p, ← mem_nonunits] at this
 
 theorem maximalIdeal_eq_span_p : maximalIdeal ℤ_[p] = Ideal.span {(p : ℤ_[p])} := by
@@ -513,14 +504,14 @@ theorem maximalIdeal_eq_span_p : maximalIdeal ℤ_[p] = Ideal.span {(p : ℤ_[p]
 theorem prime_p : Prime (p : ℤ_[p]) := by
   rw [← Ideal.span_singleton_prime, ← maximalIdeal_eq_span_p]
   · infer_instance
-  · exact mod_cast hp.1.ne_zero
+  · exact NeZero.ne _
 
 theorem irreducible_p : Irreducible (p : ℤ_[p]) := Prime.irreducible prime_p
 
 instance : DiscreteValuationRing ℤ_[p] :=
   DiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
     ⟨p, irreducible_p, fun {x hx} =>
-      ⟨x.valuation.natAbs, unitCoeff hx, by rw [mul_comm, ← unitCoeff_spec hx]⟩⟩
+      ⟨x.valuation, unitCoeff hx, by rw [mul_comm, ← unitCoeff_spec hx]⟩⟩
 
 theorem ideal_eq_span_pow_p {s : Ideal ℤ_[p]} (hs : s ≠ ⊥) :
     ∃ n : ℕ, s = Ideal.span {(p : ℤ_[p]) ^ n} :=
@@ -541,7 +532,7 @@ instance : IsAdicComplete (maximalIdeal ℤ_[p]) ℤ_[p] where
     · refine ⟨x'.lim, fun n => ?_⟩
       have : (0 : ℝ) < (p : ℝ) ^ (-n : ℤ) := by
         apply zpow_pos
-        exact mod_cast hp.1.pos
+        exact mod_cast (Fact.out : p.Prime).pos
       obtain ⟨i, hi⟩ := equiv_def₃ (equiv_lim x') this
       by_cases hin : i ≤ n
       · exact (hi i le_rfl n hin).le
@@ -583,8 +574,8 @@ instance isFractionRing : IsFractionRing ℤ_[p] ℚ_[p] where
           intro h0
           rw [h0, norm_zero] at hx
           exact hx zero_le_one
-        rw [ha, padicNormE.mul, padicNormE.norm_p_pow, Padic.norm_eq_zpow_neg_valuation hx, ← zpow_add',
-          hn_coe, neg_neg, neg_add_cancel, zpow_zero]
+        rw [ha, padicNormE.mul, padicNormE.norm_p_pow, Padic.norm_eq_zpow_neg_valuation hx,
+          ← zpow_add', hn_coe, neg_neg, neg_add_cancel, zpow_zero]
         exact Or.inl (Nat.cast_ne_zero.mpr (NeZero.ne p))
       use
         (⟨a, le_of_eq ha_norm⟩,
