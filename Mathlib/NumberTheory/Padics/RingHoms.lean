@@ -365,7 +365,7 @@ theorem appr_spec (n : ℕ) : ∀ x : ℤ_[p], x - appr x n ∈ Ideal.span {(p :
     obtain ⟨c, rfl⟩ : IsUnit c := by
       -- TODO: write a `CanLift` instance for units
       rw [Int.natAbs_eq_zero] at hc0
-      rw [isUnit_iff, norm_eq_pow_val hc', hc0, neg_zero, zpow_zero]
+      rw [isUnit_iff, norm_eq_zpow_neg_valuation hc', hc0, neg_zero, zpow_zero]
     rw [DiscreteValuationRing.unit_mul_pow_congr_unit _ _ _ _ _ hc]
     exact irreducible_p
   · simp only [zero_pow hc0, sub_zero, ZMod.cast_zero, mul_zero]
