@@ -76,7 +76,7 @@ abbrev toHom : A ≲g B → A →g B := Subtype.val
 
 @[simp] lemma coe_toHom (f : A ≲g B) : ⇑f.toHom = f := rfl
 
-abbrev injective : (f : A ≲g B) → (Function.Injective f.toHom) := Subtype.prop
+lemma injective : (f : A ≲g B) → (Function.Injective f.toHom) := Subtype.prop
 
 instance : FunLike (A ≲g B) α β where
   coe f := DFunLike.coe f.toHom
