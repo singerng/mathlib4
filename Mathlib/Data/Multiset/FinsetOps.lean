@@ -236,7 +236,7 @@ theorem ndinter_le_right {s} (t : Multiset α) (d : Nodup s) : ndinter s t ≤ t
   (le_iff_subset <| d.ndinter _).2 <| ndinter_subset_right _ _
 
 theorem inter_le_ndinter (s t : Multiset α) : s ∩ t ≤ ndinter s t :=
-  le_ndinter.2 ⟨inter_le_left _ _, subset_of_le <| inter_le_right _ _⟩
+  le_ndinter.2 ⟨inter_le_left, subset_of_le inter_le_right⟩
 
 @[simp]
 theorem ndinter_eq_inter {s t : Multiset α} (d : Nodup s) : ndinter s t = s ∩ t :=
