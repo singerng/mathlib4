@@ -70,7 +70,7 @@ private theorem ineqofmemIco' {k : ℕ} (hk : k ∈ Ico (⌊a⌋₊ + 1) ⌊b⌋
   ineqofmemIco (by rwa [← Finset.coe_Ico])
 
 private theorem integrablemulsum (ha : 0 ≤ a) (hf_int : IntegrableOn (deriv f) (Set.Icc a b)) :
-    IntegrableOn (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) (Set.Icc a b) := by
+    IntegrableOn (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) (Set.Icc a b) := by
   obtain hab | hab := le_or_gt a b
   · obtain hb | hb := eq_or_lt_of_le (Nat.floor_le_floor hab)
     · have : ∀ᵐ t, t ∈ Set.Icc a b → ∑ k ∈ Icc 0 ⌊a⌋₊, c k = ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
@@ -81,7 +81,7 @@ private theorem integrablemulsum (ha : 0 ≤ a) (hf_int : IntegrableOn (deriv f)
         (hf_int.mul_const _) ((Filter.EventuallyEq.refl _ (deriv f)).mul this)
     · have h_locint {t₁ t₂ : ℝ} {n : ℕ} (h : t₁ ≤ t₂) (h₁ : n ≤ t₁) (h₂ : t₂ ≤ n + 1)
           (h₃ : a ≤ t₁) (h₄ : t₂ ≤ b) :
-          IntervalIntegrable (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) volume t₁ t₂ := by
+          IntervalIntegrable (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) volume t₁ t₂ := by
         rw [intervalIntegrable_iff_integrableOn_Icc_of_le h]
         exact (IntegrableOn.mono_set (hf_int.mul_const _) (Set.Icc_subset_Icc h₃ h₄)).congr
           <| ae_restrict_of_ae_restrict_of_subset (Set.Icc_subset_Icc h₁ h₂)
@@ -110,7 +110,7 @@ theorem _root_.sum_mul_eq_sub_sub_integral_mul (ha : 0 ≤ a) (hab : a ≤ b)
     (hf_int : IntegrableOn (deriv f) (Set.Icc a b)) :
     ∑ k ∈ Ioc ⌊a⌋₊ ⌊b⌋₊, f k * c k =
       f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - f a * (∑ k ∈ Icc 0 ⌊a⌋₊, c k) -
-        ∫ t in Set.Ioc a b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+        ∫ t in Set.Ioc a b, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   rw [← integral_of_le hab]
   have aux1 : ⌊a⌋₊ ≤ a := Nat.floor_le ha
   have aux2 : b ≤ ⌊b⌋₊ + 1 := (Nat.lt_floor_add_one _).le
@@ -157,7 +157,7 @@ theorem _root_.sum_mul_eq_sub_sub_integral_mul' {n m : ℕ} (h : n ≤ m)
     (hf_int : IntegrableOn (deriv f) (Set.Icc (n : ℝ) m)) :
     ∑ k ∈ Ioc n m, f k * c k =
       f m * (∑ k ∈ Icc 0 m, c k) - f n * (∑ k ∈ Icc 0 n, c k) -
-        ∫ t in Set.Ioc (n : ℝ) m, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+        ∫ t in Set.Ioc (n : ℝ) m, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   convert sum_mul_eq_sub_sub_integral_mul c n.cast_nonneg (Nat.cast_le.mpr h) hf_diff hf_int
   all_goals rw [Nat.floor_natCast]
 
@@ -170,7 +170,7 @@ theorem sum_mul_eq_sub_integral_mul {b : ℝ} (hb : 0 ≤ b)
     (hf_diff : ∀ t ∈ Set.Icc 0 b, DifferentiableAt ℝ f t)
     (hf_int : IntegrableOn (deriv f) (Set.Icc 0 b)) :
     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
-      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 0 b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 0 b, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (Nat.zero_le _)]
   rw [sum_cons, ← Nat.floor_zero (α := ℝ), sum_mul_eq_sub_sub_integral_mul c le_rfl hb hf_diff
     hf_int, Nat.floor_zero, Nat.cast_zero, Icc_self, sum_singleton]
@@ -182,7 +182,7 @@ theorem sum_mul_eq_sub_integral_mul' (m : ℕ)
     (hf_int : IntegrableOn (deriv f) (Set.Icc (0 : ℝ) m)) :
     ∑ k ∈ Icc 0 m, f k * c k =
       f m * (∑ k ∈ Icc 0 m, c k) -
-        ∫ t in Set.Ioc (0 : ℝ) m, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+        ∫ t in Set.Ioc (0 : ℝ) m, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   convert sum_mul_eq_sub_integral_mul c m.cast_nonneg hf_diff hf_int
   all_goals rw [Nat.floor_natCast]
 
@@ -192,7 +192,7 @@ theorem sum_mul_eq_sub_integral_mul₀ (hc : c 0 = 0) (b : ℝ)
     (hf_diff : ∀ t ∈ Set.Icc 1 b, DifferentiableAt ℝ f t)
     (hf_int : IntegrableOn (deriv f) (Set.Icc 1 b)) :
     ∑ k ∈ Icc 0 ⌊b⌋₊, f k * c k =
-      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 1 b, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+      f b * (∑ k ∈ Icc 0 ⌊b⌋₊, c k) - ∫ t in Set.Ioc 1 b, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   obtain hb | hb := le_or_gt 1 b
   · have : 1 ≤ ⌊b⌋₊ := (Nat.one_le_floor_iff _).mpr hb
     nth_rewrite 1 [Finset.Icc_eq_cons_Ioc (by linarith), sum_cons, ← Nat.Icc_succ_left,
@@ -211,7 +211,7 @@ theorem sum_mul_eq_sub_integral_mul₀' (hc : c 0 = 0) (m : ℕ)
     (hf_int : IntegrableOn (deriv f) (Set.Icc (1 : ℝ) m)) :
     ∑ k ∈ Icc 0 m, f k * c k =
       f m * (∑ k ∈ Icc 0 m, c k) -
-        ∫ t in Set.Ioc (1 : ℝ) m, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k) := by
+        ∫ t in Set.Ioc (1 : ℝ) m, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k := by
   convert sum_mul_eq_sub_integral_mul₀ c hc m hf_diff hf_int
   all_goals rw [Nat.floor_natCast]
 
@@ -223,7 +223,7 @@ open Filter Topology abelSummationProof
 
 private theorem locallyintegrablemulsum (ha : 0 ≤ a)
     (hf_int : IntegrableOn (deriv f) (Set.Ici a)) :
-    LocallyIntegrableOn (fun t ↦ deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)) (Set.Ici a) := by
+    LocallyIntegrableOn (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) (Set.Ici a) := by
   refine (locallyIntegrableOn_iff isLocallyClosed_Ici).mpr fun K hK₁ hK₂ ↦ ?_
   by_cases hK₃ : K.Nonempty
   · have h_inf : a ≤ sInf K := (hK₁ (hK₂.sInf_mem hK₃))
@@ -234,47 +234,39 @@ private theorem locallyintegrablemulsum (ha : 0 ≤ a)
     exact integrableOn_empty
 
 theorem tendsto_sum_mul_atTop_integral (hf_diff : ∀ t ∈ Set.Ici 0, DifferentiableAt ℝ f t)
-    (hf_int : IntegrableOn (deriv f) (Set.Ici 0))
-    (h_cmp : (fun n ↦ ∑ k ∈ Icc 0 n, c k) =o[atTop] fun t ↦ (f t)⁻¹)
+    (hf_int : IntegrableOn (deriv f) (Set.Ici 0)) {l : 𝕜}
+    (h_lim: Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 l))
     {g : ℝ → 𝕜} (hg₁ : (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) =O[atTop] g)
     (hg₂ : IntegrableAtFilter g atTop) :
     Tendsto (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k * c k) atTop
-      (𝓝 (∫ t in Set.Ioi 0, - (deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)))) := by
-  have hlim₁ : Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 0) :=
-    h_cmp.tendsto_div_nhds_zero.congr fun n ↦ by rw [div_inv_eq_mul, mul_comm]
-  have hlim₂ : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (0 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
-      atTop (𝓝 (∫ t in Set.Ioi 0, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k))) := by
+      (𝓝 (l - ∫ t in Set.Ioi 0, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)) := by
+  have h_lim' : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (0 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
+      atTop (𝓝 (∫ t in Set.Ioi 0, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)) := by
     refine Tendsto.congr (fun _ ↦ by rw [← integral_of_le (Nat.cast_nonneg _)]) ?_
     refine intervalIntegral_tendsto_integral_Ioi _ ?_ tendsto_natCast_atTop_atTop
     refine integrableOn_Ici_iff_integrableOn_Ioi.mp
       <| (locallyintegrablemulsum c le_rfl hf_int).integrableOn_of_isBigO_atTop hg₁ hg₂
-  have hlim₃ := (hlim₁.sub hlim₂)
-  rw [zero_sub, ← MeasureTheory.integral_neg] at hlim₃
-  refine Tendsto.congr (fun _ ↦ ?_) hlim₃
+  refine Tendsto.congr  (fun _ ↦ ?_) (h_lim.sub h_lim')
   rw [sum_mul_eq_sub_integral_mul' _ _ (fun t ht ↦ hf_diff _ ht.1)
     (hf_int.mono_set Set.Icc_subset_Ici_self)]
 
 theorem tendsto_sum_mul_atTop_integral₀ (hc : c 0 = 0)
     (hf_diff : ∀ t ∈ Set.Ici 1, DifferentiableAt ℝ f t)
-    (hf_int : IntegrableOn (deriv f) (Set.Ici 1))
-    (h_cmp : (fun n ↦ ∑ k ∈ Icc 0 n, c k) =o[atTop] fun t ↦ (f t)⁻¹)
+    (hf_int : IntegrableOn (deriv f) (Set.Ici 1)) {l : 𝕜}
+    (h_lim: Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 l))
     {g : ℝ → 𝕜} (hg₁ : (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) =O[atTop] g)
     (hg₂ : IntegrableAtFilter g atTop) :
     Tendsto (fun n : ℕ ↦ ∑ k ∈ Icc 0 n, f k * c k) atTop
-      (𝓝 (∫ t in Set.Ioi 1, - (deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k)))) := by
-  have hlim₁ : Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 0) :=
-    h_cmp.tendsto_div_nhds_zero.congr fun n ↦ by rw [div_inv_eq_mul, mul_comm]
-  have hlim₂ : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (1 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
-      atTop (𝓝 (∫ t in Set.Ioi 1, deriv f t * (∑ k ∈ Icc 0 ⌊t⌋₊, c k))) := by
+      (𝓝 (l - ∫ t in Set.Ioi 1, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)) := by
+  have h_lim' : Tendsto (fun n : ℕ ↦ ∫ t in Set.Ioc (1 : ℝ) n, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)
+      atTop (𝓝 (∫ t in Set.Ioi 1, deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k)) := by
     refine Tendsto.congr' (by
       filter_upwards [eventually_ge_atTop 1] with _ h
       rw [← integral_of_le (Nat.one_le_cast.mpr h)]) ?_
     refine intervalIntegral_tendsto_integral_Ioi _ ?_ tendsto_natCast_atTop_atTop
     refine integrableOn_Ici_iff_integrableOn_Ioi.mp
       <| (locallyintegrablemulsum c zero_le_one hf_int).integrableOn_of_isBigO_atTop hg₁ hg₂
-  have hlim₃ := (hlim₁.sub hlim₂)
-  rw [zero_sub, ← MeasureTheory.integral_neg] at hlim₃
-  refine Tendsto.congr (fun _ ↦ ?_) hlim₃
+  refine Tendsto.congr (fun _ ↦ ?_) (h_lim.sub h_lim')
   rw [sum_mul_eq_sub_integral_mul₀' _ hc _ (fun t ht ↦ hf_diff _ ht.1)
     (hf_int.mono_set Set.Icc_subset_Ici_self)]
 
