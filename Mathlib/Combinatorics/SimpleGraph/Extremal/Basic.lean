@@ -284,4 +284,49 @@ theorem extremalNumber_eq_extremalNumber_of_iso
 
 end ExtremalNumber
 
+section IsExtremal
+
+/-- `G` is an extremal graph satisfying `p` if `G` has the maximum number of edges of any simple
+graph satisfying `p`. -/
+def IsExtremal [Fintype V] (G : SimpleGraph V) [DecidableRel G.Adj] (p : SimpleGraph V → Prop) :=
+  p G ∧ ∀ (H : SimpleGraph V) [DecidableRel H.Adj], p H → H.edgeFinset.card ≤ G.edgeFinset.card
+
+open Classical in
+/-- If one simple graph satisfies `p`, then there exists an extremal graph satisfying `p`. -/
+theorem exists_extremal_graph
+    [Fintype V] (p : SimpleGraph V → Prop) [DecidablePred p] (hp : ∃ G, p G) :
+    ∃ G : SimpleGraph V, ∃ _ : DecidableRel G.Adj, G.IsExtremal p := by
+  replace hp : (Finset.univ.filter p).Nonempty := by
+    use Exists.choose hp
+    simp_rw [Finset.mem_filter, Finset.mem_univ, true_and]
+    exact Exists.choose_spec hp
+  obtain ⟨G, hp, h⟩ := Finset.exists_max_image (Finset.univ.filter p) (·.edgeFinset.card) hp
+  simp_rw [Finset.mem_filter, Finset.mem_univ, true_and] at hp h
+  use G, inferInstance
+  exact ⟨hp, fun H _ hp' ↦ by convert h H hp'⟩
+
+lemma free_bot (h : A.edgeSet.Nonempty) : A.Free (⊥ : SimpleGraph β) := by
+  intro ⟨f, _⟩
+  rw [←ne_self_iff_false (⊥ : SimpleGraph β), ←edgeSet_nonempty]
+  obtain ⟨e, he⟩ := h
+  exact ⟨e.map f, Hom.map_mem_edgeSet f he⟩
+
+open Classical in
+/-- If `A` has one edge, then exist an `A`-free extremal graph. -/
+theorem exists_extremal_graph_of_free [Fintype β] (h : A.edgeSet.Nonempty) :
+    ∃ B : SimpleGraph β, ∃ _ : DecidableRel B.Adj, B.IsExtremal A.Free :=
+  exists_extremal_graph A.Free ⟨⊥, free_bot h⟩
+
+/-- `A`-free extremal graphs are `A`-free simple graphs having `extremalNumber β A` many edges. -/
+theorem isExtremal_free_iff [Fintype β] [DecidableRel B.Adj] :
+    B.IsExtremal A.Free ↔ (A.Free B) ∧ B.edgeFinset.card = extremalNumber β A := by
+  rw [IsExtremal, and_congr_right_iff, ←extremalNumber_le_iff]
+  intro h
+  constructor
+  · apply eq_of_le_of_le (le_extremalNumber h)
+  · rw [eq_comm]
+    apply le_of_eq
+
+end IsExtremal
+
 end SimpleGraph
