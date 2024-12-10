@@ -42,6 +42,8 @@ This modules defines the basic definitions of extremal graph theory, including e
 -/
 
 
+open Fintype
+
 namespace SimpleGraph
 
 variable {V α β γ : Type*} {G : SimpleGraph V}
@@ -121,5 +123,60 @@ theorem comp_apply (g : B ≲g C) (f : A ≲g B) (a : α) : g.comp f a = g (f a)
 end SubgraphIso
 
 end SubgraphIso
+
+section IsIsoSubgraph
+
+/-- The relation that a simple graph contains a copy of a simple graph. -/
+abbrev IsIsoSubgraph (A : SimpleGraph α) (B : SimpleGraph β) := Nonempty (A ≲g B)
+
+/-- A simple graph contains itself. -/
+@[refl]
+theorem isIsoSubgraph_refl (G : SimpleGraph V) :
+  G.IsIsoSubgraph G := ⟨SubgraphIso.refl G⟩
+
+/-- A simple graph contains its subgraphs. -/
+theorem isIsoSubgraph_of_le {G₁ G₂ : SimpleGraph V} (h : G₁ ≤ G₂) :
+  G₁.IsIsoSubgraph G₂ := ⟨SubgraphIso.ofLE h⟩
+
+/-- If `A` contains `B` and `B` contains `C`, then `A` contains `C`. -/
+theorem isIsoSubgraph_trans : A.IsIsoSubgraph B → B.IsIsoSubgraph C → A.IsIsoSubgraph C :=
+  fun ⟨f⟩ ⟨g⟩ ↦ ⟨g.comp f⟩
+
+alias IsIsoSubgraph.trans := isIsoSubgraph_trans
+
+/-- If `B` contains `C` and `A` contains `B`, then `A` contains `C`. -/
+theorem isIsoSubgraph_trans' : B.IsIsoSubgraph C → A.IsIsoSubgraph B → A.IsIsoSubgraph C :=
+  flip isIsoSubgraph_trans
+
+alias IsIsoSubgraph.trans' := isIsoSubgraph_trans'
+
+/-- A simple graph having no vertices is contained in any simple graph. -/
+theorem isIsoSubgraph_of_isEmpty [IsEmpty α] : A.IsIsoSubgraph B := by
+  let ι : α ↪ β := Function.Embedding.ofIsEmpty
+  let f : A →g B := ⟨ι, by apply isEmptyElim⟩
+  exact ⟨f.toSubgraphIso ι.injective⟩
+
+/-- A simple graph having no edges is contained in any simple graph having sufficent vertices. -/
+theorem isIsoSubgraph_of_isEmpty_edgeSet [IsEmpty A.edgeSet] [Fintype α] [Fintype β]
+    (h : card α ≤ card β) : A.IsIsoSubgraph B := by
+  haveI : Nonempty (α ↪ β) := Function.Embedding.nonempty_of_card_le h
+  let ι : α ↪ β := Classical.arbitrary (α ↪ β)
+  let f : A →g B := by
+    use ι
+    intro a₁ a₂ hadj
+    let e : A.edgeSet := by
+      use s(a₁, a₂)
+      rw [mem_edgeSet]
+      exact hadj
+    exact isEmptyElim e
+  exact ⟨f.toSubgraphIso ι.injective⟩
+
+/-- If `A ≃g B`, then `A` is contained in `C` if and only if `B` is contained in `C`. -/
+theorem isIsoSubgraph_iff_of_iso (f : A ≃g B) :
+    A.IsIsoSubgraph C ↔ B.IsIsoSubgraph C :=
+  ⟨isIsoSubgraph_trans ⟨f.symm.toSubgraphIso⟩, isIsoSubgraph_trans ⟨f.toSubgraphIso⟩⟩
+
+end IsIsoSubgraph
+
 
 end SimpleGraph
