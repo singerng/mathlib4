@@ -210,7 +210,7 @@ theorem norm_eq_zpow_neg_valuation {f : PadicSeq p} (hf : ¬f ≈ 0) :
   rw [stationaryPoint_spec hf le_rfl hn]
   simpa [H] using hε
 
-@[deprecated (since := "2024-12-10")] alias norm_eq_pow_val := norm_eq_pow_neg_valuation
+@[deprecated (since := "2024-12-10")] alias norm_eq_pow_val := norm_eq_zpow_neg_valuation
 
 theorem val_eq_iff_norm_eq {f g : PadicSeq p} (hf : ¬f ≈ 0) (hg : ¬g ≈ 0) :
     f.valuation = g.valuation ↔ f.norm = g.norm := by
@@ -999,7 +999,8 @@ theorem valuation_map_add {x y : ℚ_[p]} (hxy : x + y ≠ 0) :
   by_cases hy : y = 0
   · simpa only [hy, add_zero] using min_le_left _ _
   have : ‖x + y‖ ≤ max ‖x‖ ‖y‖ := padicNormE.nonarchimedean x y
-  simpa only [norm_eq_zpow_neg_valuation hxy, norm_eq_zpow_neg_valuation hx, norm_eq_zpow_neg_valuation hy, le_max_iff,
+  simpa only [norm_eq_zpow_neg_valuation hxy, norm_eq_zpow_neg_valuation hx,
+    norm_eq_zpow_neg_valuation hy, le_max_iff,
     zpow_le_zpow_iff_right₀ (mod_cast hp.out.one_lt : 1 < (p : ℝ)), neg_le_neg_iff, ← min_le_iff]
 
 @[simp]
@@ -1012,9 +1013,9 @@ theorem valuation_map_mul {x y : ℚ_[p]} (hx : x ≠ 0) (hy : y ≠ 0) :
   have hp_pos : (0 : ℝ) < p := by
     rw [← Nat.cast_zero, Nat.cast_lt]
     exact Nat.Prime.pos hp.elim
-  rw [norm_eq_zpow_neg_valuation hx, norm_eq_zpow_neg_valuation hy, norm_eq_zpow_neg_valuation (mul_ne_zero hx hy), ←
+  rwa [norm_eq_zpow_neg_valuation hx, norm_eq_zpow_neg_valuation hy,
+    norm_eq_zpow_neg_valuation (mul_ne_zero hx hy), ←
     zpow_add₀ (ne_of_gt hp_pos), zpow_right_inj₀ hp_pos hp_ne_one, ← neg_add, neg_inj] at h_norm
-  exact h_norm
 
 open Classical in
 /-- The additive `p`-adic valuation on `ℚ_[p]`, with values in `WithTop ℤ`. -/
@@ -1086,7 +1087,7 @@ theorem norm_lt_pow_iff_norm_le_pow_sub_one (x : ℚ_[p]) (n : ℤ) :
 theorem norm_le_one_iff_val_nonneg (x : ℚ_[p]) : ‖x‖ ≤ 1 ↔ 0 ≤ x.valuation := by
   by_cases hx : x = 0
   · simp only [hx, norm_zero, valuation_zero, zero_le_one, le_refl]
-  · rw [norm_eq_zpow_neg_valuation hx, ← zpow_zero (p : ℝ), zpow_le_zpow_iff_right₀, Right.neg_nonpos_iff]
+  · rw [norm_eq_zpow_neg_valuation hx, ← zpow_zero (p : ℝ), zpow_le_zpow_iff_right₀, neg_nonpos]
     exact Nat.one_lt_cast.2 (Nat.Prime.one_lt' p).1
 
 end NormLEIff
