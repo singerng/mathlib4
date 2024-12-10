@@ -164,7 +164,7 @@ theorem le_ndunion_left {s} (t : Multiset α) (d : Nodup s) : s ≤ ndunion s t 
   (le_iff_subset d).2 <| subset_ndunion_left _ _
 
 theorem ndunion_le_union (s t : Multiset α) : ndunion s t ≤ s ∪ t :=
-  ndunion_le.2 ⟨subset_of_le (le_union_left _ _), le_union_right _ _⟩
+  ndunion_le.2 ⟨subset_of_le le_union_left, le_union_right⟩
 
 theorem Nodup.ndunion (s : Multiset α) {t : Multiset α} : Nodup t → Nodup (ndunion s t) :=
   Quot.induction_on₂ s t fun _ _ => List.Nodup.union _

@@ -2253,9 +2253,9 @@ lemma union_add_inter (s t : Multiset α) : s ∪ t + s ∩ t = s + t := by
     rw [add_comm]
     exact add_le_add_right inter_le_left _
   · rw [add_comm, add_inter_distrib]
-    refine le_inter (add_le_add_right (le_union_right ..) _) ?_
+    refine le_inter (add_le_add_right le_union_right _) ?_
     rw [add_comm]
-    exact add_le_add_right (le_union_left ..) _
+    exact add_le_add_right le_union_left _
 
 lemma sub_add_inter (s t : Multiset α) : s - t + s ∩ t = s := by
   rw [inter_comm]
@@ -2301,6 +2301,13 @@ theorem inter_replicate (s : Multiset α) (n : ℕ) (x : α) :
   rw [inter_comm, replicate_inter, min_comm]
 
 end sub
+
+@[ext]
+theorem addHom_ext [AddZeroClass β] ⦃f g : Multiset α →+ β⦄ (h : ∀ x, f {x} = g {x}) : f = g := by
+  ext s
+  induction' s using Multiset.induction_on with a s ih
+  · simp only [_root_.map_zero]
+  · simp only [← singleton_add, _root_.map_add, ih, h]
 
 section Embedding
 
