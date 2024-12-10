@@ -233,7 +233,7 @@ private theorem locallyintegrablemulsum (ha : 0 ≤ a)
   · rw [Set.not_nonempty_iff_eq_empty.mp hK₃]
     exact integrableOn_empty
 
-theorem tendsto_sum_mul_atTop_integral (hf_diff : ∀ t ∈ Set.Ici 0, DifferentiableAt ℝ f t)
+theorem tendsto_sum_mul_atTop_sub_integral (hf_diff : ∀ t ∈ Set.Ici 0, DifferentiableAt ℝ f t)
     (hf_int : IntegrableOn (deriv f) (Set.Ici 0)) {l : 𝕜}
     (h_lim: Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 l))
     {g : ℝ → 𝕜} (hg₁ : (fun t ↦ deriv f t * ∑ k ∈ Icc 0 ⌊t⌋₊, c k) =O[atTop] g)
@@ -250,7 +250,7 @@ theorem tendsto_sum_mul_atTop_integral (hf_diff : ∀ t ∈ Set.Ici 0, Different
   rw [sum_mul_eq_sub_integral_mul' _ _ (fun t ht ↦ hf_diff _ ht.1)
     (hf_int.mono_set Set.Icc_subset_Ici_self)]
 
-theorem tendsto_sum_mul_atTop_integral₀ (hc : c 0 = 0)
+theorem tendsto_sum_mul_atTop_sub_integral₀ (hc : c 0 = 0)
     (hf_diff : ∀ t ∈ Set.Ici 1, DifferentiableAt ℝ f t)
     (hf_int : IntegrableOn (deriv f) (Set.Ici 1)) {l : 𝕜}
     (h_lim: Tendsto (fun n : ℕ ↦ f n * ∑ k ∈ Icc 0 n, c k) atTop (𝓝 l))
