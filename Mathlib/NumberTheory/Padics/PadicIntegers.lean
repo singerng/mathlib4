@@ -339,11 +339,6 @@ lemma le_valuation_add (hxy : x + y ≠ 0) : min x.valuation y.valuation ≤ (x 
 lemma valuation_pow (x : ℤ_[p]) (n : ℕ) : (x ^ n).valuation = n * x.valuation := by
   zify; simp [← valuation_coe]
 
-@[simp]
-lemma valuation_zpow (x : ℚ_[p]) : ∀ n : ℤ, (x ^ n).valuation = n * x.valuation
-  | (n : ℕ) => by simp
-  | .negSucc n => by simp [← neg_mul]; simp [Int.negSucc_eq]
-
 lemma norm_eq_zpow_neg_valuation {x : ℤ_[p]} (hx : x ≠ 0) : ‖x‖ = p ^ (-x.valuation : ℤ) := by
   simp [norm_def, Padic.norm_eq_zpow_neg_valuation <| coe_ne_zero.2 hx]
 
