@@ -874,12 +874,14 @@ structure Config where
 declare_command_config_elab elabSimpsConfig Config
 
 /-- A common configuration for `@[simps]`: generate equalities between functions instead equalities
-  between fully applied Expressions. Use this using `@[simps (config := .asFn)]`. -/
+  between fully applied Expressions. Use this using `@[simps (config := .asFn)]`.
+  Alternatively, use `@[simps -fullyApplied]`. -/
 def Config.asFn : Simps.Config where
   fullyApplied := false
 
 /-- A common configuration for `@[simps]`: don't tag the generated lemmas with `@[simp]`.
-  Use this using `@[simps (config := .lemmasOnly)]`. -/
+  Use this using `@[simps (config := .lemmasOnly)]`.
+  Alternatively, use `@[simps -isSimp]`. -/
 def Config.lemmasOnly : Config where
   isSimp := false
 
