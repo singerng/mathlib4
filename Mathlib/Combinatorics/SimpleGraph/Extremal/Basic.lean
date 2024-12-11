@@ -3,8 +3,9 @@ Copyright (c) 2024 Mitchell Horner. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Mitchell Horner
 -/
-import Mathlib.Combinatorics.SimpleGraph.Operations
 import Mathlib.Algebra.Order.Floor
+import Mathlib.Combinatorics.SimpleGraph.Operations
+import Mathlib.Combinatorics.SimpleGraph.Subgraph
 
 /-!
 # Extremal graph theory
@@ -123,6 +124,10 @@ theorem comp_apply (g : B ≲g C) (f : A ≲g B) (a : α) : g.comp f a = g (f a)
 
 end SubgraphIso
 
+/-- The subgraph isomorphism from a `Subgraph G` coercion to `G`. -/
+def Subgraph.subgraphIso (G' : G.Subgraph) : (G'.coe) ≲g G :=
+  G'.hom.toSubgraphIso Subgraph.hom.injective
+
 end SubgraphIso
 
 section IsIsoSubgraph
@@ -176,6 +181,28 @@ theorem isIsoSubgraph_of_isEmpty_edgeSet [IsEmpty A.edgeSet] [Fintype α] [Finty
 theorem isIsoSubgraph_iff_of_iso (f : A ≃g B) :
     A.IsIsoSubgraph C ↔ B.IsIsoSubgraph C :=
   ⟨isIsoSubgraph_trans ⟨f.symm.toSubgraphIso⟩, isIsoSubgraph_trans ⟨f.toSubgraphIso⟩⟩
+
+/-- A simple graph `G` contains all `Subgraph G` coercions. -/
+lemma Subgraph.coe_isIsoSubgraph (G' : G.Subgraph) : (G'.coe).IsIsoSubgraph G := ⟨G'.subgraphIso⟩
+
+/-- The isomorphism from `Subgraph A` to its map under a subgraph isomorphism `A ≲g B`. -/
+noncomputable def Subgraph.isoMap (f : A ≲g B) (A' : A.Subgraph) :
+    A'.coe ≃g (A'.map f.toHom).coe := by
+  use Equiv.Set.image f.toHom _ f.injective
+  simp_rw [map_verts, Equiv.Set.image_apply, coe_adj, map_adj, Relation.map_apply,
+    Function.Injective.eq_iff f.injective, exists_eq_right_right, exists_eq_right, forall_true_iff]
+
+/-- `B` contains `A` if and only if `B` has a subgraph `B'` and `B'` is isomorphic to `A`. -/
+theorem isIsoSubgraph_iff_exists_iso_subgraph :
+    A.IsIsoSubgraph B ↔ ∃ B' : B.Subgraph, Nonempty (A ≃g B'.coe) := by
+  constructor
+  · intro ⟨f⟩
+    use (⊤ : A.Subgraph).map f
+    exact ⟨((⊤ : A.Subgraph).isoMap f).comp Subgraph.topIso.symm⟩
+  · intro ⟨B', ⟨e⟩⟩
+    exact B'.coe_isIsoSubgraph.trans' ⟨e.toSubgraphIso⟩
+
+alias ⟨exists_iso_subgraph, _⟩ := isIsoSubgraph_iff_exists_iso_subgraph
 
 end IsIsoSubgraph
 
