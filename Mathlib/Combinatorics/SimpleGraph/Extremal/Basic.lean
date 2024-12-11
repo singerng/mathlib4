@@ -82,6 +82,8 @@ instance : FunLike (A ≲g B) α β where
   coe f := DFunLike.coe f.toHom
   coe_injective' _ _ h := Subtype.val_injective (DFunLike.coe_injective h)
 
+@[simp] lemma coe_toHom_apply (f : A ≲g B) (a : α) : ⇑f.toHom a = f a := rfl
+
 /-- A subgraph isomorphism induces an embedding of edge sets. -/
 def mapEdgeSet (f : A ≲g B) : A.edgeSet ↪ B.edgeSet where
   toFun := Hom.mapEdgeSet f.toHom
@@ -95,11 +97,8 @@ def mapNeighborSet (f : A ≲g B) (a : α) :
     rw [Subtype.mk_eq_mk] at h ⊢
     exact f.injective h
 
-instance : EmbeddingLike (A ≲g B) α β where
-  injective' f := f.injective
-
-/-- A subgraph isomorphism gives rise to embeddings of vertex types. -/
-def asEmbedding (f : A ≲g B) : α ↪ β := ⟨f, EmbeddingLike.injective f⟩
+/-- A subgraph isomorphism gives rise to an embedding of vertex types. -/
+def asEmbedding (f : A ≲g B) : α ↪ β := ⟨f, f.injective⟩
 
 /-- The identity subgraph isomorphism from a simple graph to itself. -/
 @[refl] def refl (G : SimpleGraph V) : G ≲g G := ⟨Hom.id, Function.injective_id⟩
@@ -118,6 +117,7 @@ def comp (g : B ≲g C) (f : A ≲g B) : A ≲g C := by
   rw [Hom.coe_comp]
   exact Function.Injective.comp g.injective f.injective
 
+@[simp]
 theorem comp_apply (g : B ≲g C) (f : A ≲g B) (a : α) : g.comp f a = g (f a) :=
   RelHom.comp_apply g.toHom f.toHom a
 
