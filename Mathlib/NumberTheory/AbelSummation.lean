@@ -3,10 +3,11 @@ Copyright (c) 2024 Xavier Roblot. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Xavier Roblot
 -/
+import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Integral.Asymptotics
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 import Mathlib.Topology.Order.IsLocallyClosed
-import Mathlib.MeasureTheory.Function.Floor
+
 
 /-!
 # Abel's summation formula
@@ -24,7 +25,7 @@ We prove several versions of Abel's summation formula.
 * `sum_mul_eq_sub_integral_mul₀`: a specialized version of `sum_mul_eq_sub_integral_mul` for
   when the first coefficient of the sequence is `0`. This is useful for `ArithmeticFunction`.
 
-Primed versions of those three results are also stated for when the endpoints are `Nat`.
+Primed versions of the three results above are also stated for when the endpoints are `Nat`.
 
 * `tendsto_sum_mul_atTop_eq_sub_integral`: limit version of `sum_mul_eq_sub_integral_mul` when `a`
   tends to `∞`.
@@ -32,8 +33,8 @@ Primed versions of those three results are also stated for when the endpoints ar
 * `tendsto_sum_mul_atTop_eq_sub_integral₀`: limit version of `sum_mul_eq_sub_integral_mul₀` when `a`
   tends to `∞`.
 
-* `summable_mul_of_bigO_atTop`: let `c : ℕ → 𝕜` and `f : ℝ → 𝕜`, prove the summability of
-  `n ↦ (c n) * (f n)` using Abel's formula under some `bigO` assumption at infinity.
+* `summable_mul_of_bigO_atTop`: let `c : ℕ → 𝕜` and `f : ℝ → 𝕜` with `𝕜 = ℝ` or `ℂ`, prove the
+  summability of `n ↦ (c n) * (f n)` using Abel's formula under some `bigO` assumptions at infinity.
 
 ## References
 
@@ -289,14 +290,6 @@ section summable
 
 open Filter abelSummationProof
 
-theorem summable_of_partial_sums_norm_bounded {E : Type*} [SeminormedAddCommGroup E]
-    [CompleteSpace E] (f : ℕ → E)
-    (hf : ∃ C, ∀ n, ∑ i ∈ Finset.range n, ‖f i‖ < C) :
-    Summable f :=
-  Summable.of_norm (by rwa [summable_iff_partial_sums_bounded_of_nonneg (fun _ ↦ norm_nonneg _)])
-
-#find_home summable_of_partial_sums_norm_bounded
-
 theorem summable_mul_of_bigO_atTop
     (hf_diff : ∀ t ∈ Set.Ici 0, DifferentiableAt ℝ (fun x ↦ ‖f x‖) t)
     (hf_int : IntegrableOn (deriv (fun t ↦ ‖f t‖)) (Set.Ici 0))
@@ -307,7 +300,7 @@ theorem summable_mul_of_bigO_atTop
     Summable (fun n : ℕ ↦ f n * c n) := by
   obtain ⟨C₁, hC₁⟩ := Asymptotics.isBigO_one_nat_atTop_iff.mp h_bdd
   let C₂ := ∫ t in Set.Ioi 0, ‖deriv (fun t ↦ ‖f t‖) t * ∑ k ∈ Icc 0 ⌊t⌋₊, ‖c k‖‖
-  refine summable_of_partial_sums_norm_bounded _ ⟨max (C₁ + C₂ + 1) 1, fun n ↦ ?_⟩
+  refine summable_iff_partial_sums_norm_bounded.mpr ⟨max (C₁ + C₂ + 1) 1, fun n ↦ ?_⟩
   cases n with
   | zero => simp only [range_zero, sum_empty, lt_sup_iff, zero_lt_one, or_true]
   | succ n =>
