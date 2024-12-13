@@ -163,3 +163,9 @@ theorem Summable.of_norm {f : ι → E} (hf : Summable fun a => ‖f a‖) : Sum
 
 theorem Summable.of_nnnorm {f : ι → E} (hf : Summable fun a => ‖f a‖₊) : Summable f :=
   .of_nnnorm_bounded _ hf fun _i => le_rfl
+
+theorem summable_of_partial_sums_norm_bounded {E : Type*} [SeminormedAddCommGroup E]
+    [CompleteSpace E] (f : ℕ → E)
+    (hf : ∃ C, ∀ n, ∑ i ∈ Finset.range n, ‖f i‖ < C) :
+    Summable f :=
+  Summable.of_norm (by rwa [summable_iff_partial_sums_bounded_of_nonneg (fun _ ↦ norm_nonneg _)])
