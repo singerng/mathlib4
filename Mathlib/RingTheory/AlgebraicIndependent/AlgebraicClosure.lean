@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Junyan Xu
 -/
 import Mathlib.FieldTheory.AlgebraicClosure
+import Mathlib.RingTheory.Algebraic.Basic
 import Mathlib.RingTheory.Algebraic.Integral
 import Mathlib.RingTheory.AlgebraicIndependent.Transcendental
 
@@ -73,3 +74,5 @@ protected theorem algebraicClosure {F E : Type*} [Field F] [Field E] [Algebra F 
   hx.extendScalars Subtype.val_injective
 
 end AlgebraicIndependent
+
+theorem IsTranscendenceBasis ...

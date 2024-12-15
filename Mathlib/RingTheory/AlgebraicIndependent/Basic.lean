@@ -19,10 +19,6 @@ This file contains basic results on algebraic independence of a family of elemen
 
 * [Stacks: Transcendence](https://stacks.math.columbia.edu/tag/030D)
 
-## TODO
-Define the transcendence degree and show it is independent of the choice of a
-transcendence basis.
-
 ## Tags
 transcendence basis, transcendence degree, transcendence
 
@@ -31,12 +27,20 @@ transcendence basis, transcendence degree, transcendence
 
 noncomputable section
 
-open Function Set Subalgebra MvPolynomial Algebra
+open Cardinal Function Set Subalgebra MvPolynomial Algebra
 
 open scoped Classical
 
 variable {ι ι' R K A A' : Type*} {x : ι → A}
 variable [CommRing R] [CommRing A] [CommRing A'] [Algebra R A] [Algebra R A']
+
+variable (R A) in
+/-- The transcendence degree of a commutative algebra `A` over a commutative ring `R` is
+defined to be the maximal cardinality of an `R`-algebraically independent set in `A`. -/
+def TranscendenceDegree : Cardinal :=
+  ⨆ ι : { s : Set A // AlgebraicIndependent R ((↑) : s → A) }, #ι.1
+
+noncomputable alias trdeg := TranscendenceDegree
 
 theorem algebraicIndependent_iff_ker_eq_bot :
     AlgebraicIndependent R x ↔
